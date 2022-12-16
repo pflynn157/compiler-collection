@@ -13,13 +13,13 @@ extern "C" {
 // Called if a conditional statement has only one operand. If it does,
 // we have to expand to have two operands before we get down to the
 // compiler layer
-AstExpression *Parser::checkCondExpression(AstExpression *toCheck) {
+AstExpression *Parser::checkCondExpression(AstBlock *block, AstExpression *toCheck) {
     AstExpression *expr = toCheck;
     
     switch (toCheck->getType()) {
         case V_AstType::ID: {
             AstID *id = static_cast<AstID *>(toCheck);
-            AstDataType *dataType = typeMap[id->getValue()];            
+            AstDataType *dataType = block->getDataType(id->getValue());            
             AstEQOp *eq = new AstEQOp;
             eq->setLVal(id);
             
@@ -52,17 +52,21 @@ AstExpression *Parser::checkCondExpression(AstExpression *toCheck) {
 // Builds a conditional statement
 bool Parser::buildConditional(AstBlock *block) {
     AstIfStmt *cond = new AstIfStmt;
-    AstExpression *arg = buildExpression(nullptr, t_then);
+    AstExpression *arg = buildExpression(block, nullptr, t_then);
     if (!arg) return false;
     cond->setExpression(arg);
     block->addStatement(cond);
     
-    AstExpression *expr = checkCondExpression(cond->getExpression());
+    AstExpression *expr = checkCondExpression(block, cond->getExpression());
     cond->setExpression(expr);
     
     AstBlock *trueBlock = new AstBlock;
+    trueBlock->mergeSymbols(block);
     cond->setTrueBlock(trueBlock);
-    cond->setFalseBlock(new AstBlock);
+    
+    AstBlock *falseBlock = new AstBlock;
+    falseBlock->mergeSymbols(block);
+    cond->setFalseBlock(falseBlock);
     buildBlock(trueBlock, cond);
     
     return true;
@@ -71,15 +75,16 @@ bool Parser::buildConditional(AstBlock *block) {
 // Builds a while statement
 bool Parser::buildWhile(AstBlock *block) {
     AstWhileStmt *loop = new AstWhileStmt;
-    AstExpression *arg = buildExpression(nullptr, t_do);
+    AstExpression *arg = buildExpression(block, nullptr, t_do);
     if (!arg) return false;
     loop->setExpression(arg);
     block->addStatement(loop);
     
-    AstExpression *expr = checkCondExpression(loop->getExpression());
+    AstExpression *expr = checkCondExpression(block, loop->getExpression());
     loop->setExpression(expr);
     
     AstBlock *block2 = new AstBlock;
+    block2->mergeSymbols(block);
     buildBlock(block2);
     loop->setBlock(block2);
     

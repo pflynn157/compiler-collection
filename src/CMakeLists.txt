@@ -25,6 +25,7 @@ set(SRC
     #${CMAKE_BINARY_DIR}/src/lex.cpp
     #${CMAKE_BINARY_DIR}/src/lex_debug.cpp
     
+    ast/ast.cpp
     ast/ast_builder.cpp
     ast/astdot.cpp
     

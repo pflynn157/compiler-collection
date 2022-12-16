@@ -100,13 +100,13 @@ bool Parser::buildOperator(token tk, ExprContext *ctx) {
     return true;        
 }
 
-bool Parser::buildIDExpr(token tk, ExprContext *ctx) {
+bool Parser::buildIDExpr(AstBlock *block, token tk, ExprContext *ctx) {
     ctx->lastWasOp = false;
     int currentLine = 0;
 
     std::string name = lex_get_id(scanner);
     if (ctx->varType && ctx->varType->getType() == V_AstType::Void) {
-        ctx->varType = typeMap[name];
+        ctx->varType = block->getDataType(name);
         if (ctx->varType && ctx->varType->getType() == V_AstType::Ptr)
             ctx->varType = static_cast<AstPointerType *>(ctx->varType)->getBaseType();
     }
@@ -115,7 +115,11 @@ bool Parser::buildIDExpr(token tk, ExprContext *ctx) {
     if (tk == t_lbracket) {
         //AstExpression *index = nullptr;
         //buildExpression(nullptr, DataType::I32, RBracket, EmptyToken, &index);
-        AstExpression *index = buildExpression(AstBuilder::buildInt32Type(), t_rbracket);
+        AstExpression *index = buildExpression(block, AstBuilder::buildInt32Type(), t_rbracket);
+        if (index == nullptr) {
+            syntax->addError(0, "Invalid array reference.");
+            return false;
+        }
         
         AstArrayAccess *acc = new AstArrayAccess(name);
         acc->setIndex(index);
@@ -131,7 +135,7 @@ bool Parser::buildIDExpr(token tk, ExprContext *ctx) {
         }
     
         AstFuncCallExpr *fc = new AstFuncCallExpr(name);
-        AstExpression *args = buildExpression(ctx->varType, t_rparen, false, true);
+        AstExpression *args = buildExpression(block, ctx->varType, t_rparen, false, true);
         fc->setArgExpression(args);
         
         ctx->output.push(fc);
@@ -157,7 +161,7 @@ bool Parser::buildIDExpr(token tk, ExprContext *ctx) {
                 ctx->output.push(expr);
             }
         } else {
-            if (isVar(name)) {
+            if (block->isVar(name)) {
                 AstID *id = new AstID(name);
                 ctx->output.push(id);
             } else {
@@ -239,7 +243,7 @@ bool Parser::applyAssoc(ExprContext *ctx) {
 }
 
 // Our new expression builder
-AstExpression *Parser::buildExpression(AstDataType *currentType, token stopToken, bool isConst, bool buildList) {
+AstExpression *Parser::buildExpression(AstBlock *block, AstDataType *currentType, token stopToken, bool isConst, bool buildList) {
     ExprContext *ctx = new ExprContext;
     if (currentType) ctx->varType = currentType;
     else ctx->varType = AstBuilder::buildVoidType();
@@ -261,7 +265,7 @@ AstExpression *Parser::buildExpression(AstDataType *currentType, token stopToken
             } break;
             
             case t_id: {
-                if (!buildIDExpr(tk, ctx)) return nullptr;
+                if (!buildIDExpr(block, tk, ctx)) return nullptr;
             } break;
             
             case t_assign:
@@ -287,7 +291,7 @@ AstExpression *Parser::buildExpression(AstDataType *currentType, token stopToken
             } break;
             
             case t_lparen: {
-                AstExpression *subExpr = buildExpression(ctx->varType, t_rparen, false, isList);
+                AstExpression *subExpr = buildExpression(block, ctx->varType, t_rparen, false, isList);
                 if (!subExpr) {
                     return nullptr;
                 }

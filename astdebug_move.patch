@@ -1,0 +1,40 @@
+From 5406b721f459b6838f77a8ab55af5d5eeccb4d5c Mon Sep 17 00:00:00 2001
+From: Patrick Flynn <pflynn157@gmail.com>
+Date: Fri, 16 Dec 2022 09:40:03 -0500
+Subject: [PATCH] Moved AST debug code into separate file
+
+---
+ src/CMakeLists.txt              | 3 +--
+ src/{debug => ast}/AstDebug.cpp | 0
+ src/{debug => ast}/AstDebug.hpp | 0
+ 3 files changed, 1 insertion(+), 2 deletions(-)
+ rename src/{debug => ast}/AstDebug.cpp (100%)
+ rename src/{debug => ast}/AstDebug.hpp (100%)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index ff44975..ef58707 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -25,10 +25,9 @@ set(SRC
+     
+     ast/ast.cpp
+     ast/ast_builder.cpp
++    ast/AstDebug.cpp
+     ast/astdot.cpp
+     
+-    debug/AstDebug.cpp
+-    
+     parser/ErrorManager.cpp
+     parser/Expression.cpp
+     parser/Flow.cpp
+diff --git a/src/debug/AstDebug.cpp b/src/ast/AstDebug.cpp
+similarity index 100%
+rename from src/debug/AstDebug.cpp
+rename to src/ast/AstDebug.cpp
+diff --git a/src/debug/AstDebug.hpp b/src/ast/AstDebug.hpp
+similarity index 100%
+rename from src/debug/AstDebug.hpp
+rename to src/ast/AstDebug.hpp
+-- 
+2.34.5
+

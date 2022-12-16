@@ -171,14 +171,29 @@ class AstBlock : public AstNode {
 public:
     AstBlock() : AstNode(V_AstType::Block) {}
 
-    void addStatement(AstStatement *stmt) { block.push_back(stmt); }
-    void addStatements(std::vector<AstStatement *> block) { this->block = block; }
-    std::vector<AstStatement *> getBlock() { return block; }
+    void addStatement(AstStatement *stmt);
+    void addStatements(std::vector<AstStatement *> block);
+    std::vector<AstStatement *> getBlock();
+    
+    size_t getBlockSize();
+    AstStatement *getStatementAt(size_t i);
+    
+    void removeAt(size_t pos);
+    void insertAt(AstStatement *stmt, size_t pos);
+    
+    void addSymbol(std::string name, AstDataType *dataType);
+    void mergeSymbols(AstBlock *parent);
+    std::map<std::string, AstDataType *> getSymbolTable();
+    AstDataType *getDataType(std::string name);
+    
+    bool isVar(std::string name);
     
     void print(int indent = 4);
     std::string dot(std::string parent);
-private:
+protected:
     std::vector<AstStatement *> block;
+    std::map<std::string, AstDataType *> symbolTable;
+    std::vector<std::string> vars;
 };
 
 // Represents a struct

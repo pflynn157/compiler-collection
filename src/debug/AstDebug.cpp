@@ -77,6 +77,22 @@ void AstFunction::print() {
 }
 
 void AstBlock::print(int indent) {
+    // Print the symbol table
+    for (int i = 0; i<indent; i++) std::cout << " ";
+    std::cout << "[" << std::endl;
+    
+    for (auto const &x : symbolTable) {
+        for (int i = 0; i<indent+2; i++) std::cout << " ";
+        std::cout << "SYM: " << x.first << " : ";
+        if (x.second) x.second->print();
+        else std::cout << "<NULL TYPE>";
+        std::cout << std::endl;
+    }
+    
+    for (int i = 0; i<indent; i++) std::cout << " ";
+    std::cout << "]" << std::endl;
+
+    // Print the block
     for (int i = 0; i<indent; i++) std::cout << " ";
     std::cout << "{" << std::endl;
     

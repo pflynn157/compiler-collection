@@ -14,7 +14,7 @@ extern "C" {
 }
 
 // Returns the function arguments
-bool Parser::getFunctionArgs(std::vector<Var> &args) {
+bool Parser::getFunctionArgs(AstBlock *block, std::vector<Var> &args) {
     token tk = lex_get_next(scanner);
     if (tk == t_lparen) {
         tk = lex_get_next(scanner);
@@ -36,7 +36,6 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
             
             v.type = buildDataType();
             v.name = name;
-            vars.push_back(name);
             
             tk = lex_get_next(scanner);
             if (tk == t_comma) {
@@ -44,7 +43,7 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
             }
             
             args.push_back(v);
-            typeMap[v.name] = v.type;
+            block->addSymbol(v.name, v.type);
         }
     } else {
         lex_rewind(scanner, tk);
@@ -55,9 +54,7 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
 
 // Builds a function
 bool Parser::buildFunction(token startToken, std::string className) {
-    typeMap.clear();
     localConsts.clear();
-    vars.clear();
     
     token tk;
     bool isExtern = false;
@@ -78,7 +75,8 @@ bool Parser::buildFunction(token startToken, std::string className) {
     
     // Get arguments
     std::vector<Var> args;
-    if (!getFunctionArgs(args)) return false;
+    AstBlock *block = new AstBlock;
+    if (!getFunctionArgs(block, args)) return false;
 
     // Check to see if there's any return type
     //std::string retName = "";       // TODO: Do we need this?
@@ -114,6 +112,7 @@ bool Parser::buildFunction(token startToken, std::string className) {
     func->setDataType(dataType);
     func->setArguments(args);
     tree->addGlobalStatement(func);
+    func->getBlock()->mergeSymbols(block);
     
     // Build the body
     int stopLayer = 0;
@@ -153,7 +152,7 @@ bool Parser::buildFunctionCallStmt(AstBlock *block, token idToken) {
     AstFuncCallStmt *fc = new AstFuncCallStmt(lex_get_id(scanner));
     block->addStatement(fc);
     
-    AstExpression *args = buildExpression(nullptr, t_semicolon, false, true);
+    AstExpression *args = buildExpression(block, nullptr, t_semicolon, false, true);
     if (!args) return false;
     fc->setExpression(args);
     
@@ -165,7 +164,7 @@ bool Parser::buildReturn(AstBlock *block) {
     AstReturnStmt *stmt = new AstReturnStmt;
     block->addStatement(stmt);
     
-    AstExpression *arg = buildExpression(nullptr);
+    AstExpression *arg = buildExpression(block, nullptr);
     if (!arg) return false;
     stmt->setExpression(arg);
     

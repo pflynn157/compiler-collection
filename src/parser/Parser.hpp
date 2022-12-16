@@ -32,7 +32,7 @@ public:
     void debugScanner();
 protected:
     // Function.cpp
-    bool getFunctionArgs(std::vector<Var> &args);
+    bool getFunctionArgs(AstBlock *block, std::vector<Var> &args);
     bool buildFunction(token startToken, std::string className = "");
     bool buildFunctionCallStmt(AstBlock *block, token idToken);
     bool buildReturn(AstBlock *block);
@@ -62,14 +62,14 @@ protected:
     
     AstExpression *buildConstExpr(token tk);
     bool buildOperator(token tk, ExprContext *ctx);
-    bool buildIDExpr(token tk, ExprContext *ctx);
+    bool buildIDExpr(AstBlock *block, token tk, ExprContext *ctx);
     bool applyHigherPred(ExprContext *ctx);
     bool applyAssoc(ExprContext *ctx);
-    AstExpression *buildExpression(AstDataType *currentType, token stopToken = t_semicolon, bool isConst = false, bool buildList = false);
+    AstExpression *buildExpression(AstBlock *block, AstDataType *currentType, token stopToken = t_semicolon, bool isConst = false, bool buildList = false);
     AstExpression *checkExpression(AstExpression *expr, AstDataType *varType);
     
     bool buildBlock(AstBlock *block, AstNode *parent = nullptr);
-    AstExpression *checkCondExpression(AstExpression *toCheck);
+    AstExpression *checkCondExpression(AstBlock *block, AstExpression *toCheck);
     int isConstant(std::string name);
     bool isVar(std::string name);
     bool isFunc(std::string name);
@@ -81,10 +81,8 @@ private:
     AstTree *tree;
     ErrorManager *syntax;
     
-    std::map<std::string, AstDataType *> typeMap;
     std::map<std::string, std::pair<AstDataType *, AstExpression*>> globalConsts;
     std::map<std::string, std::pair<AstDataType *, AstExpression*>> localConsts;
-    std::vector<std::string> vars;
     std::vector<std::string> funcs;
 };
 

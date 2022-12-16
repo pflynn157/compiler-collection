@@ -250,13 +250,6 @@ int Parser::isConstant(std::string name) {
     return 0;
 }
 
-bool Parser::isVar(std::string name) {
-    if (std::find(vars.begin(), vars.end(), name) != vars.end()) {
-        return true;
-    }
-    return false;
-}
-
 bool Parser::isFunc(std::string name) {
     if (std::find(funcs.begin(), funcs.end(), name) != funcs.end()) {
         return true;

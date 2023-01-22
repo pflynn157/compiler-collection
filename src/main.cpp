@@ -36,7 +36,7 @@ AstTree *getAstTree(std::string input, bool testLex, bool printAst, bool emitDot
     tree = frontend->getTree();
     
     delete frontend;
-    remove(input.c_str());
+    //remove(input.c_str());
     
     if (printAst) {
         tree->print();

@@ -9,65 +9,69 @@
 #include <ast/ast.hpp>
 #include <ast/ast_builder.hpp>
 
+extern "C" {
+#include <lex/lex.h>
+}
+
 // Returns the function arguments
 bool Parser::getFunctionArgs(std::vector<Var> &args) {
-    Token token = scanner->getNext();
-    if (token.type == LParen) {
-        token = scanner->getNext();
-        while (token.type != Eof && token.type != RParen) {
-            Token t1 = token;
-            Token t2 = scanner->getNext();
+    token tk = lex_get_next(scanner);
+    if (tk == t_lparen) {
+        tk = lex_get_next(scanner);
+        while (tk != t_eof && tk != t_rparen) {
+            token t1 = tk;
+            token t2 = lex_get_next(scanner);
             Var v;
             
-            if (t1.type != Id) {
-                syntax->addError(scanner->getLine(), "Invalid function argument: Expected name.");
+            if (t1 != t_id) {
+                syntax->addError(0, "Invalid function argument: Expected name.");
                 return false;
             }
             
-            if (t2.type != Colon) {
-                syntax->addError(scanner->getLine(), "Invalid function argument: Expected \':\'.");
+            if (t2 != t_colon) {
+                syntax->addError(0, "Invalid function argument: Expected \':\'.");
                 return false;
             }
             
             v.type = buildDataType();
-            v.name = t1.id_val;
-            vars.push_back(t1.id_val);
+            v.name = lex_get_id(scanner);
+            vars.push_back(lex_get_id(scanner));
             
-            token = scanner->getNext();
-            if (token.type == Comma) {
-                token = scanner->getNext();
+            tk = lex_get_next(scanner);
+            if (tk == t_comma) {
+                tk = lex_get_next(scanner);
             }
             
             args.push_back(v);
             typeMap[v.name] = v.type;
         }
     } else {
-        scanner->rewind(token);
+        lex_rewind(scanner, tk);
     }
     
     return true;
 }
 
 // Builds a function
-bool Parser::buildFunction(Token startToken, std::string className) {
+bool Parser::buildFunction(token startToken, std::string className) {
     typeMap.clear();
     localConsts.clear();
     vars.clear();
     
-    Token token;
+    token tk;
     bool isExtern = false;
 
     // Handle extern function
-    if (startToken.type == Extern) {
+    if (startToken == t_extern) {
         isExtern = true;
     }
 
     // Make sure we have a function name
-    token = scanner->getNext();
-    std::string funcName = token.id_val;
+    tk = lex_get_next(scanner);
+    std::string funcName = lex_get_id(scanner);
     
-    if (token.type != Id) {
-        syntax->addError(scanner->getLine(), "Expected function name.");
+    if (tk != t_id) {
+        syntax->addError(0, "Expected function name.");
         return false;
     }
     
@@ -77,20 +81,20 @@ bool Parser::buildFunction(Token startToken, std::string className) {
 
     // Check to see if there's any return type
     //std::string retName = "";       // TODO: Do we need this?
-    token = scanner->getNext();
+    tk = lex_get_next(scanner);
     AstDataType *dataType;
-    if (token.type == Arrow) {
+    if (tk == t_arrow) {
         dataType = buildDataType();
-        token = scanner->getNext();
+        tk = lex_get_next(scanner);
     }
     else dataType = AstBuilder::buildVoidType();
     
     // Do syntax error check
-    if (token.type == SemiColon && !isExtern) {
-        syntax->addError(scanner->getLine(), "Expected \';\' for extern function.");
+    if (tk == t_semicolon && !isExtern) {
+        syntax->addError(0, "Expected \';\' for extern function.");
         return false;
-    } else if (token.type == Is && isExtern) {
-        syntax->addError(scanner->getLine(), "Expected \'is\' keyword.");
+    } else if (tk == t_is && isExtern) {
+        syntax->addError(0, "Expected \'is\' keyword.");
         return false;
     }
 
@@ -119,17 +123,17 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     if (lastType == V_AstType::Return) {
         AstStatement *ret = func->getBlock()->getBlock().back();
         if (func->getDataType()->getType() == V_AstType::Void && ret->hasExpression()) {
-            syntax->addError(scanner->getLine(), "Cannot return from void function.");
+            syntax->addError(0, "Cannot return from void function.");
             return false;
         } else if (!ret->hasExpression()) {
-            syntax->addError(scanner->getLine(), "Expected return value.");
+            syntax->addError(0, "Expected return value.");
             return false;
         }
     } else {
         if (func->getDataType()->getType() == V_AstType::Void) {
             func->addStatement(new AstReturnStmt);
         } else {
-            syntax->addError(scanner->getLine(), "Expected return statement.");
+            syntax->addError(0, "Expected return statement.");
             return false;
         }
     }
@@ -138,17 +142,17 @@ bool Parser::buildFunction(Token startToken, std::string className) {
 }
 
 // Builds a function call
-bool Parser::buildFunctionCallStmt(AstBlock *block, Token idToken) {
+bool Parser::buildFunctionCallStmt(AstBlock *block, token idToken) {
     // Make sure the function exists
-    if (!isFunc(idToken.id_val)) {
-        syntax->addError(scanner->getLine(), "Unknown function.");
+    if (!isFunc(lex_get_id(scanner))) {
+        syntax->addError(0, "Unknown function.");
         return false;
     }
 
-    AstFuncCallStmt *fc = new AstFuncCallStmt(idToken.id_val);
+    AstFuncCallStmt *fc = new AstFuncCallStmt(lex_get_id(scanner));
     block->addStatement(fc);
     
-    AstExpression *args = buildExpression(nullptr, SemiColon, false, true);
+    AstExpression *args = buildExpression(nullptr, t_semicolon, false, true);
     if (!args) return false;
     fc->setExpression(args);
     

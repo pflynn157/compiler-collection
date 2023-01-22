@@ -7,7 +7,9 @@
 #include <iostream>
 #include <cstdio>
 
-#include <lex.hpp>
+extern "C" {
+#include <lex/lex.h>
+}
 
 std::string getInputPath(std::string input) {
     std::string name = "";
@@ -23,18 +25,22 @@ std::string getInputPath(std::string input) {
 }
 
 std::string preprocessFile(std::string input, bool print) {
-    std::string newPath = "/tmp/" + getInputPath(input);
-    Scanner *scanner = new Scanner(input);
-    if (scanner->isError()) {
-        return "";
+    return input;
+    /*std::string newPath = "/tmp/" + getInputPath(input);
+    
+    FILE *file = fopen(input.c_str(), "r");
+    std::string input_str = "";
+    while (!feof(file)) {
+        input_str += fgetc(file);
     }
+    Scanner *scanner = lex_init_string((char *)input_str.c_str());
     
     std::string content = "";
     
     // Read until the end of the file
-    Token token;
-    while (!scanner->isEof() && token.type != Eof) {
-        token = scanner->getNext();
+    token tk;
+    while (tk != t_eof) {
+        tk = lex_get_next(scanner);
         
         if (token.type != Import) {
             content += scanner->getRawBuffer();
@@ -99,6 +105,6 @@ std::string preprocessFile(std::string input, bool print) {
     }
     
     delete scanner;
-    return newPath;
+    return newPath;*/
 }
 

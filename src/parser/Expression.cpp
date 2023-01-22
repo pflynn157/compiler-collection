@@ -4,19 +4,24 @@
 // Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <iostream>
+#include <stack>
 
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
 #include <ast/ast_builder.hpp>
 
+extern "C" {
+#include <lex/lex.h>
+}
+
 // Builds a constant expression value
-AstExpression *Parser::buildConstExpr(Token token) {
-    switch (token.type) {
-        case True: return new AstI32(1);
-        case False: return new AstI32(0);
-        case CharL: return new AstChar(token.i8_val);
-        case Int32: return new AstI32(token.i32_val);
-        case String: return new AstString(token.id_val);
+AstExpression *Parser::buildConstExpr(token tk) {
+    switch (tk) {
+        case t_true: return new AstI32(1);
+        case t_false: return new AstI32(0);
+        //case CharL: return new AstChar(token.i8_val);
+        case t_int_literal: return new AstI32(lex_get_int(scanner));
+        //case String: return new AstString(token.id_val);
         
         default: {}
     }
@@ -24,46 +29,46 @@ AstExpression *Parser::buildConstExpr(Token token) {
     return nullptr;
 }
 
-bool Parser::buildOperator(Token token, ExprContext *ctx) {
-    switch (token.type) {
-        case Assign:
-        case Plus: 
-        case Minus:
-        case Mul:
-        case Div:
-        case Mod:
-        case And:
-        case Or:
-        case Xor:
-        case EQ:
-        case NEQ:
-        case GT:
-        case LT:
-        case GTE:
-        case LTE:
-        case Logical_And:
-        case Logical_Or: {
+bool Parser::buildOperator(token tk, ExprContext *ctx) {
+    switch (tk) {
+        case t_assign:
+        case t_plus: 
+        case t_minus:
+        case t_mul:
+        case t_div:
+        case t_dot:
+        case t_and:
+        case t_or:
+        case t_xor:
+        case t_eq:
+        case t_neq:
+        case t_gt:
+        case t_lt:
+        case t_gte:
+        case t_lte:
+        case t_lgand:
+        case t_lgor: {
             AstBinaryOp *op = new AstBinaryOp;
             AstUnaryOp *op1 = new AstUnaryOp;
             bool useUnary = false;
-            switch (token.type) {
-                case Assign: op = new AstAssignOp; break;
-                case Plus: op = new AstAddOp; break;
-                case Mul: op = new AstMulOp; break;
-                case Div: op = new AstDivOp; break;
-                case Mod: op = new AstModOp; break;
-                case And: op = new AstAndOp; break;
-                case Or: op = new AstOrOp; break;
-                case Xor: op = new AstXorOp; break;
-                case EQ: op = new AstEQOp; break;
-                case NEQ: op = new AstNEQOp; break;
-                case GT: op = new AstGTOp; break;
-                case LT: op = new AstLTOp; break;
-                case GTE: op = new AstGTEOp; break;
-                case LTE: op = new AstLTEOp; break;
-                case Logical_And: op = new AstLogicalAndOp; break;
-                case Logical_Or: op = new AstLogicalOrOp; break;
-                case Minus: {
+            switch (tk) {
+                case t_assign: op = new AstAssignOp; break;
+                case t_plus: op = new AstAddOp; break;
+                case t_mul: op = new AstMulOp; break;
+                case t_div: op = new AstDivOp; break;
+                case t_mod: op = new AstModOp; break;
+                case t_and: op = new AstAndOp; break;
+                case t_or: op = new AstOrOp; break;
+                case t_xor: op = new AstXorOp; break;
+                case t_eq: op = new AstEQOp; break;
+                case t_neq: op = new AstNEQOp; break;
+                case t_gt: op = new AstGTOp; break;
+                case t_lt: op = new AstLTOp; break;
+                case t_gte: op = new AstGTEOp; break;
+                case t_lte: op = new AstLTEOp; break;
+                case t_lgand: op = new AstLogicalAndOp; break;
+                case t_lgor: op = new AstLogicalOrOp; break;
+                case t_minus: {
                     if (ctx->lastWasOp) {
                         op1 = new AstNegOp;
                         useUnary = true;
@@ -94,51 +99,51 @@ bool Parser::buildOperator(Token token, ExprContext *ctx) {
     return true;        
 }
 
-bool Parser::buildIDExpr(Token token, ExprContext *ctx) {
+bool Parser::buildIDExpr(token tk, ExprContext *ctx) {
     ctx->lastWasOp = false;
-    int currentLine = scanner->getLine();
+    int currentLine = 0;
 
-    std::string name = token.id_val;
+    std::string name = lex_get_id(scanner);
     if (ctx->varType && ctx->varType->getType() == V_AstType::Void) {
         ctx->varType = typeMap[name];
         if (ctx->varType && ctx->varType->getType() == V_AstType::Ptr)
             ctx->varType = static_cast<AstPointerType *>(ctx->varType)->getBaseType();
     }
     
-    token = scanner->getNext();
-    if (token.type == LBracket) {
+    tk = lex_get_next(scanner);
+    if (tk == t_lbracket) {
         //AstExpression *index = nullptr;
         //buildExpression(nullptr, DataType::I32, RBracket, EmptyToken, &index);
-        AstExpression *index = buildExpression(AstBuilder::buildInt32Type(), RBracket);
+        AstExpression *index = buildExpression(AstBuilder::buildInt32Type(), t_rbracket);
         
         AstArrayAccess *acc = new AstArrayAccess(name);
         acc->setIndex(index);
         ctx->output.push(acc);
-    } else if (token.type == LParen) {
-        if (currentLine != scanner->getLine()) {
-            syntax->addWarning(scanner->getLine(), "Function call on newline- possible logic error.");
+    } else if (tk == t_lparen) {
+        if (currentLine != 0) {
+            syntax->addWarning(0, "Function call on newline- possible logic error.");
         }
         
         if (!isFunc(name)) {
-            syntax->addError(scanner->getLine(), "Unknown function call.");
+            syntax->addError(0, "Unknown function call.");
             return false;
         }
     
         AstFuncCallExpr *fc = new AstFuncCallExpr(name);
-        AstExpression *args = buildExpression(ctx->varType, RParen, false, true);
+        AstExpression *args = buildExpression(ctx->varType, t_rparen, false, true);
         fc->setArgExpression(args);
         
         ctx->output.push(fc);
-    } else if (token.type == Dot) {
+    } else if (tk == t_dot) {
         // TODO: Search for structures here
 
-        Token idToken = scanner->getNext();
-        if (idToken.type != Id) {
-            syntax->addError(scanner->getLine(), "Expected identifier.");
+        token idToken = lex_get_next(scanner);
+        if (idToken != t_id) {
+            syntax->addError(0, "Expected identifier.");
             return false;
         }
         
-        AstStructAccess *val = new AstStructAccess(name, idToken.id_val);
+        AstStructAccess *val = new AstStructAccess(name, lex_get_id(scanner));
         ctx->output.push(val);
     } else {
         int constVal = isConstant(name);
@@ -155,12 +160,12 @@ bool Parser::buildIDExpr(Token token, ExprContext *ctx) {
                 AstID *id = new AstID(name);
                 ctx->output.push(id);
             } else {
-                syntax->addError(scanner->getLine(), "Unknown variable.");
+                syntax->addError(0, "Unknown variable.");
                 return false;
             }
         }
         
-        scanner->rewind(token);
+        lex_rewind(scanner, tk);
     }
     return true;
 }
@@ -168,14 +173,14 @@ bool Parser::buildIDExpr(Token token, ExprContext *ctx) {
 // Applies higher precedence for an operator
 bool Parser::applyHigherPred(ExprContext *ctx) {
     if (ctx->output.empty()) {
-        syntax->addError(scanner->getLine(), "Invalid expression: No RVAL");
+        syntax->addError(0, "Invalid expression: No RVAL");
         return false;
     }
     AstExpression *rval = checkExpression(ctx->output.top(), ctx->varType);
     ctx->output.pop();
     
     if (ctx->output.empty()) {
-        syntax->addError(scanner->getLine(), "Invalid expression: No LVAL");
+        syntax->addError(0, "Invalid expression: No LVAL");
         return false;
     }
     AstExpression *lval = checkExpression(ctx->output.top(), ctx->varType);
@@ -196,14 +201,14 @@ bool Parser::applyAssoc(ExprContext *ctx) {
     V_AstType lastOp = V_AstType::None;
     while (ctx->opStack.size() > 0) {
         if (ctx->output.empty()) {
-            syntax->addError(scanner->getLine(), "Invalid expression: No RVAL");
+            syntax->addError(0, "Invalid expression: No RVAL");
             return false;
         }
         AstExpression *rval = checkExpression(ctx->output.top(), ctx->varType);
         ctx->output.pop();
         
         if (ctx->output.empty()) {
-            syntax->addError(scanner->getLine(), "Invalid expression: No LVAL");
+            syntax->addError(0, "Invalid expression: No LVAL");
             return false;
         }
         AstExpression *lval = checkExpression(ctx->output.top(), ctx->varType);
@@ -233,7 +238,7 @@ bool Parser::applyAssoc(ExprContext *ctx) {
 }
 
 // Our new expression builder
-AstExpression *Parser::buildExpression(AstDataType *currentType, TokenType stopToken, bool isConst, bool buildList) {
+AstExpression *Parser::buildExpression(AstDataType *currentType, token stopToken, bool isConst, bool buildList) {
     ExprContext *ctx = new ExprContext;
     if (currentType) ctx->varType = currentType;
     else ctx->varType = AstBuilder::buildVoidType();
@@ -241,47 +246,47 @@ AstExpression *Parser::buildExpression(AstDataType *currentType, TokenType stopT
     AstExprList *list = new AstExprList;
     bool isList = buildList;
     
-    Token token = scanner->getNext();
-    while (token.type != Eof && token.type != stopToken) {
-        switch (token.type) {
-            case True:
-            case False:
-            case CharL:
-            case Int32:
-            case String: {
+    token tk = lex_get_next(scanner);
+    while (tk != t_eof && tk != stopToken) {
+        switch (tk) {
+            case t_true:
+            case t_false:
+            //case CharL:
+            case t_int_literal:
+            /*case String:*/ {
                 ctx->lastWasOp = false;
-                AstExpression *expr = buildConstExpr(token);
+                AstExpression *expr = buildConstExpr(tk);
                 ctx->output.push(expr);
             } break;
             
-            case Id: {
-                if (!buildIDExpr(token, ctx)) return nullptr;
+            case t_id: {
+                if (!buildIDExpr(tk, ctx)) return nullptr;
             } break;
             
-            case Assign:
-            case Plus: 
-            case Minus:
-            case Mul:
-            case Div:
-            case Mod:
-            case And:
-            case Or:
-            case Xor:
-            case EQ:
-            case NEQ:
-            case GT:
-            case LT:
-            case GTE:
-            case LTE:
-            case Logical_And:
-            case Logical_Or: {
-                if (!buildOperator(token, ctx)) {
+            case t_assign:
+            case t_plus: 
+            case t_minus:
+            case t_mul:
+            case t_div:
+            case t_mod:
+            case t_and:
+            case t_or:
+            case t_xor:
+            case t_eq:
+            case t_neq:
+            case t_gt:
+            case t_lt:
+            case t_gte:
+            case t_lte:
+            case t_lgand:
+            case t_lgor: {
+                if (!buildOperator(tk, ctx)) {
                     return nullptr;
                 }
             } break;
             
-            case LParen: {
-                AstExpression *subExpr = buildExpression(ctx->varType, RParen, false, isList);
+            case t_lparen: {
+                AstExpression *subExpr = buildExpression(ctx->varType, t_rparen, false, isList);
                 if (!subExpr) {
                     return nullptr;
                 }
@@ -290,9 +295,9 @@ AstExpression *Parser::buildExpression(AstDataType *currentType, TokenType stopT
             } break;
             
             // TODO: We need some syntax checking with this
-            case RParen: break;
+            case t_rparen: break;
             
-            case Comma: {
+            case t_comma: {
                 applyAssoc(ctx);
                 AstExpression *expr = checkExpression(ctx->output.top(), ctx->varType);
                 list->addExpression(expr);
@@ -302,7 +307,7 @@ AstExpression *Parser::buildExpression(AstDataType *currentType, TokenType stopT
             } break;
             
             default: {
-                syntax->addError(scanner->getLine(), "Invalid token in expression.");
+                syntax->addError(0, "Invalid token in expression.");
                 return nullptr;
             }
         }
@@ -319,11 +324,11 @@ AstExpression *Parser::buildExpression(AstDataType *currentType, TokenType stopT
             }
         }
         
-        token = scanner->getNext();
+        tk = lex_get_next(scanner);
     }
     
-    if (token.type == Eof) {
-        syntax->addError(scanner->getLine(), "Invalid expression-> missing \';\'.");
+    if (tk == t_eof) {
+        syntax->addError(0, "Invalid expression-> missing \';\'.");
         return nullptr;
     }
     

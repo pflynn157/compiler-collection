@@ -11,52 +11,56 @@
 #include <ast/ast.hpp>
 #include <ast/ast_builder.hpp>
 
+extern "C" {
+#include <lex/lex.h>
+}
+
 // Builds a variable declaration
 // A variable declaration is composed of an Alloca and optionally, an assignment
 bool Parser::buildVariableDec(AstBlock *block) {
-    Token token = scanner->getNext();
+    token tk = lex_get_next(scanner);
     std::vector<std::string> toDeclare;
-    toDeclare.push_back(token.id_val);
+    toDeclare.push_back(lex_get_id(scanner));
     
-    if (token.type != Id) {
-        syntax->addError(scanner->getLine(), "Expected variable name.");
+    if (tk != t_id) {
+        syntax->addError(0, "Expected variable name.");
         return false;
     }
     
-    token = scanner->getNext();
+    tk = lex_get_next(scanner);
     
-    while (token.type != Colon) {
-        if (token.type == Comma) {
-            token = scanner->getNext();
+    while (tk != t_colon) {
+        if (tk == t_comma) {
+            tk = lex_get_next(scanner);
             
-            if (token.type != Id) {
-                syntax->addError(scanner->getLine(), "Expected variable name.");
+            if (tk != t_id) {
+                syntax->addError(0, "Expected variable name.");
                 return false;
             }
             
-            toDeclare.push_back(token.id_val);
-        } else if (token.type != Colon) {
-            syntax->addError(scanner->getLine(), "Invalid token in variable declaration.");
+            toDeclare.push_back(lex_get_id(scanner));
+        } else if (tk != t_colon) {
+            syntax->addError(0, "Invalt_id tk in variable declaration.");
             return false;
         }
         
-        token = scanner->getNext();
+        tk = lex_get_next(scanner);
     }
     
     AstDataType *dataType = buildDataType(false);
-    token = scanner->getNext();
+    tk = lex_get_next(scanner);
     
     // We have an array
-    if (token.type == LBracket) {
+    if (tk == t_lbracket) {
         dataType = AstBuilder::buildPointerType(dataType);
         AstVarDec *empty = new AstVarDec("", dataType);
-        AstExpression *arg = buildExpression(AstBuilder::buildInt32Type(), RBracket);
+        AstExpression *arg = buildExpression(AstBuilder::buildInt32Type(), t_rbracket);
         if (!arg) return false;
         empty->setExpression(arg); 
         
-        token = scanner->getNext();
-        if (token.type != SemiColon) {
-            syntax->addError(scanner->getLine(), "Error: Expected \';\'.");
+        tk = lex_get_next(scanner);
+        if (tk != t_semicolon) {
+            syntax->addError(0, "Error: Expected \';\'.");
             return false;
         }
         
@@ -101,8 +105,8 @@ bool Parser::buildVariableDec(AstBlock *block) {
         }
     
     // We're at the end of the declaration
-    } else if (token.type == SemiColon) {
-        syntax->addError(scanner->getLine(), "Expected init expression.");
+    } else if (tk == t_semicolon) {
+        syntax->addError(0, "Expected init expression.");
         return false;
         
     // Otherwise, we have a regular variable
@@ -131,8 +135,8 @@ bool Parser::buildVariableDec(AstBlock *block) {
 }
 
 // Builds a variable or an array assignment
-bool Parser::buildVariableAssign(AstBlock *block, Token idToken) {
-    AstDataType *dataType = typeMap[idToken.id_val];
+bool Parser::buildVariableAssign(AstBlock *block, token t_idToken) {
+    AstDataType *dataType = typeMap[lex_get_id(scanner)];
     
     // TODO: This abomination is temporar
     AstExpression *expr = buildExpression(dataType);
@@ -148,19 +152,19 @@ bool Parser::buildVariableAssign(AstBlock *block, Token idToken) {
 
 // Builds a constant variable
 bool Parser::buildConst(bool isGlobal) {
-    Token token = scanner->getNext();
-    std::string name = token.id_val;
+    token tk = lex_get_next(scanner);
+    std::string name = lex_get_id(scanner);
     
     // Make sure we have a name for our constant
-    if (token.type != Id) {
-        syntax->addError(scanner->getLine(), "Expected constant name.");
+    if (tk != t_id) {
+        syntax->addError(0, "Expected constant name.");
         return false;
     }
     
     // Syntax check
-    token = scanner->getNext();
-    if (token.type != Colon) {
-        syntax->addError(scanner->getLine(), "Expected \':\' in constant expression.");
+    tk = lex_get_next(scanner);
+    if (tk != t_colon) {
+        syntax->addError(0, "Expected \':\' in constant expression.");
         return false;
     }
     
@@ -168,14 +172,14 @@ bool Parser::buildConst(bool isGlobal) {
     AstDataType *dataType = buildDataType(false);
     
     // Final syntax check
-    token = scanner->getNext();
-    if (token.type != Assign) {
-        syntax->addError(scanner->getLine(), "Expected \'=\' after const assignment.");
+    tk = lex_get_next(scanner);
+    if (tk != t_assign) {
+        syntax->addError(0, "Expected \'=\' after const assignment.");
         return false;
     }
     
     // Build the expression. We create a dummy statement for this
-    AstExpression *expr = buildExpression(dataType, SemiColon, true);
+    AstExpression *expr = buildExpression(dataType, t_semicolon, true);
     if (!expr) return false;
     
     // Put it all together

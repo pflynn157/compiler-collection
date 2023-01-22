@@ -7,10 +7,14 @@
 
 #include <string>
 #include <map>
+#include <stack>
 
-#include <lex.hpp>
 #include <parser/ErrorManager.hpp>
 #include <ast/ast.hpp>
+
+extern "C" {
+#include <lex/lex.h>
+}
 
 // The parser class
 // The parser is in charge of performing all parsing and AST-building tasks
@@ -29,13 +33,13 @@ public:
 protected:
     // Function.cpp
     bool getFunctionArgs(std::vector<Var> &args);
-    bool buildFunction(Token startToken, std::string className = "");
-    bool buildFunctionCallStmt(AstBlock *block, Token idToken);
+    bool buildFunction(token startToken, std::string className = "");
+    bool buildFunctionCallStmt(AstBlock *block, token idToken);
     bool buildReturn(AstBlock *block);
     
     // Variable.cpp
     bool buildVariableDec(AstBlock *block);
-    bool buildVariableAssign(AstBlock *block, Token idToken);
+    bool buildVariableAssign(AstBlock *block, token idToken);
     bool buildConst(bool isGlobal);
     
     // Flow.cpp
@@ -45,7 +49,7 @@ protected:
     
     // Structure.cpp
     bool buildStruct();
-    bool buildStructMember(AstStruct *str, Token token);
+    bool buildStructMember(AstStruct *str, token tk);
     bool buildStructDec(AstBlock *block);
     
     // Expression.cpp
@@ -56,12 +60,12 @@ protected:
         bool lastWasOp = true;
     };
     
-    AstExpression *buildConstExpr(Token token);
-    bool buildOperator(Token token, ExprContext *ctx);
-    bool buildIDExpr(Token token, ExprContext *ctx);
+    AstExpression *buildConstExpr(token tk);
+    bool buildOperator(token tk, ExprContext *ctx);
+    bool buildIDExpr(token tk, ExprContext *ctx);
     bool applyHigherPred(ExprContext *ctx);
     bool applyAssoc(ExprContext *ctx);
-    AstExpression *buildExpression(AstDataType *currentType, TokenType stopToken = SemiColon, bool isConst = false, bool buildList = false);
+    AstExpression *buildExpression(AstDataType *currentType, token stopToken = t_semicolon, bool isConst = false, bool buildList = false);
     AstExpression *checkExpression(AstExpression *expr, AstDataType *varType);
     
     bool buildBlock(AstBlock *block, AstNode *parent = nullptr);
@@ -72,7 +76,8 @@ protected:
     AstDataType *buildDataType(bool checkBrackets = true);
 private:
     std::string input = "";
-    Scanner *scanner;
+    //Scanner *scanner;
+    lex *scanner;
     AstTree *tree;
     ErrorManager *syntax;
     

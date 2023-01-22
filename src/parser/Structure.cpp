@@ -11,29 +11,33 @@
 #include <ast/ast.hpp>
 #include <ast/ast_builder.hpp>
 
+extern "C" {
+#include <lex/lex.h>
+}
+
 // Parses and builds a structure
 bool Parser::buildStruct() {
-    Token token = scanner->getNext();
-    std::string name = token.id_val;
+    token tk = lex_get_next(scanner);
+    std::string name = lex_get_id(scanner);
     
-    if (token.type != Id) {
-        syntax->addError(scanner->getLine(), "Expected name for struct.");
+    if (tk != t_id) {
+        syntax->addError(0, "Expected name for struct.");
         return false;
     }
     
     // Next token should be "is"
-    token = scanner->getNext();
-    if (token.type != Is) {
-        syntax->addError(scanner->getLine(), "Expected \"is\".");
+    tk = lex_get_next(scanner);
+    if (tk != t_is) {
+        syntax->addError(0, "Expected \"is\".");
     }
     
     // Builds the struct items
     AstStruct *str = new AstStruct(name);
-    token = scanner->getNext();
+    tk = lex_get_next(scanner);
     
-    while (token.type != End && token.type != Eof) {
-        if (!buildStructMember(str, token)) return false;
-        token = scanner->getNext();
+    while (tk != t_end && tk != t_eof) {
+        if (!buildStructMember(str, tk)) return false;
+        tk = lex_get_next(scanner);
     }
     
     tree->addStruct(str);
@@ -41,31 +45,31 @@ bool Parser::buildStruct() {
     return true;
 }
 
-bool Parser::buildStructMember(AstStruct *str, Token token) {
-    std::string valName = token.id_val;
+bool Parser::buildStructMember(AstStruct *str, token tk) {
+    std::string valName = lex_get_id(scanner);
     
-    if (token.type != Id) {
-        syntax->addError(scanner->getLine(), "Expected id value.");
-        token.print();
+    if (tk != t_id) {
+        syntax->addError(0, "Expected id value.");
+        //token.print();
         return false;
     }
         
     // Get the data type
-    token = scanner->getNext();
-    if (token.type != Colon) {
-        syntax->addError(scanner->getLine(), "Expected \':\' in structure member.");
-        token.print();
+    tk = lex_get_next(scanner);
+    if (tk != t_colon) {
+        syntax->addError(0, "Expected \':\' in structure member.");
+        //token.print();
         return false;
     }
     
     AstDataType *dataType = buildDataType();
         
     // If its an array, build that. Otherwise, build the default value
-    token = scanner->getNext();
+    tk = lex_get_next(scanner);
         
-    if (token.type == Assign) {
+    if (tk == t_assign) {
         AstExpression *expr = nullptr;
-        expr = buildExpression(dataType, SemiColon, true);
+        expr = buildExpression(dataType, t_semicolon, true);
         if (!expr) return false;
                 
         Var v;
@@ -73,8 +77,8 @@ bool Parser::buildStructMember(AstStruct *str, Token token) {
         v.type = dataType;
         str->addItem(v, expr);
     } else {
-        syntax->addError(scanner->getLine(), "Expected default value.");
-        token.print();
+        syntax->addError(0, "Expected default value.");
+        //token.print();
         return false;
     }
         
@@ -82,25 +86,25 @@ bool Parser::buildStructMember(AstStruct *str, Token token) {
 }
 
 bool Parser::buildStructDec(AstBlock *block) {
-    Token token = scanner->getNext();
-    std::string name = token.id_val;
+    token tk = lex_get_next(scanner);
+    std::string name = lex_get_id(scanner);
     
-    if (token.type != Id) {
-        syntax->addError(scanner->getLine(), "Expected structure name.");
+    if (tk != t_id) {
+        syntax->addError(0, "Expected structure name.");
         return false;
     }
     
-    token = scanner->getNext();
-    if (token.type != Colon) {
-        syntax->addError(scanner->getLine(), "Expected \':\'");
+    tk = lex_get_next(scanner);
+    if (tk != t_colon) {
+        syntax->addError(0, "Expected \':\'");
         return false;
     }
     
-    token = scanner->getNext();
-    std::string structName = token.id_val;
+    tk = lex_get_next(scanner);
+    std::string structName = lex_get_id(scanner);
     
-    if (token.type != Id) {
-        syntax->addError(scanner->getLine(), "Expected structure type.");
+    if (tk != t_id) {
+        syntax->addError(0, "Expected structure type.");
         return false;
     }
     
@@ -115,7 +119,7 @@ bool Parser::buildStructDec(AstBlock *block) {
     }
     
     if (str == nullptr) {
-        syntax->addError(scanner->getLine(), "Unknown structure.");
+        syntax->addError(0, "Unknown structure.");
         return false;
     }
     
@@ -126,10 +130,10 @@ bool Parser::buildStructDec(AstBlock *block) {
     block->addStatement(dec);
     
     // Final syntax check
-    token = scanner->getNext();
-    if (token.type == SemiColon) {
+    tk = lex_get_next(scanner);
+    if (tk == t_semicolon) {
         return true;
-    } else if (token.type == Assign) {
+    } else if (tk == t_assign) {
         dec->setNoInit(true);
         AstExprStatement *empty = new AstExprStatement;
         AstExpression *arg = buildExpression(AstBuilder::buildStructType(structName));

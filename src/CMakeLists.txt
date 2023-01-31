@@ -8,6 +8,13 @@ if (LLIR)
         compiler/LLIR/Flow.cpp
         compiler/LLIR/Function.cpp
     )
+elseif(PTASM)
+    set(COMPILER_SRC
+        compiler/PTASM/compiler.cpp
+        compiler/PTASM/elf.cpp
+        compiler/PTASM/ptasm.cpp
+        compiler/PTASM/x86.cpp
+    )
 else()
     set(COMPILER_SRC
         compiler/LLVM/Builder.cpp
@@ -49,6 +56,9 @@ add_library(tlclex STATIC ${LEX_SRC})
 if (LLIR)
     add_executable(tlc ${SRC} llir_main.cpp)
     target_link_libraries(tlc tlclex llir)
+elseif(PTASM)
+    add_executable(tlc ${SRC} ptasm_main.cpp)
+    target_link_libraries(tlc tlclex)
 else()
     add_executable(tlc ${SRC} main.cpp)
 

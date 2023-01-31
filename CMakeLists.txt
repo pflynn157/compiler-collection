@@ -17,6 +17,10 @@ if (LLIR)
     #add_subdirectory(llir)
 endif()
 
+option(PTASM "Use the PTASM backend" OFF)
+if (PTASM)
+endif()
+
 add_subdirectory(src)
 add_subdirectory(lib)
 

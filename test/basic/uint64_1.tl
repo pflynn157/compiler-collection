@@ -8,7 +8,6 @@
 
 func main -> i32 is
     var x : u64 := 0x12345678;
-    
     println("%x", x);
     println("%d", x);
     

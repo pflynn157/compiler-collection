@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 typedef enum {
     t_eof,
     t_none,
@@ -33,7 +35,9 @@ typedef enum {
     t_arrow,
     
     t_id,
-    t_int_literal
+    t_int_literal,
+    t_string_literal,
+    t_char_literal
 } token;
 
 typedef struct {
@@ -55,7 +59,7 @@ void lex_clear_buffer(lex *l);
 int lex_is_symbol(char c);
 token lex_get_symbol(lex *l, char c);
 int lex_is_int(lex *l);
-int lex_get_int(lex *l);
+uint64_t lex_get_int(lex *l);
 char *lex_get_id(lex *l);
 void lex_rewind(lex *l, token tk);
 token lex_get_next(lex *l);

@@ -49,6 +49,7 @@ int lex_is_symbol(char c)
         case '+':
         case '-':
         case '*':
+        case '/':
         case '%':
         case '&': case '|': case '^':
         case ':':
@@ -132,6 +133,10 @@ token lex_get_symbol(lex *l, char c)
 
 int lex_is_int(lex *l)
 {
+    if (l->buffer[0] == '0' && l->buffer[1] == 'x') {
+        return 1;
+    }
+
     for (int i = 0; i<l->buf_index; i++) {
         if (isdigit(l->buffer[i]) == 0) return 0;
     }
@@ -139,8 +144,12 @@ int lex_is_int(lex *l)
     return 1;
 }
 
-int lex_get_int(lex *l)
+uint64_t lex_get_int(lex *l)
 {
+    if (l->last_buf[0] == '0' && l->last_buf[1] == 'x') {
+        return (uint64_t)strtol(l->last_buf, NULL, 0);
+    }
+
     return atoi(l->last_buf);
 }
 
@@ -184,6 +193,45 @@ token lex_get_next(lex *l)
                 c = l->input[l->index];
                 ++l->index;
             }
+        }
+        
+        if (c == '\"') {
+            do {
+                c = l->input[l->index];
+                ++l->index;
+                
+                if (c != '\"') {
+                    l->buffer[l->buf_index] = c;
+                    ++l->buf_index;
+                }
+            } while (c != '\"');
+            
+            lex_set_last_buffer(l);
+            lex_clear_buffer(l);
+            return t_string_literal;
+        }
+        
+        if (c == '\'') {
+            char c = l->input[l->index];
+            if (c == '\\') {
+                char c2 = c;
+                if (l->input[l->index+1] == 'n') {
+                    ++l->index;
+                    l->buffer[0] = '\n';
+                } else {
+                    l->buffer[0] = c;
+                }
+            } else {
+                l->buffer[0] = c;
+            }
+            ++l->buf_index;
+            ++l->index;
+            
+            ++l->index;
+            
+            lex_set_last_buffer(l);
+            lex_clear_buffer(l);
+            return t_char_literal;
         }
         
         if (c == ' ' || c == '\n' || lex_is_symbol(c)) {

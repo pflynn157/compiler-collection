@@ -22,8 +22,8 @@ set(LEX_SRC lex/lex.c)
 
 set(SRC
     # Frontend sources
-    ${CMAKE_BINARY_DIR}/src/lex.cpp
-    ${CMAKE_BINARY_DIR}/src/lex_debug.cpp
+    #${CMAKE_BINARY_DIR}/src/lex.cpp
+    #${CMAKE_BINARY_DIR}/src/lex_debug.cpp
     
     ast/ast_builder.cpp
     ast/astdot.cpp

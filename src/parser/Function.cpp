@@ -20,6 +20,7 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
         tk = lex_get_next(scanner);
         while (tk != t_eof && tk != t_rparen) {
             token t1 = tk;
+            char *name = lex_get_id(scanner);
             token t2 = lex_get_next(scanner);
             Var v;
             
@@ -34,8 +35,8 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
             }
             
             v.type = buildDataType();
-            v.name = lex_get_id(scanner);
-            vars.push_back(lex_get_id(scanner));
+            v.name = name;
+            vars.push_back(name);
             
             tk = lex_get_next(scanner);
             if (tk == t_comma) {

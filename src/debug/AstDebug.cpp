@@ -65,6 +65,7 @@ void AstFunction::print() {
     std::cout << std::endl;
     std::cout << "FUNC " << name << "(";
     for (auto var : args) {
+        std::cout << var.name << ":";
         var.type->print();
         std::cout << ", ";
     }

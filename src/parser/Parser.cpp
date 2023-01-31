@@ -23,7 +23,7 @@ Parser::Parser(std::string input) {
     if (reader.is_open()) {
         std::string line = "";
         while (std::getline(reader, line)) {
-            input_str += line;
+            input_str += line + '\n';
         }
     }
     scanner = lex_init_string(strdup(input_str.c_str()));

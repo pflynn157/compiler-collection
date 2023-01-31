@@ -12,7 +12,11 @@ function run_test() {
     	echo ""
     	echo $name
     	
+    	#if [[ $name == "op_pred" ]] ; then
+    	#    valgrind $TLC $entry -o $name
+    	#fi
     	$TLC $entry -o $name
+    	#echo "$TLC $entry -o $name"
     	./$name > /tmp/$name.actual
     	CODE=$?
     	cat $1/out/$name.out > /tmp/$name.exp

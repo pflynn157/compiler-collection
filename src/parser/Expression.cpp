@@ -19,9 +19,9 @@ AstExpression *Parser::buildConstExpr(token tk) {
     switch (tk) {
         case t_true: return new AstI32(1);
         case t_false: return new AstI32(0);
-        //case CharL: return new AstChar(token.i8_val);
+        case t_char_literal: return new AstChar(lex_get_id(scanner)[0]);
         case t_int_literal: return new AstI32(lex_get_int(scanner));
-        //case String: return new AstString(token.id_val);
+        case t_string_literal: return new AstString(lex_get_id(scanner));
         
         default: {}
     }
@@ -36,6 +36,7 @@ bool Parser::buildOperator(token tk, ExprContext *ctx) {
         case t_minus:
         case t_mul:
         case t_div:
+        case t_mod:
         case t_dot:
         case t_and:
         case t_or:
@@ -160,7 +161,7 @@ bool Parser::buildIDExpr(token tk, ExprContext *ctx) {
                 AstID *id = new AstID(name);
                 ctx->output.push(id);
             } else {
-                syntax->addError(0, "Unknown variable.");
+                syntax->addError(0, "Unknown variable: " + name);
                 return false;
             }
         }
@@ -251,9 +252,9 @@ AstExpression *Parser::buildExpression(AstDataType *currentType, token stopToken
         switch (tk) {
             case t_true:
             case t_false:
-            //case CharL:
+            case t_char_literal:
             case t_int_literal:
-            /*case String:*/ {
+            case t_string_literal: {
                 ctx->lastWasOp = false;
                 AstExpression *expr = buildConstExpr(tk);
                 ctx->output.push(expr);

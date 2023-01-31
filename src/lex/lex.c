@@ -8,7 +8,7 @@
 lex *lex_init_string(char *input)
 {
     lex *l = malloc(sizeof(lex));
-    l->input = malloc(sizeof(char) * strlen(input));
+    l->input = malloc(sizeof(char) * strlen(input) + 10);
     strcpy(l->input, input);
     
     l->index = 0;
@@ -412,33 +412,35 @@ void lex_debug(token t, lex *l)
         case t_lgand: puts("AND"); break;
         case t_lgor: puts("OR"); break;
         
-        case t_dot:
-        case t_semicolon:
-        case t_comma:
-        case t_lparen:
-        case t_rparen:
-        case t_lbracket:
-        case t_rbracket:
-        case t_plus:
-        case t_minus:
-        case t_mul:
-        case t_div:
-        case t_mod:
-        case t_and:
-        case t_or:
-        case t_xor:
-        case t_colon:
-        case t_gt:
-        case t_gte:
-        case t_lt:
-        case t_lte:
-        case t_eq:
-        case t_neq:
-        case t_assign:
-        case t_arrow: puts("SYMBOLS"); break;
+        case t_dot: puts("."); break;
+        case t_semicolon: puts(";"); break;
+        case t_comma: puts(","); break;
+        case t_lparen: puts("("); break;
+        case t_rparen: puts(")"); break;
+        case t_lbracket: puts("["); break;
+        case t_rbracket: puts("]"); break;
+        case t_plus: puts("+"); break;
+        case t_minus: puts("-"); break;
+        case t_mul: puts("*"); break;
+        case t_div: puts("/"); break;
+        case t_mod: puts("%"); break;
+        case t_and: puts("AND"); break;
+        case t_or: puts("OR"); break;
+        case t_xor: puts("XOR"); break;
+        case t_colon: puts(":"); break;
+        case t_gt: puts(">"); break;
+        case t_gte: puts(">="); break;
+        case t_lt: puts("<"); break;
+        case t_lte: puts("<="); break;
+        case t_eq: puts("="); break;
+        case t_neq: puts("!="); break;
+        case t_assign: puts(":="); break;
+        case t_arrow: puts("->"); break;
         
         case t_id: printf("ID: %s\n", lex_get_id(l)); break;
         case t_int_literal: printf("INT_LITERAL: %d\n", lex_get_int(l)); break;
+        case t_string_literal: printf("STR(%s)\n", lex_get_id(l)); break;
+        case t_char_literal: printf("CHAR(%c)\n", lex_get_int(l)); break;
         
         default: puts("???");
     }

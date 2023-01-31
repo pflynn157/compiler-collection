@@ -27,10 +27,14 @@ end
 
 func main -> i32 is
     struct s : S1;
+    
     println("Before:");
     printStruct(s);
+    
     updateStruct(s);
+    
     println("After:");
     printStruct(s);
+    
     return 0;
 end

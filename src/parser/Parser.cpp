@@ -233,7 +233,7 @@ void Parser::debugScanner() {
     token t;
     do {
         t = lex_get_next(scanner);
-        //t.print();
+        lex_debug(t, scanner);
     } while (t != t_eof);
 }
 

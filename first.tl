@@ -1,10 +1,17 @@
 
 #OUTPUT
+#12345678
+#305419896
+#END
+
+#RET 0
 
 func main -> i32 is
-    var x : char := 'a';
-    println("%d", 10);
-    println("%d", 20);
+    var x : u64 := 0x12345678;
     
-    return 5;
+    println("%x", x);
+    println("%d", x);
+    
+    return 0;
 end
+

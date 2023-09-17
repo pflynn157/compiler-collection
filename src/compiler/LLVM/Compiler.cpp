@@ -16,7 +16,7 @@ using namespace llvm::sys;
 #include "Compiler.hpp"
 #include <llvm-c/Support.h>
 
-Compiler::Compiler(AstTree *tree, CFlags cflags) {
+Compiler::Compiler(std::shared_ptr<AstTree> tree, CFlags cflags) {
     char const *args[] = { "", "--x86-asm-syntax=intel" };
     LLVMParseCommandLineOptions(2, args, NULL);
     

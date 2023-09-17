@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <cstdio>
+#include <memory>
 
 #include <preproc/Preproc.hpp>
 #include <parser/Parser.hpp>
@@ -17,9 +18,9 @@ bool isError = false;
 
 // TODO: I'm not sure actually if the lex testing actually works
 //
-AstTree *getAstTree(std::string input, bool testLex, bool printAst, bool emitDot) {
-    Parser *frontend = new Parser(input);
-    AstTree *tree;
+std::shared_ptr<AstTree> getAstTree(std::string input, bool testLex, bool printAst, bool emitDot) {
+    std::unique_ptr<Parser> frontend = std::make_unique<Parser>(input);
+    std::shared_ptr<AstTree> tree;
     
     if (testLex) {
         frontend->debugScanner();
@@ -28,15 +29,11 @@ AstTree *getAstTree(std::string input, bool testLex, bool printAst, bool emitDot
     }
     
     if (!frontend->parse()) {
-        delete frontend;
         isError = true;
         return nullptr;
     }
     
     tree = frontend->getTree();
-    
-    delete frontend;
-    //remove(input.c_str());
     
     if (printAst) {
         tree->print();
@@ -51,8 +48,8 @@ AstTree *getAstTree(std::string input, bool testLex, bool printAst, bool emitDot
     return tree;
 }
 
-int compileLLVM(AstTree *tree, CFlags flags, bool printLLVM, bool emitLLVM) {
-    Compiler *compiler = new Compiler(tree, flags);
+int compileLLVM(std::shared_ptr<AstTree> tree, CFlags flags, bool printLLVM, bool emitLLVM) {
+    std::unique_ptr<Compiler> compiler = std::make_unique<Compiler>(tree, flags);
     compiler->compile();
         
     if (printLLVM) {
@@ -127,7 +124,7 @@ int main(int argc, char **argv) {
         return 1;
     }
     
-    AstTree *tree = getAstTree(newInput, testLex, printAst, emitDot);
+    std::shared_ptr<AstTree> tree = getAstTree(newInput, testLex, printAst, emitDot);
     if (tree == nullptr) {
         if (isError) return 1;
         return 0;

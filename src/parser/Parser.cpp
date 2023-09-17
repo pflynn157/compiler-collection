@@ -28,8 +28,8 @@ Parser::Parser(std::string input) {
     }
     scanner = lex_init_string(strdup(input_str.c_str()));
     
-    tree = new AstTree(input);
-    syntax = new ErrorManager;
+    tree = std::make_shared<AstTree>(input);
+    syntax = std::make_shared<ErrorManager>();
     
     // Add the built-in functions
     //string malloc(string)
@@ -89,7 +89,6 @@ Parser::Parser(std::string input) {
 
 Parser::~Parser() {
     lex_close(scanner);
-    delete syntax;
 }
 
 bool Parser::parse() {

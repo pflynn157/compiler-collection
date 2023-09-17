@@ -24,7 +24,7 @@ struct CFlags {
 
 class Compiler {
 public:
-    explicit Compiler(AstTree *tree, CFlags flags);
+    explicit Compiler(std::shared_ptr<AstTree> tree, CFlags flags);
     void compile();
     void debug();
     void emitLLVM(std::string path);
@@ -51,7 +51,7 @@ protected:
     void compileStructDeclaration(std::shared_ptr<AstStatement> stmt);
     Value *compileStructAccess(std::shared_ptr<AstExpression> expr, bool isAssign = false);
 private:
-    AstTree *tree;
+    std::shared_ptr<AstTree> tree;
     CFlags cflags;
 
     // LLVM stuff

@@ -29,7 +29,7 @@ std::shared_ptr<AstExpression> Parser::buildConstExpr(token tk) {
     return nullptr;
 }
 
-bool Parser::buildOperator(token tk, ExprContext *ctx) {
+bool Parser::buildOperator(token tk, std::shared_ptr<ExprContext> ctx) {
     switch (tk) {
         case t_assign:
         case t_plus: 
@@ -100,7 +100,7 @@ bool Parser::buildOperator(token tk, ExprContext *ctx) {
     return true;        
 }
 
-bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, token tk, ExprContext *ctx) {
+bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, token tk, std::shared_ptr<ExprContext> ctx) {
     ctx->lastWasOp = false;
     int currentLine = 0;
 
@@ -174,7 +174,7 @@ bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, token tk, ExprContext 
 }
 
 // Applies higher precedence for an operator
-bool Parser::applyHigherPred(ExprContext *ctx) {
+bool Parser::applyHigherPred(std::shared_ptr<ExprContext> ctx) {
     if (ctx->output.empty()) {
         syntax->addError(0, "Invalid expression: No RVAL");
         return false;
@@ -200,7 +200,7 @@ bool Parser::applyHigherPred(ExprContext *ctx) {
 }
 
 // Applies operator associativity
-bool Parser::applyAssoc(ExprContext *ctx) {
+bool Parser::applyAssoc(std::shared_ptr<ExprContext> ctx) {
     V_AstType lastOp = V_AstType::None;
     while (ctx->opStack.size() > 0) {
         if (ctx->output.empty()) {
@@ -243,7 +243,7 @@ bool Parser::applyAssoc(ExprContext *ctx) {
 // Our new expression builder
 std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
                                                         token stopToken, bool isConst, bool buildList) {
-    ExprContext *ctx = new ExprContext;
+    std::shared_ptr<ExprContext> ctx = std::make_shared<ExprContext>();
     if (currentType) ctx->varType = currentType;
     else ctx->varType = AstBuilder::buildVoidType();
     

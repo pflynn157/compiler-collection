@@ -28,7 +28,7 @@ public:
     
     bool parse();
     
-    AstTree *getTree() { return tree; }
+    std::shared_ptr<AstTree> getTree() { return tree; }
     
     void debugScanner();
 protected:
@@ -62,10 +62,10 @@ protected:
     };
     
     std::shared_ptr<AstExpression> buildConstExpr(token tk);
-    bool buildOperator(token tk, ExprContext *ctx);
-    bool buildIDExpr(std::shared_ptr<AstBlock> block, token tk, ExprContext *ctx);
-    bool applyHigherPred(ExprContext *ctx);
-    bool applyAssoc(ExprContext *ctx);
+    bool buildOperator(token tk, std::shared_ptr<ExprContext> ctx);
+    bool buildIDExpr(std::shared_ptr<AstBlock> block, token tk, std::shared_ptr<ExprContext> ctx);
+    bool applyHigherPred(std::shared_ptr<ExprContext> ctx);
+    bool applyAssoc(std::shared_ptr<ExprContext> ctx);
     std::shared_ptr<AstExpression> buildExpression(
                         std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
                         token stopToken = t_semicolon,
@@ -82,8 +82,8 @@ private:
     std::string input = "";
     //Scanner *scanner;
     lex *scanner;
-    AstTree *tree;
-    ErrorManager *syntax;
+    std::shared_ptr<AstTree> tree;
+    std::shared_ptr<ErrorManager> syntax;
     
     std::map<std::string, std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>> globalConsts;
     std::map<std::string, std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>> localConsts;

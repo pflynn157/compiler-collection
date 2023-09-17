@@ -8,8 +8,8 @@
 // Translates an AST IF statement to LLVM
 void Compiler::compileIfStatement(std::shared_ptr<AstStatement> stmt) {
     std::shared_ptr<AstIfStmt> condStmt = std::static_pointer_cast<AstIfStmt>(stmt);
-    AstBlock *astTrueBlock = condStmt->getTrueBlock();
-    AstBlock *astFalseBlock = condStmt->getFalseBlock();
+    std::shared_ptr<AstBlock> astTrueBlock = condStmt->getTrueBlock();
+    std::shared_ptr<AstBlock> astFalseBlock = condStmt->getFalseBlock();
     
     BasicBlock *trueBlock = BasicBlock::Create(*context, "true" + std::to_string(blockCount), currentFunc);
     BasicBlock *falseBlock = BasicBlock::Create(*context, "false" + std::to_string(blockCount), currentFunc);

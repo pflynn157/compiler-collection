@@ -33,25 +33,25 @@ public:
     void debugScanner();
 protected:
     // Function.cpp
-    bool getFunctionArgs(AstBlock *block, std::vector<Var> &args);
+    bool getFunctionArgs(std::shared_ptr<AstBlock> block, std::vector<Var> &args);
     bool buildFunction(token startToken, std::string className = "");
-    bool buildFunctionCallStmt(AstBlock *block, token idToken);
-    bool buildReturn(AstBlock *block);
+    bool buildFunctionCallStmt(std::shared_ptr<AstBlock> block, token idToken);
+    bool buildReturn(std::shared_ptr<AstBlock> block);
     
     // Variable.cpp
-    bool buildVariableDec(AstBlock *block);
-    bool buildVariableAssign(AstBlock *block, token idToken);
+    bool buildVariableDec(std::shared_ptr<AstBlock> block);
+    bool buildVariableAssign(std::shared_ptr<AstBlock> block, token idToken);
     bool buildConst(bool isGlobal);
     
     // Flow.cpp
-    bool buildConditional(AstBlock *block);
-    bool buildWhile(AstBlock *block);
-    bool buildLoopCtrl(AstBlock *block, bool isBreak);
+    bool buildConditional(std::shared_ptr<AstBlock> block);
+    bool buildWhile(std::shared_ptr<AstBlock> block);
+    bool buildLoopCtrl(std::shared_ptr<AstBlock> block, bool isBreak);
     
     // Structure.cpp
     bool buildStruct();
     bool buildStructMember(AstStruct *str, token tk);
-    bool buildStructDec(AstBlock *block);
+    bool buildStructDec(std::shared_ptr<AstBlock> block);
     
     // Expression.cpp
     struct ExprContext {
@@ -63,17 +63,17 @@ protected:
     
     std::shared_ptr<AstExpression> buildConstExpr(token tk);
     bool buildOperator(token tk, ExprContext *ctx);
-    bool buildIDExpr(AstBlock *block, token tk, ExprContext *ctx);
+    bool buildIDExpr(std::shared_ptr<AstBlock> block, token tk, ExprContext *ctx);
     bool applyHigherPred(ExprContext *ctx);
     bool applyAssoc(ExprContext *ctx);
     std::shared_ptr<AstExpression> buildExpression(
-                        AstBlock *block, AstDataType *currentType,
+                        std::shared_ptr<AstBlock> block, AstDataType *currentType,
                         token stopToken = t_semicolon,
                         bool isConst = false, bool buildList = false);
     std::shared_ptr<AstExpression> checkExpression(std::shared_ptr<AstExpression> expr, AstDataType *varType);
     
-    bool buildBlock(AstBlock *block, std::shared_ptr<AstNode> parent = nullptr);
-    std::shared_ptr<AstExpression> checkCondExpression(AstBlock *block, std::shared_ptr<AstExpression> toCheck);
+    bool buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent = nullptr);
+    std::shared_ptr<AstExpression> checkCondExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstExpression> toCheck);
     int isConstant(std::string name);
     bool isVar(std::string name);
     bool isFunc(std::string name);

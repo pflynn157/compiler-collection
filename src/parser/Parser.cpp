@@ -130,7 +130,7 @@ bool Parser::parse() {
 }
 
 // Builds a statement block
-bool Parser::buildBlock(AstBlock *block, std::shared_ptr<AstNode> parent) {
+bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent) {
     token tk = lex_get_next(scanner);
     while (tk != t_end && tk != t_eof) {
         bool code = true;

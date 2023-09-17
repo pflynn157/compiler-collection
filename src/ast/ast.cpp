@@ -39,7 +39,7 @@ void AstBlock::addSymbol(std::string name, AstDataType *dataType) {
     vars.push_back(name);
 }
 
-void AstBlock::mergeSymbols(AstBlock *parent) {
+void AstBlock::mergeSymbols(std::shared_ptr<AstBlock> parent) {
     auto map = parent->getSymbolTable();
     for (auto const &element : map) {
         symbolTable[element.first] = element.second;

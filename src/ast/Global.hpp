@@ -58,13 +58,13 @@ class AstFunction : public AstGlobalStatement {
 public:
     explicit AstFunction(std::string name) : AstGlobalStatement(V_AstType::Func) {
         this->name = name;
-        block = new AstBlock;
+        block = std::make_shared<AstBlock>();
     }
     
     std::string getName() { return name; }
     AstDataType *getDataType() { return dataType; }
     std::vector<Var> getArguments() { return args; }
-    AstBlock *getBlock() { return block; }
+    std::shared_ptr<AstBlock> getBlock() { return block; }
     
     void setName(std::string name) { this->name = name; }
     
@@ -83,7 +83,7 @@ public:
 private:
     std::string name = "";
     std::vector<Var> args;
-    AstBlock *block;
+    std::shared_ptr<AstBlock> block;
     AstDataType *dataType;
     std::string dtName = "";
 };

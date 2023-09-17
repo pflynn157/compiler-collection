@@ -183,7 +183,7 @@ public:
     void insertAt(std::shared_ptr<AstStatement> stmt, size_t pos);
     
     void addSymbol(std::string name, AstDataType *dataType);
-    void mergeSymbols(AstBlock *parent);
+    void mergeSymbols(std::shared_ptr<AstBlock> parent);
     std::map<std::string, AstDataType *> getSymbolTable();
     AstDataType *getDataType(std::string name);
     

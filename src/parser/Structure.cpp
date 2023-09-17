@@ -85,7 +85,7 @@ bool Parser::buildStructMember(AstStruct *str, token tk) {
     return true;
 }
 
-bool Parser::buildStructDec(AstBlock *block) {
+bool Parser::buildStructDec(std::shared_ptr<AstBlock> block) {
     token tk = lex_get_next(scanner);
     std::string name = lex_get_id(scanner);
     

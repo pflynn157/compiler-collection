@@ -15,7 +15,7 @@ extern "C" {
 }
 
 // Returns the function arguments
-bool Parser::getFunctionArgs(AstBlock *block, std::vector<Var> &args) {
+bool Parser::getFunctionArgs(std::shared_ptr<AstBlock> block, std::vector<Var> &args) {
     token tk = lex_get_next(scanner);
     if (tk == t_lparen) {
         tk = lex_get_next(scanner);
@@ -76,7 +76,7 @@ bool Parser::buildFunction(token startToken, std::string className) {
     
     // Get arguments
     std::vector<Var> args;
-    AstBlock *block = new AstBlock;
+    std::shared_ptr<AstBlock> block = std::make_shared<AstBlock>();
     if (!getFunctionArgs(block, args)) return false;
 
     // Check to see if there's any return type
@@ -143,7 +143,7 @@ bool Parser::buildFunction(token startToken, std::string className) {
 }
 
 // Builds a function call
-bool Parser::buildFunctionCallStmt(AstBlock *block, token idToken) {
+bool Parser::buildFunctionCallStmt(std::shared_ptr<AstBlock> block, token idToken) {
     // Make sure the function exists
     if (!isFunc(lex_get_id(scanner))) {
         syntax->addError(0, "Unknown function.");
@@ -161,7 +161,7 @@ bool Parser::buildFunctionCallStmt(AstBlock *block, token idToken) {
 }
 
 // Builds a return statement
-bool Parser::buildReturn(AstBlock *block) {
+bool Parser::buildReturn(std::shared_ptr<AstBlock> block) {
     std::shared_ptr<AstReturnStmt> stmt = std::make_shared<AstReturnStmt>();
     block->addStatement(stmt);
     

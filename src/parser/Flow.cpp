@@ -15,7 +15,7 @@ extern "C" {
 // Called if a conditional statement has only one operand. If it does,
 // we have to expand to have two operands before we get down to the
 // compiler layer
-std::shared_ptr<AstExpression> Parser::checkCondExpression(AstBlock *block, std::shared_ptr<AstExpression> toCheck) {
+std::shared_ptr<AstExpression> Parser::checkCondExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstExpression> toCheck) {
     std::shared_ptr<AstExpression> expr = toCheck;
     
     switch (toCheck->getType()) {
@@ -52,7 +52,7 @@ std::shared_ptr<AstExpression> Parser::checkCondExpression(AstBlock *block, std:
 }
 
 // Builds a conditional statement
-bool Parser::buildConditional(AstBlock *block) {
+bool Parser::buildConditional(std::shared_ptr<AstBlock> block) {
     std::shared_ptr<AstIfStmt> cond = std::make_shared<AstIfStmt>();
     std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr, t_then);
     if (!arg) return false;
@@ -62,11 +62,11 @@ bool Parser::buildConditional(AstBlock *block) {
     std::shared_ptr<AstExpression> expr = checkCondExpression(block, cond->getExpression());
     cond->setExpression(expr);
     
-    AstBlock *trueBlock = new AstBlock;
+    std::shared_ptr<AstBlock> trueBlock = std::make_shared<AstBlock>();
     trueBlock->mergeSymbols(block);
     cond->setTrueBlock(trueBlock);
     
-    AstBlock *falseBlock = new AstBlock;
+    std::shared_ptr<AstBlock> falseBlock = std::make_shared<AstBlock>();
     falseBlock->mergeSymbols(block);
     cond->setFalseBlock(falseBlock);
     buildBlock(trueBlock, cond);
@@ -75,7 +75,7 @@ bool Parser::buildConditional(AstBlock *block) {
 }
 
 // Builds a while statement
-bool Parser::buildWhile(AstBlock *block) {
+bool Parser::buildWhile(std::shared_ptr<AstBlock> block) {
     std::shared_ptr<AstWhileStmt> loop = std::make_shared<AstWhileStmt>();
     std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr, t_do);
     if (!arg) return false;
@@ -85,7 +85,7 @@ bool Parser::buildWhile(AstBlock *block) {
     std::shared_ptr<AstExpression> expr = checkCondExpression(block, loop->getExpression());
     loop->setExpression(expr);
     
-    AstBlock *block2 = new AstBlock;
+    std::shared_ptr<AstBlock> block2 = std::make_shared<AstBlock>();
     block2->mergeSymbols(block);
     buildBlock(block2);
     loop->setBlock(block2);
@@ -94,7 +94,7 @@ bool Parser::buildWhile(AstBlock *block) {
 }
 
 // Builds a loop keyword
-bool Parser::buildLoopCtrl(AstBlock *block, bool isBreak) {
+bool Parser::buildLoopCtrl(std::shared_ptr<AstBlock> block, bool isBreak) {
     if (isBreak) block->addStatement(std::make_shared<AstBreak>());
     else block->addStatement(std::make_shared<AstContinue>());
     

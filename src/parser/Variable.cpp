@@ -18,7 +18,7 @@ extern "C" {
 
 // Builds a variable declaration
 // A variable declaration is composed of an Alloca and optionally, an assignment
-bool Parser::buildVariableDec(AstBlock *block) {
+bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
     token tk = lex_get_next(scanner);
     std::vector<std::string> toDeclare;
     toDeclare.push_back(lex_get_id(scanner));
@@ -135,7 +135,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
 }
 
 // Builds a variable or an array assignment
-bool Parser::buildVariableAssign(AstBlock *block, token t_idToken) {
+bool Parser::buildVariableAssign(std::shared_ptr<AstBlock> block, token t_idToken) {
     AstDataType *dataType = block->getDataType(lex_get_id(scanner));
     
     std::shared_ptr<AstExpression> expr = buildExpression(block, dataType);

@@ -126,17 +126,17 @@ class AstIfStmt : public AstStatement {
 public:
     explicit AstIfStmt() : AstStatement(V_AstType::If) {}
     
-    void setTrueBlock(AstBlock *block) { trueBlock = block; }
-    void setFalseBlock(AstBlock *block) { falseBlock = block; }
+    void setTrueBlock(std::shared_ptr<AstBlock> block) { trueBlock = block; }
+    void setFalseBlock(std::shared_ptr<AstBlock> block) { falseBlock = block; }
     
-    AstBlock *getTrueBlock() { return trueBlock; }
-    AstBlock *getFalseBlock() { return falseBlock; }
+    std::shared_ptr<AstBlock> getTrueBlock() { return trueBlock; }
+    std::shared_ptr<AstBlock> getFalseBlock() { return falseBlock; }
     
     void print(int indent);
     std::string dot(std::string parent) override;
 private:
-    AstBlock *trueBlock = nullptr;
-    AstBlock *falseBlock = nullptr;
+    std::shared_ptr<AstBlock> trueBlock = nullptr;
+    std::shared_ptr<AstBlock> falseBlock = nullptr;
 };
 
 // Represents a while statement
@@ -144,13 +144,13 @@ class AstWhileStmt : public AstStatement {
 public:
     explicit AstWhileStmt() : AstStatement(V_AstType::While) {}
     
-    void setBlock(AstBlock *block) { this->block = block; }
-    AstBlock *getBlock() { return block; }
+    void setBlock(std::shared_ptr<AstBlock> block) { this->block = block; }
+    std::shared_ptr<AstBlock> getBlock() { return block; }
     
     void print(int indent = 0);
     std::string dot(std::string parent) override;
 private:
-    AstBlock *block = nullptr;
+    std::shared_ptr<AstBlock> block = nullptr;
 };
 
 // Represents a break statement for a loop

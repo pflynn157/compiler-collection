@@ -32,7 +32,7 @@ public:
     void assemble();
     void link();
 protected:
-    void compileStatement(AstStatement *stmt);
+    void compileStatement(std::shared_ptr<AstStatement> stmt);
     Value *compileValue(std::shared_ptr<AstExpression> expr, bool isAssign = false);
     Type *translateType(AstDataType *dataType);
     int getStructIndex(std::string name, std::string member);
@@ -40,15 +40,15 @@ protected:
     // Function.cpp
     void compileFunction(AstGlobalStatement *global);
     void compileExternFunction(AstGlobalStatement *global);
-    void compileFuncCallStatement(AstStatement *stmt);
-    void compileReturnStatement(AstStatement *stmt);
+    void compileFuncCallStatement(std::shared_ptr<AstStatement> stmt);
+    void compileReturnStatement(std::shared_ptr<AstStatement> stmt);
     
     // Flow.cpp
-    void compileIfStatement(AstStatement *stmt);
-    void compileWhileStatement(AstStatement *stmt);
+    void compileIfStatement(std::shared_ptr<AstStatement> stmt);
+    void compileWhileStatement(std::shared_ptr<AstStatement> stmt);
     
     // Variable.cpp
-    void compileStructDeclaration(AstStatement *stmt);
+    void compileStructDeclaration(std::shared_ptr<AstStatement> stmt);
     Value *compileStructAccess(std::shared_ptr<AstExpression> expr, bool isAssign = false);
 private:
     AstTree *tree;

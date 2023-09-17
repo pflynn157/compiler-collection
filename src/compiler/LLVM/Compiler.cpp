@@ -76,17 +76,17 @@ void Compiler::emitLLVM(std::string path) {
 }
 
 // Compiles an individual statement
-void Compiler::compileStatement(AstStatement *stmt) {
+void Compiler::compileStatement(std::shared_ptr<AstStatement> stmt) {
     switch (stmt->getType()) {
         // Expression statement
         case V_AstType::ExprStmt: {
-            AstExprStatement *expr_stmt = static_cast<AstExprStatement *>(stmt);
+            std::shared_ptr<AstExprStatement> expr_stmt = std::static_pointer_cast<AstExprStatement>(stmt);
             compileValue(expr_stmt->getExpression());
         } break;
     
         // A variable declaration (alloca) statement
         case V_AstType::VarDec: {
-            AstVarDec *vd = static_cast<AstVarDec *>(stmt);
+            std::shared_ptr<AstVarDec> vd = std::static_pointer_cast<AstVarDec>(stmt);
             Type *type = translateType(vd->getDataType());
             
             AllocaInst *var = builder->CreateAlloca(type);

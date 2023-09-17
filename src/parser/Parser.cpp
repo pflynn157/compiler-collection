@@ -130,7 +130,7 @@ bool Parser::parse() {
 }
 
 // Builds a statement block
-bool Parser::buildBlock(AstBlock *block, AstNode *parent) {
+bool Parser::buildBlock(AstBlock *block, std::shared_ptr<AstNode> parent) {
     token tk = lex_get_next(scanner);
     while (tk != t_end && tk != t_eof) {
         bool code = true;
@@ -163,12 +163,12 @@ bool Parser::buildBlock(AstBlock *block, AstNode *parent) {
             // Handle conditionals
             case t_if: code = buildConditional(block); break;
             case t_elif: {
-                AstIfStmt *condParent = static_cast<AstIfStmt *>(parent);
+                std::shared_ptr<AstIfStmt> condParent = std::static_pointer_cast<AstIfStmt>(parent);
                 code = buildConditional(condParent->getFalseBlock());
                 end = true;
             } break;
             case t_else: {
-                AstIfStmt *condParent = static_cast<AstIfStmt *>(parent);
+                std::shared_ptr<AstIfStmt> condParent = std::static_pointer_cast<AstIfStmt>(parent);
                 buildBlock(condParent->getFalseBlock());
                 end = true;
             } break;

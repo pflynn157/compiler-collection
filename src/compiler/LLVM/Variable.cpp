@@ -9,8 +9,8 @@
 #include <ast/ast_builder.hpp>
 
 // Compiles a structure declaration
-void Compiler::compileStructDeclaration(AstStatement *stmt) {
-    AstStructDec *sd = static_cast<AstStructDec *>(stmt);
+void Compiler::compileStructDeclaration(std::shared_ptr<AstStatement> stmt) {
+    std::shared_ptr<AstStructDec> sd = std::static_pointer_cast<AstStructDec>(stmt);
     StructType *type1 = structTable[sd->getStructName()];
     PointerType *type = PointerType::getUnqual(type1);
     

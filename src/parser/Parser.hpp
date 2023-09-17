@@ -72,7 +72,7 @@ protected:
                         bool isConst = false, bool buildList = false);
     std::shared_ptr<AstExpression> checkExpression(std::shared_ptr<AstExpression> expr, AstDataType *varType);
     
-    bool buildBlock(AstBlock *block, AstNode *parent = nullptr);
+    bool buildBlock(AstBlock *block, std::shared_ptr<AstNode> parent = nullptr);
     std::shared_ptr<AstExpression> checkCondExpression(AstBlock *block, std::shared_ptr<AstExpression> toCheck);
     int isConstant(std::string name);
     bool isVar(std::string name);

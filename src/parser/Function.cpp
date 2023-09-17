@@ -122,7 +122,7 @@ bool Parser::buildFunction(token startToken, std::string className) {
     // Make sure we end with a return statement
     V_AstType lastType = func->getBlock()->getBlock().back()->getType();
     if (lastType == V_AstType::Return) {
-        AstStatement *ret = func->getBlock()->getBlock().back();
+        std::shared_ptr<AstStatement> ret = func->getBlock()->getBlock().back();
         if (func->getDataType()->getType() == V_AstType::Void && ret->hasExpression()) {
             syntax->addError(0, "Cannot return from void function.");
             return false;
@@ -132,7 +132,7 @@ bool Parser::buildFunction(token startToken, std::string className) {
         }
     } else {
         if (func->getDataType()->getType() == V_AstType::Void) {
-            func->addStatement(new AstReturnStmt);
+            func->addStatement(std::make_shared<AstReturnStmt>());
         } else {
             syntax->addError(0, "Expected return statement.");
             return false;
@@ -150,7 +150,7 @@ bool Parser::buildFunctionCallStmt(AstBlock *block, token idToken) {
         return false;
     }
 
-    AstFuncCallStmt *fc = new AstFuncCallStmt(lex_get_id(scanner));
+    std::shared_ptr<AstFuncCallStmt> fc = std::make_shared<AstFuncCallStmt>(lex_get_id(scanner));
     block->addStatement(fc);
     
     std::shared_ptr<AstExpression> args = buildExpression(block, nullptr, t_semicolon, false, true);
@@ -162,7 +162,7 @@ bool Parser::buildFunctionCallStmt(AstBlock *block, token idToken) {
 
 // Builds a return statement
 bool Parser::buildReturn(AstBlock *block) {
-    AstReturnStmt *stmt = new AstReturnStmt;
+    std::shared_ptr<AstReturnStmt> stmt = std::make_shared<AstReturnStmt>();
     block->addStatement(stmt);
     
     std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr);

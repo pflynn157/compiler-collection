@@ -125,7 +125,7 @@ bool Parser::buildStructDec(AstBlock *block) {
     
     // Now build the declaration and push back
     block->addSymbol(name, AstBuilder::buildStructType(structName));
-    AstStructDec *dec = new AstStructDec(name, structName);
+    std::shared_ptr<AstStructDec> dec = std::make_shared<AstStructDec>(name, structName);
     block->addStatement(dec);
     
     // Final syntax check
@@ -134,7 +134,7 @@ bool Parser::buildStructDec(AstBlock *block) {
         return true;
     } else if (tk == t_assign) {
         dec->setNoInit(true);
-        AstExprStatement *empty = new AstExprStatement;
+        std::shared_ptr<AstExprStatement> empty = std::make_shared<AstExprStatement>();
         std::shared_ptr<AstExpression> arg = buildExpression(block, AstBuilder::buildStructType(structName));
         if (!arg) return false;
         

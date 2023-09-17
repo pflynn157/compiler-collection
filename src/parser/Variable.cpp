@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
@@ -53,7 +54,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
     // We have an array
     if (tk == t_lbracket) {
         dataType = AstBuilder::buildPointerType(dataType);
-        AstVarDec *empty = new AstVarDec("", dataType);
+        std::shared_ptr<AstVarDec> empty = std::make_shared<AstVarDec>("", dataType);
         std::shared_ptr<AstExpression> arg = buildExpression(block, AstBuilder::buildInt32Type(), t_rbracket);
         if (!arg) return false;
         empty->setExpression(arg); 
@@ -65,12 +66,12 @@ bool Parser::buildVariableDec(AstBlock *block) {
         }
         
         for (std::string name : toDeclare) {
-            AstVarDec *vd = new AstVarDec(name, dataType);
+            std::shared_ptr<AstVarDec> vd = std::make_shared<AstVarDec>(name, dataType);
             block->addStatement(vd);
             vd->setExpression(empty->getExpression());
             
             // Create an assignment to a malloc call
-            AstExprStatement *va = new AstExprStatement;
+            std::shared_ptr<AstExprStatement> va = std::make_shared<AstExprStatement>();
             va->setDataType(dataType);
             block->addStatement(va);
             
@@ -114,13 +115,13 @@ bool Parser::buildVariableDec(AstBlock *block) {
         if (!arg) return false;
     
         for (std::string name : toDeclare) {
-            AstVarDec *vd = new AstVarDec(name, dataType);
+            std::shared_ptr<AstVarDec> vd = std::make_shared<AstVarDec>(name, dataType);
             block->addStatement(vd);
             
             std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
             std::shared_ptr<AstAssignOp> assign = std::make_shared<AstAssignOp>(id, arg);
             
-            AstExprStatement *va = new AstExprStatement;
+            std::shared_ptr<AstExprStatement> va = std::make_shared<AstExprStatement>();
             va->setDataType(dataType);
             va->setExpression(assign);
             block->addStatement(va);
@@ -140,7 +141,7 @@ bool Parser::buildVariableAssign(AstBlock *block, token t_idToken) {
     std::shared_ptr<AstExpression> expr = buildExpression(block, dataType);
     if (!expr) return false;
     
-    AstExprStatement *stmt = new AstExprStatement;
+    std::shared_ptr<AstExprStatement> stmt = std::make_shared<AstExprStatement>();
     stmt->setDataType(dataType);
     stmt->setExpression(expr);
     block->addStatement(stmt);

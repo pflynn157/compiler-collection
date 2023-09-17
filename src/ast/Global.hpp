@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <ast/Types.hpp>
 
@@ -69,7 +70,7 @@ public:
     
     void setArguments(std::vector<Var> args) { this->args = args; }
     
-    void addStatement(AstStatement *statement) {
+    void addStatement(std::shared_ptr<AstStatement> statement) {
         block->addStatement(statement);
     }
     

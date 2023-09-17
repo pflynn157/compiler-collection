@@ -53,7 +53,7 @@ std::shared_ptr<AstExpression> Parser::checkCondExpression(AstBlock *block, std:
 
 // Builds a conditional statement
 bool Parser::buildConditional(AstBlock *block) {
-    AstIfStmt *cond = new AstIfStmt;
+    std::shared_ptr<AstIfStmt> cond = std::make_shared<AstIfStmt>();
     std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr, t_then);
     if (!arg) return false;
     cond->setExpression(arg);
@@ -76,7 +76,7 @@ bool Parser::buildConditional(AstBlock *block) {
 
 // Builds a while statement
 bool Parser::buildWhile(AstBlock *block) {
-    AstWhileStmt *loop = new AstWhileStmt;
+    std::shared_ptr<AstWhileStmt> loop = std::make_shared<AstWhileStmt>();
     std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr, t_do);
     if (!arg) return false;
     loop->setExpression(arg);
@@ -95,8 +95,8 @@ bool Parser::buildWhile(AstBlock *block) {
 
 // Builds a loop keyword
 bool Parser::buildLoopCtrl(AstBlock *block, bool isBreak) {
-    if (isBreak) block->addStatement(new AstBreak);
-    else block->addStatement(new AstContinue);
+    if (isBreak) block->addStatement(std::make_shared<AstBreak>());
+    else block->addStatement(std::make_shared<AstContinue>());
     
     token tk = lex_get_next(scanner);
     if (tk != t_semicolon) {

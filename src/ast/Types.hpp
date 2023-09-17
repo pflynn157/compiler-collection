@@ -172,15 +172,15 @@ class AstBlock : public AstNode {
 public:
     AstBlock() : AstNode(V_AstType::Block) {}
 
-    void addStatement(AstStatement *stmt);
-    void addStatements(std::vector<AstStatement *> block);
-    std::vector<AstStatement *> getBlock();
+    void addStatement(std::shared_ptr<AstStatement> stmt);
+    void addStatements(std::vector<std::shared_ptr<AstStatement>> block);
+    std::vector<std::shared_ptr<AstStatement>> getBlock();
     
     size_t getBlockSize();
-    AstStatement *getStatementAt(size_t i);
+    std::shared_ptr<AstStatement> getStatementAt(size_t i);
     
     void removeAt(size_t pos);
-    void insertAt(AstStatement *stmt, size_t pos);
+    void insertAt(std::shared_ptr<AstStatement> stmt, size_t pos);
     
     void addSymbol(std::string name, AstDataType *dataType);
     void mergeSymbols(AstBlock *parent);
@@ -192,7 +192,7 @@ public:
     void print(int indent = 4);
     std::string dot(std::string parent);
 protected:
-    std::vector<AstStatement *> block;
+    std::vector<std::shared_ptr<AstStatement>> block;
     std::map<std::string, AstDataType *> symbolTable;
     std::vector<std::string> vars;
 };

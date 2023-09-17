@@ -104,8 +104,8 @@ void Compiler::compileExternFunction(AstGlobalStatement *global) {
 //
 // // TODO: We should not do error handeling in the compiler. Check for invalid functions in the AST level
 //
-void Compiler::compileFuncCallStatement(AstStatement *stmt) {
-    AstFuncCallStmt *fc = static_cast<AstFuncCallStmt *>(stmt);
+void Compiler::compileFuncCallStatement(std::shared_ptr<AstStatement> stmt) {
+    std::shared_ptr<AstFuncCallStmt> fc = std::static_pointer_cast<AstFuncCallStmt>(stmt);
     std::vector<Value *> args;
     
     /*for (auto stmt : stmt->getExpressions()) {
@@ -127,7 +127,7 @@ void Compiler::compileFuncCallStatement(AstStatement *stmt) {
 // Compiles a return statement
 // TODO: We may want to rethink this some
 //
-void Compiler::compileReturnStatement(AstStatement *stmt) {
+void Compiler::compileReturnStatement(std::shared_ptr<AstStatement> stmt) {
     if (!stmt->hasExpression()) {
         builder->CreateRetVoid();
     } else if (stmt->hasExpression()) {

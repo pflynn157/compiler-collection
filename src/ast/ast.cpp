@@ -6,15 +6,15 @@
 //
 // AstBlock
 //
-void AstBlock::addStatement(AstStatement *stmt) {
+void AstBlock::addStatement(std::shared_ptr<AstStatement> stmt) {
     block.push_back(stmt);
 }
 
-void AstBlock::addStatements(std::vector<AstStatement *> block) {
+void AstBlock::addStatements(std::vector<std::shared_ptr<AstStatement>> block) {
     this->block = block;
 }
 
-std::vector<AstStatement *> AstBlock::getBlock() {
+std::vector<std::shared_ptr<AstStatement>> AstBlock::getBlock() {
     return block;
 }
 
@@ -22,7 +22,7 @@ size_t AstBlock::getBlockSize() {
     return block.size();
 }
 
-AstStatement *AstBlock::getStatementAt(size_t i) {
+std::shared_ptr<AstStatement> AstBlock::getStatementAt(size_t i) {
     return block.at(i);
 }
 
@@ -30,7 +30,7 @@ void AstBlock::removeAt(size_t pos) {
     block.erase(block.begin() + pos);
 }
 
-void AstBlock::insertAt(AstStatement *stmt, size_t pos) {
+void AstBlock::insertAt(std::shared_ptr<AstStatement> stmt, size_t pos) {
     block.insert(block.begin() + pos, stmt);
 }
 

@@ -6,8 +6,8 @@
 #include "Compiler.hpp"
 
 // Translates an AST IF statement to LLVM
-void Compiler::compileIfStatement(AstStatement *stmt) {
-    AstIfStmt *condStmt = static_cast<AstIfStmt *>(stmt);
+void Compiler::compileIfStatement(std::shared_ptr<AstStatement> stmt) {
+    std::shared_ptr<AstIfStmt> condStmt = std::static_pointer_cast<AstIfStmt>(stmt);
     AstBlock *astTrueBlock = condStmt->getTrueBlock();
     AstBlock *astFalseBlock = condStmt->getFalseBlock();
     
@@ -55,8 +55,8 @@ void Compiler::compileIfStatement(AstStatement *stmt) {
 }
 
 // Translates a while statement to LLVM
-void Compiler::compileWhileStatement(AstStatement *stmt) {
-    AstWhileStmt *loop = static_cast<AstWhileStmt *>(stmt);
+void Compiler::compileWhileStatement(std::shared_ptr<AstStatement> stmt) {
+    std::shared_ptr<AstWhileStmt> loop = std::static_pointer_cast<AstWhileStmt>(stmt);
 
     BasicBlock *loopBlock = BasicBlock::Create(*context, "loop_body" + std::to_string(blockCount), currentFunc);
     BasicBlock *loopCmp = BasicBlock::Create(*context, "loop_cmp" + std::to_string(blockCount), currentFunc);

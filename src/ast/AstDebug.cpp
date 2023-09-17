@@ -100,10 +100,10 @@ void AstBlock::print(int indent) {
         for (int i = 0; i<indent; i++) std::cout << " ";
         switch (stmt->getType()) {
             case V_AstType::If: {
-                static_cast<AstIfStmt *>(stmt)->print(indent);
+                std::static_pointer_cast<AstIfStmt>(stmt)->print(indent);
             } break;
             case V_AstType::While: {
-                static_cast<AstWhileStmt *>(stmt)->print(indent);
+                std::static_pointer_cast<AstWhileStmt>(stmt)->print(indent);
             } break;
             
             default: stmt->print();

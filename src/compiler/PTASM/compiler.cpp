@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "compiler.hpp"
 #include "ptasm.hpp"
 
@@ -5,9 +7,9 @@ Compiler::Compiler(std::string name) {
     file = new AsmFile(name);
 }
 
-void Compiler::compile(AstTree *tree) {
+void Compiler::compile(std::shared_ptr<AstTree> tree) {
     // Start by compiling global statements
-    for (AstGlobalStatement *global : tree->getGlobalStatements()) {
+    for (auto const &global : tree->getGlobalStatements()) {
         if (global->getType() == V_AstType::ExternFunc) {
         
         } else if (global->getType() == V_AstType::Func) {
@@ -16,8 +18,8 @@ void Compiler::compile(AstTree *tree) {
     }
 }
 
-void Compiler::compileFunction(AstGlobalStatement *global) {
-    AstFunction *func = static_cast<AstFunction *>(global);
+void Compiler::compileFunction(std::shared_ptr<AstGlobalStatement> global) {
+    std::shared_ptr<AstFunction> func = std::static_pointer_cast<AstFunction>(global);
     AsmFunction *asmFunc = new AsmFunction(func->getName());
     file->addFunction(asmFunc);
     
@@ -25,22 +27,22 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
     compileBlock(asmFunc, func->getBlock());
 }
 
-void Compiler::compileBlock(AsmFunction *func, AstBlock *block) {
+void Compiler::compileBlock(AsmFunction *func, std::shared_ptr<AstBlock> block) {
     std::string blockName = "block" + std::to_string(label_counter);
     ++label_counter;
     AsmBlock *asmBlock = new AsmBlock(blockName);
     func->addBlock(asmBlock);
     
     // Now, assemble each statement within the block
-    for (AstStatement *stmt : block->getBlock()) {
+    for (auto const &stmt : block->getBlock()) {
         compileStatement(func, asmBlock, stmt);
     }
 }
 
-void Compiler::compileStatement(AsmFunction *func, AsmBlock *block, AstStatement *stmt) {
+void Compiler::compileStatement(AsmFunction *func, AsmBlock *block, std::shared_ptr<AstStatement> stmt) {
     switch (stmt->getType()) {
         case V_AstType::VarDec: {
-            AstVarDec *vd = static_cast<AstVarDec *>(stmt);
+            std::shared_ptr<AstVarDec> vd = std::static_pointer_cast<AstVarDec>(stmt);
         
             AsmInstruction *instr = new AsmInstruction(V_AsmType::Alloca);
             instr->setDestOperand(new AsmId(vd->getName()));
@@ -66,10 +68,10 @@ void Compiler::compileStatement(AsmFunction *func, AsmBlock *block, AstStatement
     }
 }
 
-AsmOperand *Compiler::compileExpression(AsmBlock *block, AstExpression *expr) {
+AsmOperand *Compiler::compileExpression(AsmBlock *block, std::shared_ptr<AstExpression> expr) {
     switch (expr->getType()) {
         case V_AstType::I32L: {
-            AstI32 *i = static_cast<AstI32 *>(expr);
+            std::shared_ptr<AstI32> i = std::static_pointer_cast<AstI32>(expr);
             return new AsmInt(i->getValue());
         }
         

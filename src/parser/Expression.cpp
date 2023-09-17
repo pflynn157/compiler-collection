@@ -15,13 +15,13 @@ extern "C" {
 }
 
 // Builds a constant expression value
-AstExpression *Parser::buildConstExpr(token tk) {
+std::shared_ptr<AstExpression> Parser::buildConstExpr(token tk) {
     switch (tk) {
-        case t_true: return new AstI32(1);
-        case t_false: return new AstI32(0);
-        case t_char_literal: return new AstChar(lex_get_id(scanner)[0]);
-        case t_int_literal: return new AstI32(lex_get_int(scanner));
-        case t_string_literal: return new AstString(lex_get_id(scanner));
+        case t_true: return std::make_shared<AstI32>(1);
+        case t_false: return std::make_shared<AstI32>(0);
+        case t_char_literal: return std::make_shared<AstChar>(lex_get_id(scanner)[0]);
+        case t_int_literal: return std::make_shared<AstI32>(lex_get_int(scanner));
+        case t_string_literal: return std::make_shared<AstString>(lex_get_id(scanner));
         
         default: {}
     }
@@ -49,40 +49,40 @@ bool Parser::buildOperator(token tk, ExprContext *ctx) {
         case t_lte:
         case t_lgand:
         case t_lgor: {
-            AstBinaryOp *op = new AstBinaryOp;
-            AstUnaryOp *op1 = new AstUnaryOp;
+            std::shared_ptr<AstBinaryOp> op = std::make_shared<AstBinaryOp>();
+            std::shared_ptr<AstUnaryOp> op1 = std::make_shared<AstUnaryOp>();
             bool useUnary = false;
             switch (tk) {
-                case t_assign: op = new AstAssignOp; break;
-                case t_plus: op = new AstAddOp; break;
-                case t_mul: op = new AstMulOp; break;
-                case t_div: op = new AstDivOp; break;
-                case t_mod: op = new AstModOp; break;
-                case t_and: op = new AstAndOp; break;
-                case t_or: op = new AstOrOp; break;
-                case t_xor: op = new AstXorOp; break;
-                case t_eq: op = new AstEQOp; break;
-                case t_neq: op = new AstNEQOp; break;
-                case t_gt: op = new AstGTOp; break;
-                case t_lt: op = new AstLTOp; break;
-                case t_gte: op = new AstGTEOp; break;
-                case t_lte: op = new AstLTEOp; break;
-                case t_lgand: op = new AstLogicalAndOp; break;
-                case t_lgor: op = new AstLogicalOrOp; break;
+                case t_assign: op = std::make_shared<AstAssignOp>(); break;
+                case t_plus: op = std::make_shared<AstAddOp>(); break;
+                case t_mul: op = std::make_shared<AstMulOp>(); break;
+                case t_div: op = std::make_shared<AstDivOp>(); break;
+                case t_mod: op = std::make_shared<AstModOp>(); break;
+                case t_and: op = std::make_shared<AstAndOp>(); break;
+                case t_or: op = std::make_shared<AstOrOp>(); break;
+                case t_xor: op = std::make_shared<AstXorOp>(); break;
+                case t_eq: op = std::make_shared<AstEQOp>(); break;
+                case t_neq: op = std::make_shared<AstNEQOp>(); break;
+                case t_gt: op = std::make_shared<AstGTOp>(); break;
+                case t_lt: op = std::make_shared<AstLTOp>(); break;
+                case t_gte: op = std::make_shared<AstGTEOp>(); break;
+                case t_lte: op = std::make_shared<AstLTEOp>(); break;
+                case t_lgand: op = std::make_shared<AstLogicalAndOp>(); break;
+                case t_lgor: op = std::make_shared<AstLogicalOrOp>(); break;
                 case t_minus: {
                     if (ctx->lastWasOp) {
-                        op1 = new AstNegOp;
+                        op1 = std::make_shared<AstNegOp>();
                         useUnary = true;
                     } else {
-                        op = new AstSubOp;
+                        op = std::make_shared<AstSubOp>();
                     }
                 } break;
             }
             
             if (ctx->opStack.size() > 0 && useUnary == false) {
-                AstOp *top = ctx->opStack.top();
+                std::shared_ptr<AstOp> top = ctx->opStack.top();
                     if (top->isBinaryOp()) {
-                    AstBinaryOp *op2 = static_cast<AstBinaryOp *>(top);
+                    std::shared_ptr<AstBinaryOp> op2 = std::static_pointer_cast<AstBinaryOp>(top);
                     if (op->getPrecedence() > op2->getPrecedence()) {
                         if (!applyHigherPred(ctx)) return false;
                     }
@@ -113,15 +113,13 @@ bool Parser::buildIDExpr(AstBlock *block, token tk, ExprContext *ctx) {
     
     tk = lex_get_next(scanner);
     if (tk == t_lbracket) {
-        //AstExpression *index = nullptr;
-        //buildExpression(nullptr, DataType::I32, RBracket, EmptyToken, &index);
-        AstExpression *index = buildExpression(block, AstBuilder::buildInt32Type(), t_rbracket);
+        std::shared_ptr<AstExpression> index = buildExpression(block, AstBuilder::buildInt32Type(), t_rbracket);
         if (index == nullptr) {
             syntax->addError(0, "Invalid array reference.");
             return false;
         }
         
-        AstArrayAccess *acc = new AstArrayAccess(name);
+        std::shared_ptr<AstArrayAccess> acc = std::make_shared<AstArrayAccess>(name);
         acc->setIndex(index);
         ctx->output.push(acc);
     } else if (tk == t_lparen) {
@@ -134,8 +132,8 @@ bool Parser::buildIDExpr(AstBlock *block, token tk, ExprContext *ctx) {
             return false;
         }
     
-        AstFuncCallExpr *fc = new AstFuncCallExpr(name);
-        AstExpression *args = buildExpression(block, ctx->varType, t_rparen, false, true);
+        std::shared_ptr<AstFuncCallExpr> fc = std::make_shared<AstFuncCallExpr>(name);
+        std::shared_ptr<AstExpression> args = buildExpression(block, ctx->varType, t_rparen, false, true);
         fc->setArgExpression(args);
         
         ctx->output.push(fc);
@@ -148,21 +146,21 @@ bool Parser::buildIDExpr(AstBlock *block, token tk, ExprContext *ctx) {
             return false;
         }
         
-        AstStructAccess *val = new AstStructAccess(name, lex_get_id(scanner));
+        std::shared_ptr<AstStructAccess> val = std::make_shared<AstStructAccess>(name, lex_get_id(scanner));
         ctx->output.push(val);
     } else {
         int constVal = isConstant(name);
         if (constVal > 0) {
             if (constVal == 1) {
-                AstExpression *expr = globalConsts[name].second;
+                std::shared_ptr<AstExpression> expr = globalConsts[name].second;
                 ctx->output.push(expr);
             } else if (constVal == 2) {
-                AstExpression *expr = localConsts[name].second;
+                std::shared_ptr<AstExpression> expr = localConsts[name].second;
                 ctx->output.push(expr);
             }
         } else {
             if (block->isVar(name)) {
-                AstID *id = new AstID(name);
+                std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
                 ctx->output.push(id);
             } else {
                 syntax->addError(0, "Unknown variable: " + name);
@@ -181,17 +179,17 @@ bool Parser::applyHigherPred(ExprContext *ctx) {
         syntax->addError(0, "Invalid expression: No RVAL");
         return false;
     }
-    AstExpression *rval = checkExpression(ctx->output.top(), ctx->varType);
+    std::shared_ptr<AstExpression> rval = checkExpression(ctx->output.top(), ctx->varType);
     ctx->output.pop();
     
     if (ctx->output.empty()) {
         syntax->addError(0, "Invalid expression: No LVAL");
         return false;
     }
-    AstExpression *lval = checkExpression(ctx->output.top(), ctx->varType);
+    std::shared_ptr<AstExpression> lval = checkExpression(ctx->output.top(), ctx->varType);
     ctx->output.pop();
     
-    AstBinaryOp *op = static_cast<AstBinaryOp *>(ctx->opStack.top());
+    std::shared_ptr<AstBinaryOp> op = std::static_pointer_cast<AstBinaryOp>(ctx->opStack.top());
     ctx->opStack.pop();
     
     op->setLVal(lval);
@@ -209,21 +207,21 @@ bool Parser::applyAssoc(ExprContext *ctx) {
             syntax->addError(0, "Invalid expression: No RVAL");
             return false;
         }
-        AstExpression *rval = checkExpression(ctx->output.top(), ctx->varType);
+        std::shared_ptr<AstExpression> rval = checkExpression(ctx->output.top(), ctx->varType);
         ctx->output.pop();
         
         if (ctx->output.empty()) {
             syntax->addError(0, "Invalid expression: No LVAL");
             return false;
         }
-        AstExpression *lval = checkExpression(ctx->output.top(), ctx->varType);
+        std::shared_ptr<AstExpression> lval = checkExpression(ctx->output.top(), ctx->varType);
         ctx->output.pop();
         
-        AstBinaryOp *op = static_cast<AstBinaryOp *>(ctx->opStack.top());
+        std::shared_ptr<AstBinaryOp> op = std::static_pointer_cast<AstBinaryOp>(ctx->opStack.top());
         ctx->opStack.pop();
         
         if (op->getType() == lastOp) {
-            AstBinaryOp *op2 = static_cast<AstBinaryOp *>(rval);
+            std::shared_ptr<AstBinaryOp> op2 = std::static_pointer_cast<AstBinaryOp>(rval);
             
             rval = op2->getRVal();
             op2->setRVal(op2->getLVal());
@@ -243,12 +241,13 @@ bool Parser::applyAssoc(ExprContext *ctx) {
 }
 
 // Our new expression builder
-AstExpression *Parser::buildExpression(AstBlock *block, AstDataType *currentType, token stopToken, bool isConst, bool buildList) {
+std::shared_ptr<AstExpression> Parser::buildExpression(AstBlock *block, AstDataType *currentType,
+                                                        token stopToken, bool isConst, bool buildList) {
     ExprContext *ctx = new ExprContext;
     if (currentType) ctx->varType = currentType;
     else ctx->varType = AstBuilder::buildVoidType();
     
-    AstExprList *list = new AstExprList;
+    std::shared_ptr<AstExprList> list = std::make_shared<AstExprList>();
     bool isList = buildList;
     
     token tk = lex_get_next(scanner);
@@ -260,7 +259,7 @@ AstExpression *Parser::buildExpression(AstBlock *block, AstDataType *currentType
             case t_int_literal:
             case t_string_literal: {
                 ctx->lastWasOp = false;
-                AstExpression *expr = buildConstExpr(tk);
+                std::shared_ptr<AstExpression> expr = buildConstExpr(tk);
                 ctx->output.push(expr);
             } break;
             
@@ -291,7 +290,7 @@ AstExpression *Parser::buildExpression(AstBlock *block, AstDataType *currentType
             } break;
             
             case t_lparen: {
-                AstExpression *subExpr = buildExpression(block, ctx->varType, t_rparen, false, isList);
+                std::shared_ptr<AstExpression> subExpr = buildExpression(block, ctx->varType, t_rparen, false, isList);
                 if (!subExpr) {
                     return nullptr;
                 }
@@ -304,7 +303,7 @@ AstExpression *Parser::buildExpression(AstBlock *block, AstDataType *currentType
             
             case t_comma: {
                 applyAssoc(ctx);
-                AstExpression *expr = checkExpression(ctx->output.top(), ctx->varType);
+                std::shared_ptr<AstExpression> expr = checkExpression(ctx->output.top(), ctx->varType);
                 list->addExpression(expr);
                 while (ctx->output.size() > 0) ctx->output.pop();
                 while (ctx->opStack.size() > 0) ctx->opStack.pop();
@@ -319,10 +318,10 @@ AstExpression *Parser::buildExpression(AstBlock *block, AstDataType *currentType
         
         if (!ctx->lastWasOp && ctx->opStack.size() > 0) {
             if (ctx->opStack.top()->getType() == V_AstType::Neg) {
-                AstExpression *val = checkExpression(ctx->output.top(), ctx->varType);
+                std::shared_ptr<AstExpression> val = checkExpression(ctx->output.top(), ctx->varType);
                 ctx->output.pop();
                 
-                AstNegOp *op = static_cast<AstNegOp *>(ctx->opStack.top());
+                std::shared_ptr<AstNegOp> op = std::static_pointer_cast<AstNegOp>(ctx->opStack.top());
                 ctx->opStack.pop();
                 op->setVal(val);
                 ctx->output.push(op);
@@ -346,7 +345,7 @@ AstExpression *Parser::buildExpression(AstBlock *block, AstDataType *currentType
     }
     
     // Type check the top
-    AstExpression *expr = checkExpression(ctx->output.top(), ctx->varType);
+    std::shared_ptr<AstExpression> expr = checkExpression(ctx->output.top(), ctx->varType);
     
     if (isList) {
         list->addExpression(expr);

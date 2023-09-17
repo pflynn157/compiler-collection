@@ -3,6 +3,8 @@
 // This file is part of the Tiny Lang compiler.
 // Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
 //
+#include <memory>
+
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
 
@@ -13,22 +15,22 @@ extern "C" {
 // Called if a conditional statement has only one operand. If it does,
 // we have to expand to have two operands before we get down to the
 // compiler layer
-AstExpression *Parser::checkCondExpression(AstBlock *block, AstExpression *toCheck) {
-    AstExpression *expr = toCheck;
+std::shared_ptr<AstExpression> Parser::checkCondExpression(AstBlock *block, std::shared_ptr<AstExpression> toCheck) {
+    std::shared_ptr<AstExpression> expr = toCheck;
     
     switch (toCheck->getType()) {
         case V_AstType::ID: {
-            AstID *id = static_cast<AstID *>(toCheck);
+            std::shared_ptr<AstID> id = std::static_pointer_cast<AstID>(toCheck);
             AstDataType *dataType = block->getDataType(id->getValue());            
-            AstEQOp *eq = new AstEQOp;
+            std::shared_ptr<AstEQOp> eq = std::make_shared<AstEQOp>();
             eq->setLVal(id);
             
             switch (dataType->getType()) {
-                case V_AstType::Bool: eq->setRVal(new AstI32(1)); break;
-                case V_AstType::Int8: eq->setRVal(new AstI8(1)); break;
-                case V_AstType::Int16: eq->setRVal(new AstI16(1)); break;
-                case V_AstType::Int32: eq->setRVal(new AstI32(1)); break;
-                case V_AstType::Int64: eq->setRVal(new AstI64(1)); break;
+                case V_AstType::Bool: eq->setRVal(std::make_shared<AstI32>(1)); break;
+                case V_AstType::Int8: eq->setRVal(std::make_shared<AstI8>(1)); break;
+                case V_AstType::Int16: eq->setRVal(std::make_shared<AstI16>(1)); break;
+                case V_AstType::Int32: eq->setRVal(std::make_shared<AstI32>(1)); break;
+                case V_AstType::Int64: eq->setRVal(std::make_shared<AstI64>(1)); break;
                 
                 default: {}
             }
@@ -37,9 +39,9 @@ AstExpression *Parser::checkCondExpression(AstBlock *block, AstExpression *toChe
         } break;
         
         case V_AstType::I32L: {
-            AstEQOp *eq = new AstEQOp;
+            std::shared_ptr<AstEQOp> eq = std::make_shared<AstEQOp>();
             eq->setLVal(expr);
-            eq->setRVal(new AstI32(1));
+            eq->setRVal(std::make_shared<AstI32>(1));
             expr = eq;
         } break;
         
@@ -52,12 +54,12 @@ AstExpression *Parser::checkCondExpression(AstBlock *block, AstExpression *toChe
 // Builds a conditional statement
 bool Parser::buildConditional(AstBlock *block) {
     AstIfStmt *cond = new AstIfStmt;
-    AstExpression *arg = buildExpression(block, nullptr, t_then);
+    std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr, t_then);
     if (!arg) return false;
     cond->setExpression(arg);
     block->addStatement(cond);
     
-    AstExpression *expr = checkCondExpression(block, cond->getExpression());
+    std::shared_ptr<AstExpression> expr = checkCondExpression(block, cond->getExpression());
     cond->setExpression(expr);
     
     AstBlock *trueBlock = new AstBlock;
@@ -75,12 +77,12 @@ bool Parser::buildConditional(AstBlock *block) {
 // Builds a while statement
 bool Parser::buildWhile(AstBlock *block) {
     AstWhileStmt *loop = new AstWhileStmt;
-    AstExpression *arg = buildExpression(block, nullptr, t_do);
+    std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr, t_do);
     if (!arg) return false;
     loop->setExpression(arg);
     block->addStatement(loop);
     
-    AstExpression *expr = checkCondExpression(block, loop->getExpression());
+    std::shared_ptr<AstExpression> expr = checkCondExpression(block, loop->getExpression());
     loop->setExpression(expr);
     
     AstBlock *block2 = new AstBlock;

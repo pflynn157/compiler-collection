@@ -132,40 +132,40 @@ void Compiler::compileStatement(AstStatement *stmt) {
 }
 
 // Converts an AST value to an LLVM value
-Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
+Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign) {
     switch (expr->getType()) {
         case V_AstType::I8L: {
-            AstI8 *i8 = static_cast<AstI8 *>(expr);
+            std::shared_ptr<AstI8> i8 = std::static_pointer_cast<AstI8>(expr);
             return builder->getInt8(i8->getValue());
         } break;
         
         case V_AstType::I16L: {
-            AstI16 *i16 = static_cast<AstI16 *>(expr);
+            std::shared_ptr<AstI16> i16 = std::static_pointer_cast<AstI16>(expr);
             return builder->getInt16(i16->getValue());
         } break;
         
         case V_AstType::I32L: {
-            AstI32 *ival = static_cast<AstI32 *>(expr);
+            std::shared_ptr<AstI32> ival = std::static_pointer_cast<AstI32>(expr);
             return builder->getInt32(ival->getValue());
         } break;
         
         case V_AstType::I64L: {
-            AstI64 *i64 = static_cast<AstI64 *>(expr);
+            std::shared_ptr<AstI64> i64 = std::static_pointer_cast<AstI64>(expr);
             return builder->getInt64(i64->getValue());
         } break;
         
         case V_AstType::CharL: {
-            AstChar *cval = static_cast<AstChar *>(expr);
+            std::shared_ptr<AstChar> cval = std::static_pointer_cast<AstChar>(expr);
             return builder->getInt8(cval->getValue());
         } break;
         
         case V_AstType::StringL: {
-            AstString *str = static_cast<AstString *>(expr);
+            std::shared_ptr<AstString> str = std::static_pointer_cast<AstString>(expr);
             return builder->CreateGlobalStringPtr(str->getValue());
         } break;
         
         case V_AstType::ID: {
-            AstID *id = static_cast<AstID *>(expr);
+            std::shared_ptr<AstID> id = std::static_pointer_cast<AstID>(expr);
             AllocaInst *ptr = symtable[id->getValue()];
             Type *type = translateType(typeTable[id->getValue()]);
             
@@ -174,7 +174,7 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
         } break;
         
         case V_AstType::ArrayAccess: {
-            AstArrayAccess *acc = static_cast<AstArrayAccess *>(expr);
+            std::shared_ptr<AstArrayAccess> acc = std::static_pointer_cast<AstArrayAccess>(expr);
             AllocaInst *ptr = symtable[acc->getValue()];
             AstDataType *ptrType = typeTable[acc->getValue()];
             Value *index = compileValue(acc->getIndex());
@@ -202,10 +202,10 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
         case V_AstType::StructAccess: return compileStructAccess(expr, isAssign);
         
         case V_AstType::FuncCallExpr: {
-            AstFuncCallExpr *fc = static_cast<AstFuncCallExpr *>(expr);
+            std::shared_ptr<AstFuncCallExpr> fc = std::static_pointer_cast<AstFuncCallExpr>(expr);
             std::vector<Value *> args;
             
-            AstExprList *list = static_cast<AstExprList *>(fc->getArgExpression());
+            std::shared_ptr<AstExprList> list = std::static_pointer_cast<AstExprList>(fc->getArgExpression());
             for (auto arg : list->getList()) {
                 Value *val = compileValue(arg);
                 args.push_back(val);
@@ -217,15 +217,15 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
         } break;
         
         case V_AstType::Neg: {
-            AstNegOp *op = static_cast<AstNegOp *>(expr);
+            std::shared_ptr<AstNegOp> op = std::static_pointer_cast<AstNegOp>(expr);
             Value *val = compileValue(op->getVal());
             
             return builder->CreateNeg(val);
         } break;
         
         case V_AstType::Assign: {
-            AstAssignOp *op = static_cast<AstAssignOp *>(expr);
-            AstExpression *lvalExpr = op->getLVal();
+            std::shared_ptr<AstAssignOp> op = std::static_pointer_cast<AstAssignOp >(expr);
+            std::shared_ptr<AstExpression> lvalExpr = op->getLVal();
             
             Value *ptr = compileValue(lvalExpr, true);
             Value *rval = compileValue(op->getRVal());
@@ -235,9 +235,9 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
         
         case V_AstType::LogicalAnd:
         case V_AstType::LogicalOr: {
-            AstBinaryOp *op = static_cast<AstBinaryOp *>(expr);
-            AstExpression *lvalExpr = op->getLVal();
-            AstExpression *rvalExpr = op->getRVal();
+            std::shared_ptr<AstBinaryOp> op = std::static_pointer_cast<AstBinaryOp>(expr);
+            std::shared_ptr<AstExpression> lvalExpr = op->getLVal();
+            std::shared_ptr<AstExpression> rvalExpr = op->getRVal();
             
             // We only want the LVal first
             Value *lval = compileValue(lvalExpr);
@@ -277,9 +277,9 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
         case V_AstType::LT:
         case V_AstType::GTE:
         case V_AstType::LTE: {
-            AstBinaryOp *op = static_cast<AstBinaryOp *>(expr);
-            AstExpression *lvalExpr = op->getLVal();
-            AstExpression *rvalExpr = op->getRVal();
+            std::shared_ptr<AstBinaryOp> op = std::static_pointer_cast<AstBinaryOp>(expr);
+            std::shared_ptr<AstExpression> lvalExpr = op->getLVal();
+            std::shared_ptr<AstExpression> rvalExpr = op->getRVal();
             
             Value *lval = compileValue(lvalExpr);
             Value *rval = compileValue(rvalExpr);
@@ -293,11 +293,11 @@ Value *Compiler::compileValue(AstExpression *expr, bool isAssign) {
             } else if (lvalExpr->getType() == V_AstType::StringL && rvalExpr->getType() == V_AstType::CharL) {
                 strOp = true;
             } else if (lvalExpr->getType() == V_AstType::ID && rvalExpr->getType() == V_AstType::CharL) {
-                AstID *lvalID = static_cast<AstID *>(lvalExpr);
+                std::shared_ptr<AstID> lvalID = std::static_pointer_cast<AstID>(lvalExpr);
                 if (typeTable[lvalID->getValue()]->getType() == V_AstType::String) strOp = true;
             } else if (lvalExpr->getType() == V_AstType::ID && rvalExpr->getType() == V_AstType::ID) {
-                AstID *lvalID = static_cast<AstID *>(lvalExpr);
-                AstID *rvalID = static_cast<AstID *>(rvalExpr);
+                std::shared_ptr<AstID> lvalID = std::static_pointer_cast<AstID>(lvalExpr);
+                std::shared_ptr<AstID> rvalID = std::static_pointer_cast<AstID>(rvalExpr);
                 
                 if (typeTable[lvalID->getValue()]->getType() == V_AstType::String) strOp = true;
                 if (typeTable[rvalID->getValue()]->getType() == V_AstType::String) {

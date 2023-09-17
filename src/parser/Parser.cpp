@@ -195,27 +195,27 @@ bool Parser::buildBlock(AstBlock *block, AstNode *parent) {
 
 // This is meant mainly for literals; it checks to make sure all the types in
 // the expression agree in type. LLVM will have a problem if not
-AstExpression *Parser::checkExpression(AstExpression *expr, AstDataType *varType) {
+std::shared_ptr<AstExpression> Parser::checkExpression(std::shared_ptr<AstExpression> expr, AstDataType *varType) {
     if (!varType) return expr;
 
     switch (expr->getType()) {
         case V_AstType::I32L: {
             // Change to byte literals
             if (varType->getType() == V_AstType::Int8) {
-                AstI32 *i32 = static_cast<AstI32 *>(expr);
-                AstI8 *byte = new AstI8(i32->getValue());
+                std::shared_ptr<AstI32> i32 = std::static_pointer_cast<AstI32>(expr);
+                std::shared_ptr<AstI8> byte = std::make_shared<AstI8>(i32->getValue());
                 expr = byte;
                 
             // Change to word literals
             } else if (varType->getType() == V_AstType::Int16) {
-                AstI32 *i32 = static_cast<AstI32 *>(expr);
-                AstI16 *i16 = new AstI16(i32->getValue());
+                std::shared_ptr<AstI32> i32 = std::static_pointer_cast<AstI32>(expr);
+                std::shared_ptr<AstI16> i16 = std::make_shared<AstI16>(i32->getValue());
                 expr = i16;
                 
             // Change to qword literals
             } else if (varType->getType() == V_AstType::Int64) {
-                AstI32 *i32 = static_cast<AstI32 *>(expr);
-                AstI64 *i64 = new AstI64(i32->getValue());
+                std::shared_ptr<AstI32> i32 = std::static_pointer_cast<AstI32>(expr);
+                std::shared_ptr<AstI64> i64 = std::make_shared<AstI64>(i32->getValue());
                 expr = i64;
             }
         } break;

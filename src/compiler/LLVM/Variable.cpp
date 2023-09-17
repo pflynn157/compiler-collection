@@ -44,7 +44,7 @@ void Compiler::compileStructDeclaration(AstStatement *stmt) {
         ptr = builder->CreateLoad(type, var);
         
         for (Var member : str->getItems()) {
-            AstExpression *defaultExpr = str->getDefaultExpression(member.name);
+            std::shared_ptr<AstExpression> defaultExpr = str->getDefaultExpression(member.name);
             Value *defaultVal = compileValue(defaultExpr);
             
             Value *ep = builder->CreateStructGEP(type1, ptr, index);
@@ -56,8 +56,8 @@ void Compiler::compileStructDeclaration(AstStatement *stmt) {
 }
 
 // Compiles a structure access expression
-Value *Compiler::compileStructAccess(AstExpression *expr, bool isAssign) {
-    AstStructAccess *sa = static_cast<AstStructAccess *>(expr);
+Value *Compiler::compileStructAccess(std::shared_ptr<AstExpression> expr, bool isAssign) {
+    std::shared_ptr<AstStructAccess> sa = std::static_pointer_cast<AstStructAccess>(expr);
     Value *ptr = symtable[sa->getName()];
     int pos = getStructIndex(sa->getName(), sa->getMember());
     

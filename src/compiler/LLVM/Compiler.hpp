@@ -14,6 +14,7 @@ using namespace llvm;
 #include <string>
 #include <map>
 #include <stack>
+#include <memory>
 
 #include <ast/ast.hpp>
 
@@ -32,7 +33,7 @@ public:
     void link();
 protected:
     void compileStatement(AstStatement *stmt);
-    Value *compileValue(AstExpression *expr, bool isAssign = false);
+    Value *compileValue(std::shared_ptr<AstExpression> expr, bool isAssign = false);
     Type *translateType(AstDataType *dataType);
     int getStructIndex(std::string name, std::string member);
 
@@ -48,7 +49,7 @@ protected:
     
     // Variable.cpp
     void compileStructDeclaration(AstStatement *stmt);
-    Value *compileStructAccess(AstExpression *expr, bool isAssign = false);
+    Value *compileStructAccess(std::shared_ptr<AstExpression> expr, bool isAssign = false);
 private:
     AstTree *tree;
     CFlags cflags;

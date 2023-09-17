@@ -54,7 +54,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
     if (tk == t_lbracket) {
         dataType = AstBuilder::buildPointerType(dataType);
         AstVarDec *empty = new AstVarDec("", dataType);
-        AstExpression *arg = buildExpression(block, AstBuilder::buildInt32Type(), t_rbracket);
+        std::shared_ptr<AstExpression> arg = buildExpression(block, AstBuilder::buildInt32Type(), t_rbracket);
         if (!arg) return false;
         empty->setExpression(arg); 
         
@@ -74,25 +74,25 @@ bool Parser::buildVariableDec(AstBlock *block) {
             va->setDataType(dataType);
             block->addStatement(va);
             
-            AstID *id = new AstID(name);
-            AstFuncCallExpr *callMalloc = new AstFuncCallExpr("malloc");
-            AstAssignOp *assign = new AstAssignOp(id, callMalloc);
+            std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
+            std::shared_ptr<AstFuncCallExpr> callMalloc = std::make_shared<AstFuncCallExpr>("malloc");
+            std::shared_ptr<AstAssignOp> assign = std::make_shared<AstAssignOp>(id, callMalloc);
             
             va->setExpression(assign);
             
             // In order to get a proper malloc, we need to multiply the argument by
             // the size of the type. Get the arguments, and do that
-            AstExprList *list = new AstExprList;
+            std::shared_ptr<AstExprList> list = std::make_shared<AstExprList>();
             callMalloc->setArgExpression(list);
             
-            AstI32 *size;
+            std::shared_ptr<AstI32> size;
             AstDataType *baseType = static_cast<AstPointerType *>(dataType)->getBaseType();
-            if (baseType->getType() == V_AstType::Int32) size = new AstI32(4);
-            else if (baseType->getType() == V_AstType::Int64) size = new AstI32(8);
-            else if (baseType->getType() == V_AstType::String) size = new AstI32(8);
-            else size = new AstI32(1);
+            if (baseType->getType() == V_AstType::Int32) size = std::make_shared<AstI32>(4);
+            else if (baseType->getType() == V_AstType::Int64) size = std::make_shared<AstI32>(8);
+            else if (baseType->getType() == V_AstType::String) size = std::make_shared<AstI32>(8);
+            else size = std::make_shared<AstI32>(1);
             
-            AstMulOp *op = new AstMulOp;
+            std::shared_ptr<AstMulOp> op = std::make_shared<AstMulOp>();
             op->setLVal(size);
             op->setRVal(vd->getExpression());
             list->addExpression(op);
@@ -110,15 +110,15 @@ bool Parser::buildVariableDec(AstBlock *block) {
         
     // Otherwise, we have a regular variable
     } else {
-        AstExpression *arg = buildExpression(block, dataType);
+        std::shared_ptr<AstExpression> arg = buildExpression(block, dataType);
         if (!arg) return false;
     
         for (std::string name : toDeclare) {
             AstVarDec *vd = new AstVarDec(name, dataType);
             block->addStatement(vd);
             
-            AstID *id = new AstID(name);
-            AstAssignOp *assign = new AstAssignOp(id, arg);
+            std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
+            std::shared_ptr<AstAssignOp> assign = std::make_shared<AstAssignOp>(id, arg);
             
             AstExprStatement *va = new AstExprStatement;
             va->setDataType(dataType);
@@ -137,8 +137,7 @@ bool Parser::buildVariableDec(AstBlock *block) {
 bool Parser::buildVariableAssign(AstBlock *block, token t_idToken) {
     AstDataType *dataType = block->getDataType(lex_get_id(scanner));
     
-    // TODO: This abomination is temporary
-    AstExpression *expr = buildExpression(block, dataType);
+    std::shared_ptr<AstExpression> expr = buildExpression(block, dataType);
     if (!expr) return false;
     
     AstExprStatement *stmt = new AstExprStatement;
@@ -178,15 +177,16 @@ bool Parser::buildConst(bool isGlobal) {
     }
     
     // Build the expression. We create a dummy statement for this
-    AstExpression *expr = buildExpression(nullptr, dataType, t_semicolon, true);
+    std::shared_ptr<AstExpression> expr = buildExpression(nullptr, dataType, t_semicolon, true);
     if (!expr) return false;
     
     // Put it all together
     if (isGlobal) {
-        globalConsts[name] = std::pair<AstDataType *, AstExpression*>(dataType, expr);
+        globalConsts[name] = std::pair<AstDataType *, std::shared_ptr<AstExpression>>(dataType, expr);
     } else {
-        localConsts[name] = std::pair<AstDataType *, AstExpression*>(dataType, expr);
+        localConsts[name] = std::pair<AstDataType *, std::shared_ptr<AstExpression>>(dataType, expr);
     }
     
     return true;
 }
+

@@ -4,6 +4,7 @@
 // Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <iostream>
+#include <memory>
 
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
@@ -152,7 +153,7 @@ bool Parser::buildFunctionCallStmt(AstBlock *block, token idToken) {
     AstFuncCallStmt *fc = new AstFuncCallStmt(lex_get_id(scanner));
     block->addStatement(fc);
     
-    AstExpression *args = buildExpression(block, nullptr, t_semicolon, false, true);
+    std::shared_ptr<AstExpression> args = buildExpression(block, nullptr, t_semicolon, false, true);
     if (!args) return false;
     fc->setExpression(args);
     
@@ -164,7 +165,7 @@ bool Parser::buildReturn(AstBlock *block) {
     AstReturnStmt *stmt = new AstReturnStmt;
     block->addStatement(stmt);
     
-    AstExpression *arg = buildExpression(block, nullptr);
+    std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr);
     if (!arg) return false;
     stmt->setExpression(arg);
     

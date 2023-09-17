@@ -438,9 +438,9 @@ void lex_debug(token t, lex *l)
         case t_arrow: puts("->"); break;
         
         case t_id: printf("ID: %s\n", lex_get_id(l)); break;
-        case t_int_literal: printf("INT_LITERAL: %d\n", lex_get_int(l)); break;
+        case t_int_literal: printf("INT_LITERAL: %ld\n", lex_get_int(l)); break;
         case t_string_literal: printf("STR(%s)\n", lex_get_id(l)); break;
-        case t_char_literal: printf("CHAR(%c)\n", lex_get_int(l)); break;
+        case t_char_literal: printf("CHAR(%c)\n", (char)lex_get_int(l)); break;
         
         default: puts("???");
     }

@@ -112,7 +112,7 @@ void Compiler::compileFuncCallStatement(AstStatement *stmt) {
         Value *val = compileValue(stmt);
         args.push_back(val);
     }*/
-    AstExprList *list = static_cast<AstExprList *>(fc->getExpression());
+    std::shared_ptr<AstExprList> list = std::static_pointer_cast<AstExprList>(fc->getExpression());
     for (auto arg : list->getList()) {
         Value *val = compileValue(arg);
         args.push_back(val);

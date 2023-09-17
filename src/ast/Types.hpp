@@ -7,6 +7,7 @@
 
 #include <string>
 #include <map>
+#include <memory>
 
 //
 // Contains the variants for all AST nodes
@@ -203,7 +204,7 @@ public:
         this->name = name;
     }
     
-    void addItem(Var var, AstExpression *defaultExpression) {
+    void addItem(Var var, std::shared_ptr<AstExpression> defaultExpression) {
         items.push_back(var);
         defaultExpressions[var.name] = defaultExpression;
         
@@ -226,7 +227,7 @@ public:
     std::vector<Var> getItems() { return items; }
     int getSize() { return size; }
     
-    AstExpression *getDefaultExpression(std::string name) {
+    std::shared_ptr<AstExpression> getDefaultExpression(std::string name) {
         return defaultExpressions[name];
     }
     
@@ -235,7 +236,7 @@ public:
 private:
     std::string name;
     std::vector<Var> items;
-    std::map<std::string, AstExpression*> defaultExpressions;
+    std::map<std::string, std::shared_ptr<AstExpression>> defaultExpressions;
     int size = 0;
 };
 

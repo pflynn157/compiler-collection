@@ -6,6 +6,7 @@
 // Structure.cpp
 // Handles parsing for structs
 #include <map>
+#include <memory>
 
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
@@ -68,8 +69,7 @@ bool Parser::buildStructMember(AstStruct *str, token tk) {
     tk = lex_get_next(scanner);
         
     if (tk == t_assign) {
-        AstExpression *expr = nullptr;
-        expr = buildExpression(nullptr, dataType, t_semicolon, true);
+        std::shared_ptr<AstExpression> expr = buildExpression(nullptr, dataType, t_semicolon, true);
         if (!expr) return false;
                 
         Var v;
@@ -135,11 +135,11 @@ bool Parser::buildStructDec(AstBlock *block) {
     } else if (tk == t_assign) {
         dec->setNoInit(true);
         AstExprStatement *empty = new AstExprStatement;
-        AstExpression *arg = buildExpression(block, AstBuilder::buildStructType(structName));
+        std::shared_ptr<AstExpression> arg = buildExpression(block, AstBuilder::buildStructType(structName));
         if (!arg) return false;
         
-        AstID *id = new AstID(name);
-        AstAssignOp *assign = new AstAssignOp(id, arg);
+        std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
+        std::shared_ptr<AstAssignOp> assign = std::make_shared<AstAssignOp>(id, arg);
         
         empty->setExpression(assign);
         block->addStatement(empty);

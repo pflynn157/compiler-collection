@@ -8,6 +8,7 @@
 #include <string>
 #include <map>
 #include <stack>
+#include <memory>
 
 #include <parser/ErrorManager.hpp>
 #include <ast/ast.hpp>
@@ -54,22 +55,25 @@ protected:
     
     // Expression.cpp
     struct ExprContext {
-        std::stack<AstExpression *> output;
-        std::stack<AstOp *> opStack;
+        std::stack<std::shared_ptr<AstExpression>> output;
+        std::stack<std::shared_ptr<AstOp>> opStack;
         AstDataType *varType;
         bool lastWasOp = true;
     };
     
-    AstExpression *buildConstExpr(token tk);
+    std::shared_ptr<AstExpression> buildConstExpr(token tk);
     bool buildOperator(token tk, ExprContext *ctx);
     bool buildIDExpr(AstBlock *block, token tk, ExprContext *ctx);
     bool applyHigherPred(ExprContext *ctx);
     bool applyAssoc(ExprContext *ctx);
-    AstExpression *buildExpression(AstBlock *block, AstDataType *currentType, token stopToken = t_semicolon, bool isConst = false, bool buildList = false);
-    AstExpression *checkExpression(AstExpression *expr, AstDataType *varType);
+    std::shared_ptr<AstExpression> buildExpression(
+                        AstBlock *block, AstDataType *currentType,
+                        token stopToken = t_semicolon,
+                        bool isConst = false, bool buildList = false);
+    std::shared_ptr<AstExpression> checkExpression(std::shared_ptr<AstExpression> expr, AstDataType *varType);
     
     bool buildBlock(AstBlock *block, AstNode *parent = nullptr);
-    AstExpression *checkCondExpression(AstBlock *block, AstExpression *toCheck);
+    std::shared_ptr<AstExpression> checkCondExpression(AstBlock *block, std::shared_ptr<AstExpression> toCheck);
     int isConstant(std::string name);
     bool isVar(std::string name);
     bool isFunc(std::string name);
@@ -81,8 +85,8 @@ private:
     AstTree *tree;
     ErrorManager *syntax;
     
-    std::map<std::string, std::pair<AstDataType *, AstExpression*>> globalConsts;
-    std::map<std::string, std::pair<AstDataType *, AstExpression*>> localConsts;
+    std::map<std::string, std::pair<AstDataType *, std::shared_ptr<AstExpression>>> globalConsts;
+    std::map<std::string, std::pair<AstDataType *, std::shared_ptr<AstExpression>>> localConsts;
     std::vector<std::string> funcs;
 };
 

@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <ast/Types.hpp>
 #include <ast/Expression.hpp>
@@ -21,14 +22,17 @@ public:
     explicit AstStatement() : AstNode(V_AstType::None) {}
     explicit AstStatement(V_AstType type) : AstNode(type) {}
     
-    void setExpression(AstExpression *expr) { this->expr = expr; }
-    AstExpression *getExpression() { return expr; }
-    bool hasExpression() { return expr != nullptr; }
+    void setExpression(std::shared_ptr<AstExpression> expr) { this->expr = expr; }
+    std::shared_ptr<AstExpression> getExpression() { return expr; }
+    bool hasExpression() {
+        if (expr) return true;
+        return false;
+    }
     
     virtual void print() {}
     virtual std::string dot(std::string parent) { return ""; }
 private:
-    AstExpression *expr = nullptr;
+    std::shared_ptr<AstExpression> expr = nullptr;
 };
 
 // Represents an AST expression statement
@@ -81,17 +85,17 @@ public:
     }
     
     void setDataType(AstDataType *dataType) { this->dataType = dataType; }
-    void setPtrSize(AstExpression *size) { this->size = size; }
+    void setPtrSize(std::shared_ptr<AstExpression> size) { this->size = size; }
     
     std::string getName() { return name; }
     AstDataType *getDataType() { return dataType; }
-    AstExpression *getPtrSize() { return size; }
+    std::shared_ptr<AstExpression> getPtrSize() { return size; }
     
     void print();
     std::string dot(std::string parent) override;
 private:
     std::string name = "";
-    AstExpression *size = nullptr;
+    std::shared_ptr<AstExpression> size = nullptr;
     AstDataType *dataType;
 };
 

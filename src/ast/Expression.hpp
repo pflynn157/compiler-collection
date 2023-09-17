@@ -7,7 +7,8 @@
 
 #include <string>
 #include <vector>
-#include <stdint.h>
+#include <cstdint>
+#include <memory>
 
 #include <ast/Types.hpp>
 
@@ -26,13 +27,13 @@ class AstExprList : public AstExpression {
 public:
     AstExprList() : AstExpression(V_AstType::ExprList) {}
     
-    void addExpression(AstExpression *expr) { list.push_back(expr); }
-    std::vector<AstExpression *> getList() { return list; }
+    void addExpression(std::shared_ptr<AstExpression> expr) { list.push_back(expr); }
+    std::vector<std::shared_ptr<AstExpression>> getList() { return list; }
     
     void print();
     std::string dot(std::string parent) override;
 private:
-    std::vector<AstExpression *> list;
+    std::vector<std::shared_ptr<AstExpression>> list;
 };
 
 // Represents the base of operators
@@ -53,13 +54,13 @@ public:
         isBinary = false;
     }
 
-    void setVal(AstExpression *val) { this->val = val; }
-    AstExpression *getVal() { return val; }
+    void setVal(std::shared_ptr<AstExpression> val) { this->val = val; }
+    std::shared_ptr<AstExpression> getVal() { return val; }
     
     virtual void print() {}
     virtual std::string dot(std::string parent) { return ""; }
 protected:
-    AstExpression *val;
+    std::shared_ptr<AstExpression> val;
 };
 
 // Represents a negate expression
@@ -76,18 +77,19 @@ public:
 // Represents the base of a binary expression
 class AstBinaryOp : public AstOp {
 public:
-    void setLVal(AstExpression *lval) { this->lval = lval; }
-    void setRVal(AstExpression *rval) { this->rval = rval; }
+    void setLVal(std::shared_ptr<AstExpression> lval) { this->lval = lval; }
+    void setRVal(std::shared_ptr<AstExpression> rval) { this->rval = rval; }
     void setPrecedence(int p) { this->precedence = p; }
     
-    AstExpression *getLVal() { return lval; }
-    AstExpression *getRVal() { return rval; }
+    std::shared_ptr<AstExpression> getLVal() { return lval; }
+    std::shared_ptr<AstExpression> getRVal() { return rval; }
     int getPrecedence() { return precedence; }
     
     virtual void print() {}
     virtual std::string dot(std::string parent) { return ""; }
 protected:
-    AstExpression *lval, *rval;
+    std::shared_ptr<AstExpression> lval;
+    std::shared_ptr<AstExpression> rval;
     int precedence = 0;
 };
 
@@ -99,7 +101,7 @@ public:
         this->precedence = 16;
     }
     
-    explicit AstAssignOp(AstExpression *lval, AstExpression *rval) {
+    explicit AstAssignOp(std::shared_ptr<AstExpression> lval, std::shared_ptr<AstExpression> rval) {
         this->type = V_AstType::Assign;
         this->precedence = 16;
         this->lval = lval;
@@ -410,16 +412,16 @@ public:
         this->val = val;
     }
     
-    void setIndex(AstExpression *index) { this->index = index; }
+    void setIndex(std::shared_ptr<AstExpression> index) { this->index = index; }
     
     std::string getValue() { return val; }
-    AstExpression *getIndex() { return index; }
+    std::shared_ptr<AstExpression> getIndex() { return index; }
     
     void print();
     std::string dot(std::string parent) override;
 private:
     std::string val = "";
-    AstExpression *index;
+    std::shared_ptr<AstExpression> index;
 };
 
 // Represents a structure access
@@ -447,14 +449,14 @@ public:
         this->name = name;
     }
     
-    void setArgExpression(AstExpression *expr) { this->expr = expr; }
-    AstExpression *getArgExpression() { return expr; }
+    void setArgExpression(std::shared_ptr<AstExpression> expr) { this->expr = expr; }
+    std::shared_ptr<AstExpression> getArgExpression() { return expr; }
     std::string getName() { return name; }
     
     void print();
     std::string dot(std::string parent) override;
 private:
-    AstExpression *expr;
+    std::shared_ptr<AstExpression> expr;
     std::string name = "";
 };
 

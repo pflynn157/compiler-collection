@@ -34,14 +34,14 @@ Parser::Parser(std::string input) {
     // Add the built-in functions
     //string malloc(string)
     funcs.push_back("malloc");
-    AstExternFunction *FT1 = new AstExternFunction("malloc");
+    std::shared_ptr<AstExternFunction> FT1 = std::make_shared<AstExternFunction>("malloc");
     FT1->addArgument(Var(AstBuilder::buildInt32Type(), "size"));
     FT1->setDataType(AstBuilder::buildStringType());
     tree->addGlobalStatement(FT1);
     
     //println(string)
     funcs.push_back("println");
-    AstExternFunction *FT2 = new AstExternFunction("println");
+    std::shared_ptr<AstExternFunction> FT2 = std::make_shared<AstExternFunction>("println");
     FT2->setVarArgs();
     FT2->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT2->setDataType(AstBuilder::buildVoidType());
@@ -49,7 +49,7 @@ Parser::Parser(std::string input) {
     
     //print(string)
     funcs.push_back("print");
-    AstExternFunction *FT3 = new AstExternFunction("print");
+    std::shared_ptr<AstExternFunction> FT3 = std::make_shared<AstExternFunction>("print");
     FT3->setVarArgs();
     FT3->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT3->setDataType(AstBuilder::buildVoidType());
@@ -57,14 +57,14 @@ Parser::Parser(std::string input) {
     
     //i32 strlen(string)
     funcs.push_back("strlen");
-    AstExternFunction *FT4 = new AstExternFunction("strlen");
+    std::shared_ptr<AstExternFunction> FT4 = std::make_shared<AstExternFunction>("strlen");
     FT4->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT4->setDataType(AstBuilder::buildInt32Type());
     tree->addGlobalStatement(FT4);
     
     //i32 stringcmp(string, string)
     funcs.push_back("stringcmp");
-    AstExternFunction *FT5 = new AstExternFunction("stringcmp");
+    std::shared_ptr<AstExternFunction> FT5 = std::make_shared<AstExternFunction>("stringcmp");
     FT5->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT5->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT5->setDataType(AstBuilder::buildInt32Type());
@@ -72,7 +72,7 @@ Parser::Parser(std::string input) {
     
     //string strcat_str(string, string)
     funcs.push_back("strcat_str");
-    AstExternFunction *FT6 = new AstExternFunction("strcat_str");
+    std::shared_ptr<AstExternFunction> FT6 = std::make_shared<AstExternFunction>("strcat_str");
     FT6->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT6->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT6->setDataType(AstBuilder::buildStringType());
@@ -80,7 +80,7 @@ Parser::Parser(std::string input) {
     
     //string strcat_char(string, char)
     funcs.push_back("strcat_char");
-    AstExternFunction *FT7 = new AstExternFunction("strcat_char");
+    std::shared_ptr<AstExternFunction> FT7 = std::make_shared<AstExternFunction>("strcat_char");
     FT7->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT7->addArgument(Var(AstBuilder::buildCharType(), "c"));
     FT7->setDataType(AstBuilder::buildStringType());

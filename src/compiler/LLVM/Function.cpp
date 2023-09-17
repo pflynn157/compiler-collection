@@ -10,12 +10,12 @@
 //
 // Compiles a function and its body
 //
-void Compiler::compileFunction(AstGlobalStatement *global) {
+void Compiler::compileFunction(std::shared_ptr<AstGlobalStatement> global) {
     symtable.clear();
     typeTable.clear();
     structVarTable.clear();
     
-    AstFunction *astFunc = static_cast<AstFunction *>(global);
+    std::shared_ptr<AstFunction> astFunc = std::static_pointer_cast<AstFunction>(global);
 
     std::vector<Var> astVarArgs = astFunc->getArguments();
     FunctionType *FT;
@@ -75,8 +75,8 @@ void Compiler::compileFunction(AstGlobalStatement *global) {
 //
 // Compiles an extern function declaration
 //
-void Compiler::compileExternFunction(AstGlobalStatement *global) {
-    AstExternFunction *astFunc = static_cast<AstExternFunction *>(global);
+void Compiler::compileExternFunction(std::shared_ptr<AstGlobalStatement> global) {
+    std::shared_ptr<AstExternFunction> astFunc = std::static_pointer_cast<AstExternFunction>(global);
     
     std::vector<Var> astVarArgs = astFunc->getArguments();
     FunctionType *FT;

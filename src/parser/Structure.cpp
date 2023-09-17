@@ -33,7 +33,7 @@ bool Parser::buildStruct() {
     }
     
     // Builds the struct items
-    AstStruct *str = new AstStruct(name);
+    std::shared_ptr<AstStruct> str = std::make_shared<AstStruct>(name);
     tk = lex_get_next(scanner);
     
     while (tk != t_end && tk != t_eof) {
@@ -46,7 +46,7 @@ bool Parser::buildStruct() {
     return true;
 }
 
-bool Parser::buildStructMember(AstStruct *str, token tk) {
+bool Parser::buildStructMember(std::shared_ptr<AstStruct> str, token tk) {
     std::string valName = lex_get_id(scanner);
     
     if (tk != t_id) {
@@ -109,7 +109,7 @@ bool Parser::buildStructDec(std::shared_ptr<AstBlock> block) {
     }
     
     // Make sure the given structure exists
-    AstStruct *str = nullptr;
+    std::shared_ptr<AstStruct> str = nullptr;
     
     for (auto s : tree->getStructs()) {
         if (s->getName() == structName) {

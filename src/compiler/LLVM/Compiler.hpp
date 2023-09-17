@@ -38,8 +38,8 @@ protected:
     int getStructIndex(std::string name, std::string member);
 
     // Function.cpp
-    void compileFunction(AstGlobalStatement *global);
-    void compileExternFunction(AstGlobalStatement *global);
+    void compileFunction(std::shared_ptr<AstGlobalStatement> global);
+    void compileExternFunction(std::shared_ptr<AstGlobalStatement> global);
     void compileFuncCallStatement(std::shared_ptr<AstStatement> stmt);
     void compileReturnStatement(std::shared_ptr<AstStatement> stmt);
     

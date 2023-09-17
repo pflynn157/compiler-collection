@@ -50,7 +50,7 @@ protected:
     
     // Structure.cpp
     bool buildStruct();
-    bool buildStructMember(AstStruct *str, token tk);
+    bool buildStructMember(std::shared_ptr<AstStruct> str, token tk);
     bool buildStructDec(std::shared_ptr<AstBlock> block);
     
     // Expression.cpp

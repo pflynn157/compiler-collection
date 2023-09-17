@@ -102,14 +102,14 @@ bool Parser::buildFunction(token startToken, std::string className) {
     funcs.push_back(funcName);
     
     if (isExtern) {
-        AstExternFunction *ex = new AstExternFunction(funcName);
+        std::shared_ptr<AstExternFunction> ex = std::make_shared<AstExternFunction>(funcName);
         ex->setArguments(args);
         ex->setDataType(dataType);
         tree->addGlobalStatement(ex);
         return true;
     }
     
-    AstFunction *func = new AstFunction(funcName);
+    std::shared_ptr<AstFunction> func = std::make_shared<AstFunction>(funcName);
     func->setDataType(dataType);
     func->setArguments(args);
     tree->addGlobalStatement(func);

@@ -4,6 +4,7 @@
 // Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <iostream>
+#include <memory>
 
 #include "Compiler.hpp"
 #include <ast/ast_builder.hpp>
@@ -20,8 +21,8 @@ void Compiler::compileStructDeclaration(std::shared_ptr<AstStatement> stmt) {
     structVarTable[sd->getVarName()] = sd->getStructName();
     
     // Find the corresponding AST structure
-    AstStruct *str = nullptr;
-    for (AstStruct *s : tree->getStructs()) {
+    std::shared_ptr<AstStruct> str = nullptr;
+    for (auto const &s : tree->getStructs()) {
         if (s->getName() == sd->getStructName()) {
             str = s;
             break;

@@ -53,7 +53,7 @@ void Compiler::compileFunction(std::shared_ptr<AstGlobalStatement> global) {
             if (var.type->getType() == V_AstType::Struct) {
                 symtable[var.name] = (AllocaInst *)func->getArg(i);
                 typeTable[var.name] = var.type;
-                structVarTable[var.name] = static_cast<AstStructType *>(var.type)->getName();
+                structVarTable[var.name] = std::static_pointer_cast<AstStructType>(var.type)->getName();
                 continue;
             }
             
@@ -133,7 +133,7 @@ void Compiler::compileReturnStatement(std::shared_ptr<AstStatement> stmt) {
     } else if (stmt->hasExpression()) {
         Value *val = compileValue(stmt->getExpression());
         if (currentFuncType->getType() == V_AstType::Struct) {
-            AstStructType *sType = static_cast<AstStructType *>(currentFuncType);
+            std::shared_ptr<AstStructType> sType = std::static_pointer_cast<AstStructType>(currentFuncType);
             StructType *type = structTable[sType->getName()];
             Value *ld = builder->CreateLoad(type, val);
             builder->CreateRet(ld);

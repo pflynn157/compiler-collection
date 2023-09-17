@@ -82,7 +82,7 @@ bool Parser::buildFunction(token startToken, std::string className) {
     // Check to see if there's any return type
     //std::string retName = "";       // TODO: Do we need this?
     tk = lex_get_next(scanner);
-    AstDataType *dataType;
+    std::shared_ptr<AstDataType> dataType;
     if (tk == t_arrow) {
         dataType = buildDataType();
         tk = lex_get_next(scanner);

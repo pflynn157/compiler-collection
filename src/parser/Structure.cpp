@@ -63,7 +63,7 @@ bool Parser::buildStructMember(std::shared_ptr<AstStruct> str, token tk) {
         return false;
     }
     
-    AstDataType *dataType = buildDataType();
+    std::shared_ptr<AstDataType> dataType = buildDataType();
         
     // If its an array, build that. Otherwise, build the default value
     tk = lex_get_next(scanner);

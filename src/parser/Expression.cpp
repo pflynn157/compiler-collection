@@ -108,7 +108,7 @@ bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, token tk, ExprContext 
     if (ctx->varType && ctx->varType->getType() == V_AstType::Void) {
         ctx->varType = block->getDataType(name);
         if (ctx->varType && ctx->varType->getType() == V_AstType::Ptr)
-            ctx->varType = static_cast<AstPointerType *>(ctx->varType)->getBaseType();
+            ctx->varType = std::static_pointer_cast<AstPointerType>(ctx->varType)->getBaseType();
     }
     
     tk = lex_get_next(scanner);
@@ -241,7 +241,7 @@ bool Parser::applyAssoc(ExprContext *ctx) {
 }
 
 // Our new expression builder
-std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock> block, AstDataType *currentType,
+std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
                                                         token stopToken, bool isConst, bool buildList) {
     ExprContext *ctx = new ExprContext;
     if (currentType) ctx->varType = currentType;

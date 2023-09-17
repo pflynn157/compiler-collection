@@ -33,7 +33,7 @@ public:
     void addArgument(Var arg) { this->args.push_back(arg); }
     void setArguments(std::vector<Var> args) { this->args = args; }
     
-    void setDataType(AstDataType *dataType) {
+    void setDataType(std::shared_ptr<AstDataType> dataType) {
         this->dataType = dataType;
     }
     
@@ -41,7 +41,7 @@ public:
     bool isVarArgs() { return this->varargs; }
     
     std::string getName() { return name; }
-    AstDataType *getDataType() { return dataType; }
+    std::shared_ptr<AstDataType> getDataType() { return dataType; }
     std::vector<Var> getArguments() { return args; }
     
     void print() override;
@@ -49,7 +49,7 @@ public:
 private:
     std::string name = "";
     std::vector<Var> args;
-    AstDataType *dataType;
+    std::shared_ptr<AstDataType> dataType;
     bool varargs = false;
 };
 
@@ -62,7 +62,7 @@ public:
     }
     
     std::string getName() { return name; }
-    AstDataType *getDataType() { return dataType; }
+    std::shared_ptr<AstDataType> getDataType() { return dataType; }
     std::vector<Var> getArguments() { return args; }
     std::shared_ptr<AstBlock> getBlock() { return block; }
     
@@ -74,7 +74,7 @@ public:
         block->addStatement(statement);
     }
     
-    void setDataType(AstDataType *dataType) {
+    void setDataType(std::shared_ptr<AstDataType> dataType) {
         this->dataType = dataType;
     }
     
@@ -84,6 +84,6 @@ private:
     std::string name = "";
     std::vector<Var> args;
     std::shared_ptr<AstBlock> block;
-    AstDataType *dataType;
+    std::shared_ptr<AstDataType> dataType;
     std::string dtName = "";
 };

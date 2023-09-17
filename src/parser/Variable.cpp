@@ -48,7 +48,7 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
         tk = lex_get_next(scanner);
     }
     
-    AstDataType *dataType = buildDataType(false);
+    std::shared_ptr<AstDataType> dataType = buildDataType(false);
     tk = lex_get_next(scanner);
     
     // We have an array
@@ -87,7 +87,7 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
             callMalloc->setArgExpression(list);
             
             std::shared_ptr<AstI32> size;
-            AstDataType *baseType = static_cast<AstPointerType *>(dataType)->getBaseType();
+            std::shared_ptr<AstDataType> baseType = std::static_pointer_cast<AstPointerType>(dataType)->getBaseType();
             if (baseType->getType() == V_AstType::Int32) size = std::make_shared<AstI32>(4);
             else if (baseType->getType() == V_AstType::Int64) size = std::make_shared<AstI32>(8);
             else if (baseType->getType() == V_AstType::String) size = std::make_shared<AstI32>(8);
@@ -136,7 +136,7 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
 
 // Builds a variable or an array assignment
 bool Parser::buildVariableAssign(std::shared_ptr<AstBlock> block, token t_idToken) {
-    AstDataType *dataType = block->getDataType(lex_get_id(scanner));
+    std::shared_ptr<AstDataType> dataType = block->getDataType(lex_get_id(scanner));
     
     std::shared_ptr<AstExpression> expr = buildExpression(block, dataType);
     if (!expr) return false;
@@ -168,7 +168,7 @@ bool Parser::buildConst(bool isGlobal) {
     }
     
     // Get the data type
-    AstDataType *dataType = buildDataType(false);
+    std::shared_ptr<AstDataType> dataType = buildDataType(false);
     
     // Final syntax check
     tk = lex_get_next(scanner);
@@ -183,9 +183,9 @@ bool Parser::buildConst(bool isGlobal) {
     
     // Put it all together
     if (isGlobal) {
-        globalConsts[name] = std::pair<AstDataType *, std::shared_ptr<AstExpression>>(dataType, expr);
+        globalConsts[name] = std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>(dataType, expr);
     } else {
-        localConsts[name] = std::pair<AstDataType *, std::shared_ptr<AstExpression>>(dataType, expr);
+        localConsts[name] = std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>(dataType, expr);
     }
     
     return true;

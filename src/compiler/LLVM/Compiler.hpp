@@ -34,7 +34,7 @@ public:
 protected:
     void compileStatement(std::shared_ptr<AstStatement> stmt);
     Value *compileValue(std::shared_ptr<AstExpression> expr, bool isAssign = false);
-    Type *translateType(AstDataType *dataType);
+    Type *translateType(std::shared_ptr<AstDataType> dataType);
     int getStructIndex(std::string name, std::string member);
 
     // Function.cpp
@@ -59,7 +59,7 @@ private:
     std::unique_ptr<Module> mod;
     std::unique_ptr<IRBuilder<>> builder;
     Function *currentFunc;
-    AstDataType *currentFuncType;
+    std::shared_ptr<AstDataType> currentFuncType;
     
     // The user-defined structure table
     std::map<std::string, StructType*> structTable;
@@ -68,7 +68,7 @@ private:
     
     // Symbol table
     std::map<std::string, AllocaInst *> symtable;
-    std::map<std::string, AstDataType *> typeTable;
+    std::map<std::string, std::shared_ptr<AstDataType>> typeTable;
     
     // Block stack
     int blockCount = 0;

@@ -127,15 +127,15 @@ protected:
 // Represents a pointer type
 class AstPointerType : public AstDataType {
 public:
-    explicit AstPointerType(AstDataType *baseType) : AstDataType(V_AstType::Ptr) {
+    explicit AstPointerType(std::shared_ptr<AstDataType> baseType) : AstDataType(V_AstType::Ptr) {
         this->baseType = baseType;
     }
     
-    AstDataType *getBaseType() { return baseType; }
+    std::shared_ptr<AstDataType> getBaseType() { return baseType; }
     
     void print() override;
 protected:
-    AstDataType *baseType = nullptr;
+    std::shared_ptr<AstDataType> baseType = nullptr;
 };
 
 // Represents a structure type
@@ -154,13 +154,13 @@ protected:
 
 struct Var {
     explicit Var() {}
-    explicit Var(AstDataType *type, std::string name = "") {
+    explicit Var(std::shared_ptr<AstDataType> type, std::string name = "") {
         this->type = type;
         this->name = name;
     }
 
     std::string name;
-    AstDataType *type;
+    std::shared_ptr<AstDataType> type;
 };
 
 // Forward declarations
@@ -182,10 +182,10 @@ public:
     void removeAt(size_t pos);
     void insertAt(std::shared_ptr<AstStatement> stmt, size_t pos);
     
-    void addSymbol(std::string name, AstDataType *dataType);
+    void addSymbol(std::string name, std::shared_ptr<AstDataType> dataType);
     void mergeSymbols(std::shared_ptr<AstBlock> parent);
-    std::map<std::string, AstDataType *> getSymbolTable();
-    AstDataType *getDataType(std::string name);
+    std::map<std::string, std::shared_ptr<AstDataType>> getSymbolTable();
+    std::shared_ptr<AstDataType> getDataType(std::string name);
     
     bool isVar(std::string name);
     
@@ -193,7 +193,7 @@ public:
     std::string dot(std::string parent);
 protected:
     std::vector<std::shared_ptr<AstStatement>> block;
-    std::map<std::string, AstDataType *> symbolTable;
+    std::map<std::string, std::shared_ptr<AstDataType>> symbolTable;
     std::vector<std::string> vars;
 };
 

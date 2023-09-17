@@ -176,7 +176,7 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
         case V_AstType::ArrayAccess: {
             std::shared_ptr<AstArrayAccess> acc = std::static_pointer_cast<AstArrayAccess>(expr);
             AllocaInst *ptr = symtable[acc->getValue()];
-            AstDataType *ptrType = typeTable[acc->getValue()];
+            std::shared_ptr<AstDataType> ptrType = typeTable[acc->getValue()];
             Value *index = compileValue(acc->getIndex());
             
             if (ptrType->getType() == V_AstType::String) {
@@ -188,7 +188,7 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
                 if (isAssign) return ep;
                 else return builder->CreateLoad(i8Type, ep);
             } else {
-                AstDataType *subType = static_cast<AstPointerType *>(ptrType)->getBaseType();
+                std::shared_ptr<AstDataType> subType = std::static_pointer_cast<AstPointerType>(ptrType)->getBaseType();
                 Type *arrayPtrType = translateType(ptrType);
                 Type *arrayElementType = translateType(subType);
                 
@@ -370,7 +370,7 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
     return nullptr;
 }
 
-Type *Compiler::translateType(AstDataType *dataType) {
+Type *Compiler::translateType(std::shared_ptr<AstDataType> dataType) {
     Type *type;
     
     switch (dataType->getType()) {
@@ -384,13 +384,13 @@ Type *Compiler::translateType(AstDataType *dataType) {
         case V_AstType::String:  type = PointerType::getUnqual(Type::getInt8PtrTy(*context)); break;
         
         case V_AstType::Ptr: {
-            AstPointerType *ptrType = static_cast<AstPointerType *>(dataType);
+            std::shared_ptr<AstPointerType> ptrType = std::static_pointer_cast<AstPointerType>(dataType);
             Type *baseType = translateType(ptrType->getBaseType());
             type = PointerType::getUnqual(baseType);
         } break;
         
         case V_AstType::Struct: {
-            AstStructType *sType = static_cast<AstStructType *>(dataType);
+            std::shared_ptr<AstStructType> sType = std::static_pointer_cast<AstStructType>(dataType);
             type = structTable[sType->getName()];
         } break;
         

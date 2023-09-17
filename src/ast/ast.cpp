@@ -34,7 +34,7 @@ void AstBlock::insertAt(std::shared_ptr<AstStatement> stmt, size_t pos) {
     block.insert(block.begin() + pos, stmt);
 }
 
-void AstBlock::addSymbol(std::string name, AstDataType *dataType) {
+void AstBlock::addSymbol(std::string name, std::shared_ptr<AstDataType> dataType) {
     symbolTable[name] = dataType;
     vars.push_back(name);
 }
@@ -47,11 +47,11 @@ void AstBlock::mergeSymbols(std::shared_ptr<AstBlock> parent) {
     }
 }
 
-std::map<std::string, AstDataType *> AstBlock::getSymbolTable() {
+std::map<std::string, std::shared_ptr<AstDataType>> AstBlock::getSymbolTable() {
     return symbolTable;
 }
 
-AstDataType *AstBlock::getDataType(std::string name) {
+std::shared_ptr<AstDataType> AstBlock::getDataType(std::string name) {
     return symbolTable[name];
 }
 

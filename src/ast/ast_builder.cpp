@@ -8,44 +8,44 @@ namespace AstBuilder {
 //
 // The builders for data types
 //
-AstDataType *buildVoidType() {
-    return new AstDataType(V_AstType::Void);
+std::shared_ptr<AstDataType> buildVoidType() {
+    return std::make_shared<AstDataType>(V_AstType::Void);
 }
 
-AstDataType *buildBoolType() {
-    return new AstDataType(V_AstType::Bool);
+std::shared_ptr<AstDataType> buildBoolType() {
+    return std::make_shared<AstDataType>(V_AstType::Bool);
 }
 
-AstDataType *buildCharType() {
-    return new AstDataType(V_AstType::Char);
+std::shared_ptr<AstDataType> buildCharType() {
+    return std::make_shared<AstDataType>(V_AstType::Char);
 }
 
-AstDataType *buildInt8Type(bool isUnsigned) {
-    return new AstDataType(V_AstType::Int8, isUnsigned);
+std::shared_ptr<AstDataType> buildInt8Type(bool isUnsigned) {
+    return std::make_shared<AstDataType>(V_AstType::Int8, isUnsigned);
 }
 
-AstDataType *buildInt16Type(bool isUnsigned) {
-    return new AstDataType(V_AstType::Int16, isUnsigned);
+std::shared_ptr<AstDataType> buildInt16Type(bool isUnsigned) {
+    return std::make_shared<AstDataType>(V_AstType::Int16, isUnsigned);
 }
 
-AstDataType *buildInt32Type(bool isUnsigned) {
-    return new AstDataType(V_AstType::Int32, isUnsigned);
+std::shared_ptr<AstDataType> buildInt32Type(bool isUnsigned) {
+    return std::make_shared<AstDataType>(V_AstType::Int32, isUnsigned);
 }
 
-AstDataType *buildInt64Type(bool isUnsigned) {
-    return new AstDataType(V_AstType::Int64, isUnsigned);
+std::shared_ptr<AstDataType> buildInt64Type(bool isUnsigned) {
+    return std::make_shared<AstDataType>(V_AstType::Int64, isUnsigned);
 }
 
-AstDataType *buildStringType() {
-    return new AstDataType(V_AstType::String);
+std::shared_ptr<AstDataType> buildStringType() {
+    return std::make_shared<AstDataType>(V_AstType::String);
 }
 
-AstPointerType *buildPointerType(AstDataType *base) {
-    return new AstPointerType(base);
+std::shared_ptr<AstPointerType> buildPointerType(std::shared_ptr<AstDataType> base) {
+    return std::make_shared<AstPointerType>(base);
 }
 
-AstStructType *buildStructType(std::string name) {
-    return new AstStructType(name);
+std::shared_ptr<AstStructType> buildStructType(std::string name) {
+    return std::make_shared<AstStructType>(name);
 }
 
 } // End AstBuilder

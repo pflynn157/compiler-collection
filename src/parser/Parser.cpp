@@ -195,7 +195,7 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
 
 // This is meant mainly for literals; it checks to make sure all the types in
 // the expression agree in type. LLVM will have a problem if not
-std::shared_ptr<AstExpression> Parser::checkExpression(std::shared_ptr<AstExpression> expr, AstDataType *varType) {
+std::shared_ptr<AstExpression> Parser::checkExpression(std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> varType) {
     if (!varType) return expr;
 
     switch (expr->getType()) {
@@ -260,9 +260,9 @@ bool Parser::isFunc(std::string name) {
 //
 // Builds a data type from the token stream
 //
-AstDataType *Parser::buildDataType(bool checkBrackets) {
+std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
     token tk = lex_get_next(scanner);
-    AstDataType *dataType = nullptr;
+    std::shared_ptr<AstDataType> dataType = nullptr;
     
     switch (tk) {
         case t_bool: dataType = AstBuilder::buildBoolType(); break;

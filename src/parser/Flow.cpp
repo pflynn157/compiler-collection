@@ -21,7 +21,7 @@ std::shared_ptr<AstExpression> Parser::checkCondExpression(std::shared_ptr<AstBl
     switch (toCheck->getType()) {
         case V_AstType::ID: {
             std::shared_ptr<AstID> id = std::static_pointer_cast<AstID>(toCheck);
-            AstDataType *dataType = block->getDataType(id->getValue());            
+            std::shared_ptr<AstDataType> dataType = block->getDataType(id->getValue());            
             std::shared_ptr<AstEQOp> eq = std::make_shared<AstEQOp>();
             eq->setLVal(id);
             

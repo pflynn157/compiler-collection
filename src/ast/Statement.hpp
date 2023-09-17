@@ -41,16 +41,16 @@ class AstExprStatement : public AstStatement {
 public:
     explicit AstExprStatement() : AstStatement(V_AstType::ExprStmt) {}
     
-    void setDataType(AstDataType *dataType) {
+    void setDataType(std::shared_ptr<AstDataType> dataType) {
         this->dataType = dataType;
     }
     
-    AstDataType *getDataType() { return dataType; }
+    std::shared_ptr<AstDataType> getDataType() { return dataType; }
     
     void print();
     std::string dot(std::string parent) override;
 private:
-    AstDataType *dataType;
+    std::shared_ptr<AstDataType> dataType;
 };
 
 // Represents a function call statement
@@ -79,16 +79,16 @@ public:
 // Represents a variable declaration
 class AstVarDec : public AstStatement {
 public:
-    explicit AstVarDec(std::string name, AstDataType *dataType) : AstStatement(V_AstType::VarDec) {
+    explicit AstVarDec(std::string name, std::shared_ptr<AstDataType> dataType) : AstStatement(V_AstType::VarDec) {
         this->name = name;
         this->dataType = dataType;
     }
     
-    void setDataType(AstDataType *dataType) { this->dataType = dataType; }
+    void setDataType(std::shared_ptr<AstDataType> dataType) { this->dataType = dataType; }
     void setPtrSize(std::shared_ptr<AstExpression> size) { this->size = size; }
     
     std::string getName() { return name; }
-    AstDataType *getDataType() { return dataType; }
+    std::shared_ptr<AstDataType> getDataType() { return dataType; }
     std::shared_ptr<AstExpression> getPtrSize() { return size; }
     
     void print();
@@ -96,7 +96,7 @@ public:
 private:
     std::string name = "";
     std::shared_ptr<AstExpression> size = nullptr;
-    AstDataType *dataType;
+    std::shared_ptr<AstDataType> dataType;
 };
 
 // Represents a structure declaration

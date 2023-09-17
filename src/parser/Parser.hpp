@@ -57,7 +57,7 @@ protected:
     struct ExprContext {
         std::stack<std::shared_ptr<AstExpression>> output;
         std::stack<std::shared_ptr<AstOp>> opStack;
-        AstDataType *varType;
+        std::shared_ptr<AstDataType> varType;
         bool lastWasOp = true;
     };
     
@@ -67,17 +67,17 @@ protected:
     bool applyHigherPred(ExprContext *ctx);
     bool applyAssoc(ExprContext *ctx);
     std::shared_ptr<AstExpression> buildExpression(
-                        std::shared_ptr<AstBlock> block, AstDataType *currentType,
+                        std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
                         token stopToken = t_semicolon,
                         bool isConst = false, bool buildList = false);
-    std::shared_ptr<AstExpression> checkExpression(std::shared_ptr<AstExpression> expr, AstDataType *varType);
+    std::shared_ptr<AstExpression> checkExpression(std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> varType);
     
     bool buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent = nullptr);
     std::shared_ptr<AstExpression> checkCondExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstExpression> toCheck);
     int isConstant(std::string name);
     bool isVar(std::string name);
     bool isFunc(std::string name);
-    AstDataType *buildDataType(bool checkBrackets = true);
+    std::shared_ptr<AstDataType> buildDataType(bool checkBrackets = true);
 private:
     std::string input = "";
     //Scanner *scanner;
@@ -85,8 +85,8 @@ private:
     AstTree *tree;
     ErrorManager *syntax;
     
-    std::map<std::string, std::pair<AstDataType *, std::shared_ptr<AstExpression>>> globalConsts;
-    std::map<std::string, std::pair<AstDataType *, std::shared_ptr<AstExpression>>> localConsts;
+    std::map<std::string, std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>> globalConsts;
+    std::map<std::string, std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>> localConsts;
     std::vector<std::string> funcs;
 };
 

@@ -11,12 +11,6 @@ include_directories(${LLVM_INCLUDE_DIRS})
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions(${LLVM_DEFINITIONS})
 
-option(LLIR "Use the LLIR backend" OFF)
-if (LLIR)
-    #include_directories(llir/src)
-    #add_subdirectory(llir)
-endif()
-
 option(PTASM "Use the PTASM backend" OFF)
 if (PTASM)
 endif()

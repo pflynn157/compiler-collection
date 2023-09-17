@@ -1,14 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(tl_frontend)
 
-if (LLIR)
-    set(COMPILER_SRC
-        compiler/LLIR/Builder.cpp
-        compiler/LLIR/Compiler.cpp
-        compiler/LLIR/Flow.cpp
-        compiler/LLIR/Function.cpp
-    )
-elseif(PTASM)
+if(PTASM)
     set(COMPILER_SRC
         compiler/PTASM/compiler.cpp
         compiler/PTASM/elf.cpp
@@ -28,10 +21,6 @@ endif()
 set(LEX_SRC lex/lex.c)
 
 set(SRC
-    # Frontend sources
-    #${CMAKE_BINARY_DIR}/src/lex.cpp
-    #${CMAKE_BINARY_DIR}/src/lex_debug.cpp
-    
     ast/ast.cpp
     ast/ast_builder.cpp
     ast/AstDebug.cpp
@@ -53,10 +42,7 @@ set(SRC
 
 add_library(tlclex STATIC ${LEX_SRC})
 
-if (LLIR)
-    add_executable(tlc ${SRC} llir_main.cpp)
-    target_link_libraries(tlc tlclex llir)
-elseif(PTASM)
+if(PTASM)
     add_executable(tlc ${SRC} ptasm_main.cpp)
     target_link_libraries(tlc tlclex)
 else()

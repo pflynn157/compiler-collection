@@ -36,30 +36,30 @@ Parser::Parser(std::string input) {
     funcs.push_back("malloc");
     std::shared_ptr<AstExternFunction> FT1 = std::make_shared<AstExternFunction>("malloc");
     FT1->addArgument(Var(AstBuilder::buildInt32Type(), "size"));
-    FT1->setDataType(AstBuilder::buildStringType());
+    FT1->data_type = AstBuilder::buildStringType();
     tree->addGlobalStatement(FT1);
     
     //println(string)
     funcs.push_back("println");
     std::shared_ptr<AstExternFunction> FT2 = std::make_shared<AstExternFunction>("println");
-    FT2->setVarArgs();
+    FT2->varargs = true;
     FT2->addArgument(Var(AstBuilder::buildStringType(), "str"));
-    FT2->setDataType(AstBuilder::buildVoidType());
+    FT2->data_type = AstBuilder::buildVoidType();
     tree->addGlobalStatement(FT2);
     
     //print(string)
     funcs.push_back("print");
     std::shared_ptr<AstExternFunction> FT3 = std::make_shared<AstExternFunction>("print");
-    FT3->setVarArgs();
+    FT3->varargs = true;
     FT3->addArgument(Var(AstBuilder::buildStringType(), "str"));
-    FT3->setDataType(AstBuilder::buildVoidType());
+    FT3->data_type = AstBuilder::buildVoidType();
     tree->addGlobalStatement(FT3);
     
     //i32 strlen(string)
     funcs.push_back("strlen");
     std::shared_ptr<AstExternFunction> FT4 = std::make_shared<AstExternFunction>("strlen");
     FT4->addArgument(Var(AstBuilder::buildStringType(), "str"));
-    FT4->setDataType(AstBuilder::buildInt32Type());
+    FT4->data_type = AstBuilder::buildInt32Type();
     tree->addGlobalStatement(FT4);
     
     //i32 stringcmp(string, string)
@@ -67,7 +67,7 @@ Parser::Parser(std::string input) {
     std::shared_ptr<AstExternFunction> FT5 = std::make_shared<AstExternFunction>("stringcmp");
     FT5->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT5->addArgument(Var(AstBuilder::buildStringType(), "str"));
-    FT5->setDataType(AstBuilder::buildInt32Type());
+    FT5->data_type = AstBuilder::buildInt32Type();
     tree->addGlobalStatement(FT5);
     
     //string strcat_str(string, string)
@@ -75,7 +75,7 @@ Parser::Parser(std::string input) {
     std::shared_ptr<AstExternFunction> FT6 = std::make_shared<AstExternFunction>("strcat_str");
     FT6->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT6->addArgument(Var(AstBuilder::buildStringType(), "str"));
-    FT6->setDataType(AstBuilder::buildStringType());
+    FT6->data_type = AstBuilder::buildStringType();
     tree->addGlobalStatement(FT6);
     
     //string strcat_char(string, char)
@@ -83,7 +83,7 @@ Parser::Parser(std::string input) {
     std::shared_ptr<AstExternFunction> FT7 = std::make_shared<AstExternFunction>("strcat_char");
     FT7->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT7->addArgument(Var(AstBuilder::buildCharType(), "c"));
-    FT7->setDataType(AstBuilder::buildStringType());
+    FT7->data_type = AstBuilder::buildStringType();
     tree->addGlobalStatement(FT7);
 }
 
@@ -197,22 +197,22 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
 std::shared_ptr<AstExpression> Parser::checkExpression(std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> varType) {
     if (!varType) return expr;
 
-    switch (expr->getType()) {
+    switch (expr->type) {
         case V_AstType::I32L: {
             // Change to byte literals
-            if (varType->getType() == V_AstType::Int8) {
+            if (varType->type == V_AstType::Int8) {
                 std::shared_ptr<AstI32> i32 = std::static_pointer_cast<AstI32>(expr);
                 std::shared_ptr<AstI8> byte = std::make_shared<AstI8>(i32->getValue());
                 expr = byte;
                 
             // Change to word literals
-            } else if (varType->getType() == V_AstType::Int16) {
+            } else if (varType->type == V_AstType::Int16) {
                 std::shared_ptr<AstI32> i32 = std::static_pointer_cast<AstI32>(expr);
                 std::shared_ptr<AstI16> i16 = std::make_shared<AstI16>(i32->getValue());
                 expr = i16;
                 
             // Change to qword literals
-            } else if (varType->getType() == V_AstType::Int64) {
+            } else if (varType->type == V_AstType::Int64) {
                 std::shared_ptr<AstI32> i32 = std::static_pointer_cast<AstI32>(expr);
                 std::shared_ptr<AstI64> i64 = std::make_shared<AstI64>(i32->getValue());
                 expr = i64;
@@ -279,7 +279,7 @@ std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
         case t_id: {
             bool isStruct = false;
             for (auto s : tree->getStructs()) {
-                if (s->getName() == lex_get_id(scanner)) {
+                if (s->name == lex_get_id(scanner)) {
                     isStruct = true;
                     break;
                 }

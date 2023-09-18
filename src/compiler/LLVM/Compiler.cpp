@@ -33,21 +33,21 @@ void Compiler::compile() {
     for (auto str : tree->getStructs()) {
         std::vector<Type *> elementTypes;
         
-        for (auto v : str->getItems()) {
+        for (auto v : str->items) {
             Type *t = translateType(v.type);
             elementTypes.push_back(t);
         }
         
         StructType *s = StructType::create(*context, elementTypes);
-        s->setName(str->getName());
+        s->setName(str->name);
         
-        structTable[str->getName()] = s;
-        structElementTypeTable[str->getName()] = elementTypes;
+        structTable[str->name] = s;
+        structElementTypeTable[str->name] = elementTypes;
     }
 
     // Build all other functions
     for (auto global : tree->getGlobalStatements()) {
-        switch (global->getType()) {
+        switch (global->type) {
             case V_AstType::Func: {
                 symtable.clear();
                 typeTable.clear();
@@ -77,11 +77,11 @@ void Compiler::emitLLVM(std::string path) {
 
 // Compiles an individual statement
 void Compiler::compileStatement(std::shared_ptr<AstStatement> stmt) {
-    switch (stmt->getType()) {
+    switch (stmt->type) {
         // Expression statement
         case V_AstType::ExprStmt: {
             std::shared_ptr<AstExprStatement> expr_stmt = std::static_pointer_cast<AstExprStatement>(stmt);
-            compileValue(expr_stmt->getExpression());
+            compileValue(expr_stmt->expression);
         } break;
     
         // A variable declaration (alloca) statement
@@ -133,53 +133,53 @@ void Compiler::compileStatement(std::shared_ptr<AstStatement> stmt) {
 
 // Converts an AST value to an LLVM value
 Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign) {
-    switch (expr->getType()) {
+    switch (expr->type) {
         case V_AstType::I8L: {
             std::shared_ptr<AstI8> i8 = std::static_pointer_cast<AstI8>(expr);
-            return builder->getInt8(i8->getValue());
+            return builder->getInt8(i8->value);
         } break;
         
         case V_AstType::I16L: {
             std::shared_ptr<AstI16> i16 = std::static_pointer_cast<AstI16>(expr);
-            return builder->getInt16(i16->getValue());
+            return builder->getInt16(i16->value);
         } break;
         
         case V_AstType::I32L: {
             std::shared_ptr<AstI32> ival = std::static_pointer_cast<AstI32>(expr);
-            return builder->getInt32(ival->getValue());
+            return builder->getInt32(ival->value);
         } break;
         
         case V_AstType::I64L: {
             std::shared_ptr<AstI64> i64 = std::static_pointer_cast<AstI64>(expr);
-            return builder->getInt64(i64->getValue());
+            return builder->getInt64(i64->value);
         } break;
         
         case V_AstType::CharL: {
             std::shared_ptr<AstChar> cval = std::static_pointer_cast<AstChar>(expr);
-            return builder->getInt8(cval->getValue());
+            return builder->getInt8(cval->value);
         } break;
         
         case V_AstType::StringL: {
             std::shared_ptr<AstString> str = std::static_pointer_cast<AstString>(expr);
-            return builder->CreateGlobalStringPtr(str->getValue());
+            return builder->CreateGlobalStringPtr(str->value);
         } break;
         
         case V_AstType::ID: {
             std::shared_ptr<AstID> id = std::static_pointer_cast<AstID>(expr);
-            AllocaInst *ptr = symtable[id->getValue()];
-            Type *type = translateType(typeTable[id->getValue()]);
+            AllocaInst *ptr = symtable[id->value];
+            Type *type = translateType(typeTable[id->value]);
             
-            if (typeTable[id->getValue()]->getType() == V_AstType::Struct || isAssign) return ptr;
+            if (typeTable[id->value]->type == V_AstType::Struct || isAssign) return ptr;
             return builder->CreateLoad(type, ptr);
         } break;
         
         case V_AstType::ArrayAccess: {
             std::shared_ptr<AstArrayAccess> acc = std::static_pointer_cast<AstArrayAccess>(expr);
-            AllocaInst *ptr = symtable[acc->getValue()];
-            std::shared_ptr<AstDataType> ptrType = typeTable[acc->getValue()];
-            Value *index = compileValue(acc->getIndex());
+            AllocaInst *ptr = symtable[acc->value];
+            std::shared_ptr<AstDataType> ptrType = typeTable[acc->value];
+            Value *index = compileValue(acc->index);
             
-            if (ptrType->getType() == V_AstType::String) {
+            if (ptrType->type == V_AstType::String) {
                 PointerType *strPtrType = Type::getInt8PtrTy(*context);
                 Type *i8Type = Type::getInt8Ty(*context);
                 
@@ -188,7 +188,7 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
                 if (isAssign) return ep;
                 else return builder->CreateLoad(i8Type, ep);
             } else {
-                std::shared_ptr<AstDataType> subType = std::static_pointer_cast<AstPointerType>(ptrType)->getBaseType();
+                std::shared_ptr<AstDataType> subType = std::static_pointer_cast<AstPointerType>(ptrType)->base_type;
                 Type *arrayPtrType = translateType(ptrType);
                 Type *arrayElementType = translateType(subType);
                 
@@ -205,30 +205,30 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
             std::shared_ptr<AstFuncCallExpr> fc = std::static_pointer_cast<AstFuncCallExpr>(expr);
             std::vector<Value *> args;
             
-            std::shared_ptr<AstExprList> list = std::static_pointer_cast<AstExprList>(fc->getArgExpression());
-            for (auto arg : list->getList()) {
+            std::shared_ptr<AstExprList> list = std::static_pointer_cast<AstExprList>(fc->args);
+            for (auto arg : list->list) {
                 Value *val = compileValue(arg);
                 args.push_back(val);
             }
             
-            Function *callee = mod->getFunction(fc->getName());
+            Function *callee = mod->getFunction(fc->name);
             if (!callee) std::cerr << "Invalid function call statement." << std::endl;
             return builder->CreateCall(callee, args);
         } break;
         
         case V_AstType::Neg: {
             std::shared_ptr<AstNegOp> op = std::static_pointer_cast<AstNegOp>(expr);
-            Value *val = compileValue(op->getVal());
+            Value *val = compileValue(op->value);
             
             return builder->CreateNeg(val);
         } break;
         
         case V_AstType::Assign: {
             std::shared_ptr<AstAssignOp> op = std::static_pointer_cast<AstAssignOp >(expr);
-            std::shared_ptr<AstExpression> lvalExpr = op->getLVal();
+            std::shared_ptr<AstExpression> lvalExpr = op->lval;
             
             Value *ptr = compileValue(lvalExpr, true);
-            Value *rval = compileValue(op->getRVal());
+            Value *rval = compileValue(op->rval);
             
             builder->CreateStore(rval, ptr);
         } break;
@@ -236,8 +236,8 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
         case V_AstType::LogicalAnd:
         case V_AstType::LogicalOr: {
             std::shared_ptr<AstBinaryOp> op = std::static_pointer_cast<AstBinaryOp>(expr);
-            std::shared_ptr<AstExpression> lvalExpr = op->getLVal();
-            std::shared_ptr<AstExpression> rvalExpr = op->getRVal();
+            std::shared_ptr<AstExpression> lvalExpr = op->lval;
+            std::shared_ptr<AstExpression> rvalExpr = op->rval;
             
             // We only want the LVal first
             Value *lval = compileValue(lvalExpr);
@@ -250,10 +250,10 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
             trueBlock->moveAfter(current);
             
             // Create the conditional branch
-            if (expr->getType() == V_AstType::LogicalAnd) {
+            if (expr->type == V_AstType::LogicalAnd) {
                 BasicBlock *falseBlock = logicalAndStack.top();
                 builder->CreateCondBr(lval, trueBlock, falseBlock);
-            } else if (expr->getType() == V_AstType::LogicalOr) {
+            } else if (expr->type == V_AstType::LogicalOr) {
                 BasicBlock *trueBlock1 = logicalOrStack.top();
                 builder->CreateCondBr(lval, trueBlock1, trueBlock);
             }
@@ -278,8 +278,8 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
         case V_AstType::GTE:
         case V_AstType::LTE: {
             std::shared_ptr<AstBinaryOp> op = std::static_pointer_cast<AstBinaryOp>(expr);
-            std::shared_ptr<AstExpression> lvalExpr = op->getLVal();
-            std::shared_ptr<AstExpression> rvalExpr = op->getRVal();
+            std::shared_ptr<AstExpression> lvalExpr = op->lval;
+            std::shared_ptr<AstExpression> rvalExpr = op->rval;
             
             Value *lval = compileValue(lvalExpr);
             Value *rval = compileValue(rvalExpr);
@@ -287,24 +287,24 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
             bool strOp = false;
             bool rvalStr = false;
             
-            if (lvalExpr->getType() == V_AstType::StringL || rvalExpr->getType() == V_AstType::StringL) {
+            if (lvalExpr->type == V_AstType::StringL || rvalExpr->type == V_AstType::StringL) {
                 strOp = true;
                 rvalStr = true;
-            } else if (lvalExpr->getType() == V_AstType::StringL && rvalExpr->getType() == V_AstType::CharL) {
+            } else if (lvalExpr->type == V_AstType::StringL && rvalExpr->type == V_AstType::CharL) {
                 strOp = true;
-            } else if (lvalExpr->getType() == V_AstType::ID && rvalExpr->getType() == V_AstType::CharL) {
+            } else if (lvalExpr->type == V_AstType::ID && rvalExpr->type == V_AstType::CharL) {
                 std::shared_ptr<AstID> lvalID = std::static_pointer_cast<AstID>(lvalExpr);
-                if (typeTable[lvalID->getValue()]->getType() == V_AstType::String) strOp = true;
-            } else if (lvalExpr->getType() == V_AstType::ID && rvalExpr->getType() == V_AstType::ID) {
+                if (typeTable[lvalID->value]->type == V_AstType::String) strOp = true;
+            } else if (lvalExpr->type == V_AstType::ID && rvalExpr->type == V_AstType::ID) {
                 std::shared_ptr<AstID> lvalID = std::static_pointer_cast<AstID>(lvalExpr);
                 std::shared_ptr<AstID> rvalID = std::static_pointer_cast<AstID>(rvalExpr);
                 
-                if (typeTable[lvalID->getValue()]->getType() == V_AstType::String) strOp = true;
-                if (typeTable[rvalID->getValue()]->getType() == V_AstType::String) {
+                if (typeTable[lvalID->value]->type == V_AstType::String) strOp = true;
+                if (typeTable[rvalID->value]->type == V_AstType::String) {
                     strOp = true;
                     rvalStr = true;
-                } else if (typeTable[rvalID->getValue()]->getType() == V_AstType::Char ||
-                           typeTable[rvalID->getValue()]->getType() == V_AstType::Int8) {
+                } else if (typeTable[rvalID->value]->type == V_AstType::Char ||
+                           typeTable[rvalID->value]->type == V_AstType::Int8) {
                     strOp = true;          
                 }
             }
@@ -315,17 +315,17 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
                 args.push_back(lval);
                 args.push_back(rval);
             
-                if (op->getType() == V_AstType::EQ || op->getType() == V_AstType::NEQ) {
+                if (op->type == V_AstType::EQ || op->type == V_AstType::NEQ) {
                     Function *strcmp = mod->getFunction("stringcmp");
                     if (!strcmp) std::cerr << "Error: Corelib function \"stringcmp\" not found." << std::endl;
                     Value *strcmpCall = builder->CreateCall(strcmp, args);
                     
                     int cmpVal = 0;
-                    if (op->getType() == V_AstType::NEQ) cmpVal = 0;
+                    if (op->type == V_AstType::NEQ) cmpVal = 0;
                     Value *cmpValue = builder->getInt32(cmpVal);
                     
                     return builder->CreateICmpEQ(strcmpCall, cmpValue);
-                } else if (op->getType() == V_AstType::Add) {
+                } else if (op->type == V_AstType::Add) {
                     if (rvalStr) {
                         Function *callee = mod->getFunction("strcat_str");
                         if (!callee) std::cerr << "Error: corelib function \"strcat_str\" not found." << std::endl;
@@ -342,7 +342,7 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
             }
             
             // Otherwise, build a normal comparison
-            switch (expr->getType()) {
+            switch (expr->type) {
                 case V_AstType::Add: return builder->CreateAdd(lval, rval);
                 case V_AstType::Sub: return builder->CreateSub(lval, rval);
                 case V_AstType::Mul: return builder->CreateMul(lval, rval);
@@ -373,7 +373,7 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
 Type *Compiler::translateType(std::shared_ptr<AstDataType> dataType) {
     Type *type;
     
-    switch (dataType->getType()) {
+    switch (dataType->type) {
         case V_AstType::Void: type = Type::getVoidTy(*context); break;
         case V_AstType::Bool: type = Type::getInt32Ty(*context); break;
         case V_AstType::Char:
@@ -385,13 +385,13 @@ Type *Compiler::translateType(std::shared_ptr<AstDataType> dataType) {
         
         case V_AstType::Ptr: {
             std::shared_ptr<AstPointerType> ptrType = std::static_pointer_cast<AstPointerType>(dataType);
-            Type *baseType = translateType(ptrType->getBaseType());
+            Type *baseType = translateType(ptrType->base_type);
             type = PointerType::getUnqual(baseType);
         } break;
         
         case V_AstType::Struct: {
             std::shared_ptr<AstStructType> sType = std::static_pointer_cast<AstStructType>(dataType);
-            type = structTable[sType->getName()];
+            type = structTable[sType->name];
         } break;
         
         default: {}
@@ -405,9 +405,9 @@ int Compiler::getStructIndex(std::string name, std::string member) {
     if (name2 != "") name = name2;
     
     for (auto s : tree->getStructs()) {
-        if (s->getName() != name) continue;
+        if (s->name != name) continue;
 
-        std::vector<Var> members = s->getItems();
+        std::vector<Var> members = s->items;
         for (int i = 0; i<members.size(); i++) {
             if (members.at(i).name == member) return i;
         }

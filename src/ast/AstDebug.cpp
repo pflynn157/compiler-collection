@@ -22,7 +22,7 @@ void AstTree::print() {
 // Data Types
 //
 void AstDataType::print() {
-    if (_isUnsigned) std::cout << "unsigned ";
+    if (is_unsigned) std::cout << "unsigned ";
 
     switch (type) {
         case V_AstType::Void: std::cout << "void"; break;
@@ -39,7 +39,7 @@ void AstDataType::print() {
 
 void AstPointerType::print() {
     std::cout << "*";
-    baseType->print();
+    base_type->print();
 }
 
 void AstStructType::print() {
@@ -57,7 +57,7 @@ void AstExternFunction::print() {
     }
     std::cout << ") ";
     std::cout << " -> ";
-    dataType->print();
+    data_type->print();
     std::cout << std::endl;
 }
 
@@ -70,7 +70,7 @@ void AstFunction::print() {
         std::cout << ", ";
     }
     std::cout << ") -> ";
-    dataType->print();
+    data_type->print();
     std::cout << std::endl;
     
     block->print();
@@ -98,7 +98,7 @@ void AstBlock::print(int indent) {
     
     for (auto stmt : block) {
         for (int i = 0; i<indent; i++) std::cout << " ";
-        switch (stmt->getType()) {
+        switch (stmt->type) {
             case V_AstType::If: {
                 std::static_pointer_cast<AstIfStmt>(stmt)->print(indent);
             } break;
@@ -121,7 +121,7 @@ void AstStruct::print() {
         std::cout << var.name << " : ";
         var.type->print();
         std::cout << " ";
-        defaultExpressions[var.name]->print();
+        default_expressions[var.name]->print();
         std::cout << std::endl;
     }
     std::cout << std::endl;
@@ -132,26 +132,26 @@ void AstExprStatement::print() {
     if (dataType) dataType->print();
     
     std::cout << " ";
-    getExpression()->print();
+    expression->print();
     std::cout << std::endl;
 }
 
 void AstFuncCallStmt::print() {
     std::cout << "FC " << name;
-    getExpression()->print();
+    expression->print();
     std::cout << std::endl;
 }
 
 void AstReturnStmt::print() {
     std::cout << "RETURN ";
-    if (getExpression()) getExpression()->print();
+    if (expression) expression->print();
     std::cout << std::endl;
 }
 
 void AstVarDec::print() {
     std::cout << "VAR_DEC " << name << " : ";
     dataType->print();
-    if (dataType->getType() == V_AstType::Ptr) {
+    if (dataType->type == V_AstType::Ptr) {
         std::cout << "[";
         size->print();
         std::cout << "]";
@@ -167,7 +167,7 @@ void AstStructDec::print() {
 
 void AstIfStmt::print(int indent) {
     std::cout << "IF ";
-    getExpression()->print();
+    expression->print();
     std::cout << " THEN" << std::endl;
     trueBlock->print(indent+4);
     falseBlock->print(indent+4);
@@ -175,7 +175,7 @@ void AstIfStmt::print(int indent) {
 
 void AstWhileStmt::print(int indent) {
     std::cout << "WHILE ";
-    getExpression()->print();
+    expression->print();
     std::cout << " DO" << std::endl;
     
     block->print(indent+4);
@@ -200,7 +200,7 @@ void AstExprList::print() {
 
 void AstNegOp::print() {
     std::cout << "(-";
-    val->print();
+    value->print();
     std::cout << ")";
 }
 
@@ -341,35 +341,35 @@ void AstLogicalOrOp::print() {
 }
 
 void AstChar::print() {
-    std::cout << "CHAR(" << val << ")";
+    std::cout << "CHAR(" << value << ")";
 }
 
 void AstI8::print() {
-    std::cout << val;
+    std::cout << value;
 }
 
 void AstI16::print() {
-    std::cout << val;
+    std::cout << value;
 }
 
 void AstI32::print() {
-    std::cout << val;
+    std::cout << value;
 }
 
 void AstI64::print() {
-    std::cout << val;
+    std::cout << value;
 }
 
 void AstString::print() {
-    std::cout << "\"" << val << "\"";
+    std::cout << "\"" << value << "\"";
 }
 
 void AstID::print() {
-    std::cout << val;
+    std::cout << value;
 }
 
 void AstArrayAccess::print() {
-    std::cout << val << "[";
+    std::cout << value << "[";
     index->print();
     std::cout << "]";
 }
@@ -380,7 +380,7 @@ void AstStructAccess::print() {
 
 void AstFuncCallExpr::print() {
     std::cout << name << "(";
-    expr->print();
+    args->print();
     std::cout << ")";
 }
 

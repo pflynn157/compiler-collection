@@ -11,28 +11,20 @@ AstNode::AstNode(V_AstType type) {
     this->type = type;
 }
 
-V_AstType AstNode::getType() { return type; }
-
 //
 // AstDataType
 //
 AstDataType::AstDataType(V_AstType type) : AstNode(type) {}
 AstDataType::AstDataType(V_AstType type, bool _isUnsigned) : AstNode(type) {
-    this->_isUnsigned = _isUnsigned;
+    this->is_unsigned = _isUnsigned;
 }
-
-void AstDataType::setUnsigned(bool _isUnsigned) { this->_isUnsigned = _isUnsigned; }
-
-bool AstDataType::isUnsigned() { return _isUnsigned; }
 
 //
 // AstPointerType
 //
-AstPointerType::AstPointerType(std::shared_ptr<AstDataType> baseType) : AstDataType(V_AstType::Ptr) {
-    this->baseType = baseType;
+AstPointerType::AstPointerType(std::shared_ptr<AstDataType> base_type) : AstDataType(V_AstType::Ptr) {
+    this->base_type = base_type;
 }
-
-std::shared_ptr<AstDataType> AstPointerType::getBaseType() { return baseType; }
 
 //
 // AstStructType
@@ -40,8 +32,6 @@ std::shared_ptr<AstDataType> AstPointerType::getBaseType() { return baseType; }
 AstStructType::AstStructType(std::string name) : AstDataType(V_AstType::Struct) {
     this->name = name;
 }
-
-std::string AstStructType::getName() { return name; }
 
 //
 // Var
@@ -59,11 +49,11 @@ AstStruct::AstStruct(std::string name) : AstNode(V_AstType::StructDef) {
     this->name = name;
 }
 
-void AstStruct::addItem(Var var, std::shared_ptr<AstExpression> defaultExpression) {
+void AstStruct::addItem(Var var, std::shared_ptr<AstExpression> default_expression) {
     items.push_back(var);
-    defaultExpressions[var.name] = defaultExpression;
+    default_expressions[var.name] = default_expression;
     
-    switch (var.type->getType()) {
+    switch (var.type->type) {
         case V_AstType::Char:
         case V_AstType::Int8: size += 1; break;
         case V_AstType::Int16: size += 2; break;
@@ -78,14 +68,6 @@ void AstStruct::addItem(Var var, std::shared_ptr<AstExpression> defaultExpressio
     }
 }
 
-std::string AstStruct::getName() { return name; }
-std::vector<Var> AstStruct::getItems() { return items; }
-int AstStruct::getSize() { return size; }
-
-std::shared_ptr<AstExpression> AstStruct::getDefaultExpression(std::string name) {
-    return defaultExpressions[name];
-}
-
 //
 // AstTree
 //
@@ -94,7 +76,7 @@ AstTree::~AstTree() {}
 
 std::string AstTree::getFile() { return file; }
 
-std::vector<std::shared_ptr<AstGlobalStatement>> AstTree::getGlobalStatements() {
+std::vector<std::shared_ptr<AstStatement>> AstTree::getGlobalStatements() {
     return global_statements;
 }
 
@@ -104,12 +86,12 @@ std::vector<std::shared_ptr<AstStruct>> AstTree::getStructs() {
 
 bool AstTree::hasStruct(std::string name) {
     for (auto const &s : structs) {
-        if (s->getName() == name) return true;
+        if (s->name == name) return true;
     }
     return false;
 }
 
-void AstTree::addGlobalStatement(std::shared_ptr<AstGlobalStatement> stmt) {
+void AstTree::addGlobalStatement(std::shared_ptr<AstStatement> stmt) {
     global_statements.push_back(stmt);
 }
 
@@ -182,10 +164,8 @@ bool AstBlock::isVar(std::string name) {
 AstStatement::AstStatement() : AstNode(V_AstType::None) {}
 AstStatement::AstStatement(V_AstType type) : AstNode(type) {}
 
-void AstStatement::setExpression(std::shared_ptr<AstExpression> expr) { this->expr = expr; }
-std::shared_ptr<AstExpression> AstStatement::getExpression() { return expr; }
 bool AstStatement::hasExpression() {
-    if (expr) return true;
+    if (expression) return true;
     return false;
 }
 

@@ -96,15 +96,12 @@ class AstStatement;
 //
 // The base of all AST nodes
 //
-class AstNode {
+struct AstNode {
 public:
     explicit AstNode();
     explicit AstNode(V_AstType type);
-    
-    V_AstType getType();
-    
     virtual void print() {}
-protected:
+    
     V_AstType type = V_AstType::None;
 };
 
@@ -113,38 +110,27 @@ protected:
 //
 
 // The base of all AST data types
-class AstDataType : public AstNode {
-public:
+struct AstDataType : AstNode {
     explicit AstDataType(V_AstType type);
     explicit AstDataType(V_AstType type, bool _isUnsigned);
-    
-    void setUnsigned(bool _isUnsigned);
-    bool isUnsigned();
-    
     void print() override;
-protected:
-    bool _isUnsigned = false;
+
+    bool is_unsigned = false;
 };
 
 // Represents a pointer type
-class AstPointerType : public AstDataType {
-public:
-    explicit AstPointerType(std::shared_ptr<AstDataType> baseType);
-    std::shared_ptr<AstDataType> getBaseType();
-    
+struct AstPointerType : AstDataType {
+    explicit AstPointerType(std::shared_ptr<AstDataType> base_type); 
     void print() override;
-protected:
-    std::shared_ptr<AstDataType> baseType = nullptr;
+    
+    std::shared_ptr<AstDataType> base_type = nullptr;
 };
 
 // Represents a structure type
-class AstStructType : public AstDataType {
-public:
+struct AstStructType : AstDataType {
     explicit AstStructType(std::string name);
-    std::string getName();
-    
     void print() override;
-protected:
+    
     std::string name = "";
 };
 
@@ -161,24 +147,18 @@ struct Var {
 // AstStruct
 // Represents a struct
 //
-class AstStruct : public AstNode {
-public:
+struct AstStruct : AstNode {
     explicit AstStruct(std::string name);
     
-    void addItem(Var var, std::shared_ptr<AstExpression> defaultExpression);
-    
-    std::string getName();
-    std::vector<Var> getItems();
-    int getSize();
-    
-    std::shared_ptr<AstExpression> getDefaultExpression(std::string name);
+    void addItem(Var var, std::shared_ptr<AstExpression> default_expression);
     
     void print();
     std::string dot(std::string parent);
-private:
+    
+    // Member variables
     std::string name;
     std::vector<Var> items;
-    std::map<std::string, std::shared_ptr<AstExpression>> defaultExpressions;
+    std::map<std::string, std::shared_ptr<AstExpression>> default_expressions;
     int size = 0;
 };
 
@@ -222,8 +202,7 @@ protected:
 //
 
 // Represents an AST expression
-class AstExpression : public AstNode {
-public:
+struct AstExpression : AstNode {
     explicit AstExpression() : AstNode(V_AstType::None) {}
     explicit AstExpression(V_AstType type) : AstNode(type) {}
     
@@ -232,49 +211,38 @@ public:
 };
 
 // Holds a list of expressions
-class AstExprList : public AstExpression {
-public:
+struct AstExprList : AstExpression {
     AstExprList() : AstExpression(V_AstType::ExprList) {}
-    
-    void addExpression(std::shared_ptr<AstExpression> expr) { list.push_back(expr); }
-    std::vector<std::shared_ptr<AstExpression>> getList() { return list; }
+    void add_expression(std::shared_ptr<AstExpression> expr) { list.push_back(expr); }
     
     void print();
     std::string dot(std::string parent) override;
-private:
+    
     std::vector<std::shared_ptr<AstExpression>> list;
 };
 
 // Represents the base of operators
-class AstOp : public AstExpression {
-public:
-    bool isBinaryOp() { return isBinary; }
-
+struct AstOp : AstExpression {
     virtual void print() {}
     virtual std::string dot(std::string parent) { return ""; }
-protected:
-    bool isBinary = true;
+    
+    bool is_binary = true;
 };
 
 // Represents the base of a unary expression
-class AstUnaryOp : public AstOp {
-public:
+struct AstUnaryOp : AstOp {
     AstUnaryOp() {
-        isBinary = false;
+        is_binary = false;
     }
-
-    void setVal(std::shared_ptr<AstExpression> val) { this->val = val; }
-    std::shared_ptr<AstExpression> getVal() { return val; }
     
     virtual void print() {}
     virtual std::string dot(std::string parent) { return ""; }
-protected:
-    std::shared_ptr<AstExpression> val;
+    
+    std::shared_ptr<AstExpression> value;
 };
 
 // Represents a negate expression
-class AstNegOp : public AstUnaryOp {
-public:
+struct AstNegOp : AstUnaryOp {
     AstNegOp() {
         this->type = V_AstType::Neg;
     }
@@ -284,27 +252,17 @@ public:
 };
 
 // Represents the base of a binary expression
-class AstBinaryOp : public AstOp {
-public:
-    void setLVal(std::shared_ptr<AstExpression> lval) { this->lval = lval; }
-    void setRVal(std::shared_ptr<AstExpression> rval) { this->rval = rval; }
-    void setPrecedence(int p) { this->precedence = p; }
-    
-    std::shared_ptr<AstExpression> getLVal() { return lval; }
-    std::shared_ptr<AstExpression> getRVal() { return rval; }
-    int getPrecedence() { return precedence; }
-    
+struct AstBinaryOp : AstOp {
     virtual void print() {}
     virtual std::string dot(std::string parent) { return ""; }
-protected:
+    
     std::shared_ptr<AstExpression> lval;
     std::shared_ptr<AstExpression> rval;
     int precedence = 0;
 };
 
 // Represents an assignment operation
-class AstAssignOp : public AstBinaryOp {
-public:
+struct AstAssignOp : AstBinaryOp {
     explicit AstAssignOp() {
         this->type = V_AstType::Assign;
         this->precedence = 16;
@@ -322,8 +280,7 @@ public:
 };
 
 // Represents an add operation
-class AstAddOp : public AstBinaryOp {
-public:
+struct AstAddOp : AstBinaryOp {
     AstAddOp() {
         this->type = V_AstType::Add;
         this->precedence = 4;
@@ -334,8 +291,7 @@ public:
 };
 
 // Represents a subtraction operation
-class AstSubOp : public AstBinaryOp {
-public:
+struct AstSubOp : AstBinaryOp {
     AstSubOp() {
         this->type = V_AstType::Sub;
         this->precedence = 4;
@@ -346,8 +302,7 @@ public:
 };
 
 // Represents a multiplication operation
-class AstMulOp : public AstBinaryOp {
-public:
+struct AstMulOp : AstBinaryOp {
     AstMulOp() {
         this->type = V_AstType::Mul;
         this->precedence = 3;
@@ -358,8 +313,7 @@ public:
 };
 
 // Represents a division operation
-class AstDivOp : public AstBinaryOp {
-public:
+struct AstDivOp : AstBinaryOp {
     AstDivOp() {
         this->type = V_AstType::Div;
         this->precedence = 3;
@@ -370,8 +324,7 @@ public:
 };
 
 // Represents the modulus operation
-class AstModOp : public AstBinaryOp {
-public:
+struct AstModOp : AstBinaryOp {
     AstModOp() {
         this->type = V_AstType::Mod;
         this->precedence = 3;
@@ -382,8 +335,7 @@ public:
 };
 
 // Represents a division operation
-class AstAndOp : public AstBinaryOp {
-public:
+struct AstAndOp : AstBinaryOp {
     AstAndOp() {
         this->type = V_AstType::And;
         this->precedence = 8;
@@ -394,8 +346,7 @@ public:
 };
 
 // Represents an or operation
-class AstOrOp : public AstBinaryOp {
-public:
+struct AstOrOp : AstBinaryOp {
     AstOrOp() {
         this->type = V_AstType::Or;
         this->precedence = 10;
@@ -406,8 +357,7 @@ public:
 };
 
 // Represents a xor operation
-class AstXorOp : public AstBinaryOp {
-public:
+struct AstXorOp : AstBinaryOp {
     AstXorOp() {
         this->type = V_AstType::Xor;
         this->precedence = 9;
@@ -418,8 +368,7 @@ public:
 };
 
 // Represents an equal-to operation
-class AstEQOp : public AstBinaryOp {
-public:
+struct AstEQOp : AstBinaryOp {
     AstEQOp() {
         this->type = V_AstType::EQ;
         this->precedence = 6;
@@ -430,8 +379,7 @@ public:
 };
 
 // Represents a not-equal-to operation
-class AstNEQOp : public AstBinaryOp {
-public:
+struct AstNEQOp : AstBinaryOp {
     AstNEQOp() {
         this->type = V_AstType::NEQ;
         this->precedence = 6;
@@ -442,8 +390,7 @@ public:
 };
 
 // Represents a greater-than operation
-class AstGTOp : public AstBinaryOp {
-public:
+struct AstGTOp : AstBinaryOp {
     AstGTOp() {
         this->type = V_AstType::GT;
         this->precedence = 6;
@@ -454,8 +401,7 @@ public:
 };
 
 // Represents a less-than operation
-class AstLTOp : public AstBinaryOp {
-public:
+struct AstLTOp : AstBinaryOp {
     AstLTOp() {
         this->type = V_AstType::LT;
         this->precedence = 6;
@@ -466,8 +412,7 @@ public:
 };
 
 // Represents a greater-than-or-equal operation
-class AstGTEOp : public AstBinaryOp {
-public:
+struct AstGTEOp : AstBinaryOp {
     AstGTEOp() {
         this->type = V_AstType::GTE;
         this->precedence = 6;
@@ -478,8 +423,7 @@ public:
 };
 
 // Represents a less-than-or-equal operation
-class AstLTEOp : public AstBinaryOp {
-public:
+struct AstLTEOp : AstBinaryOp {
     AstLTEOp() {
         this->type = V_AstType::LTE;
         this->precedence = 6;
@@ -490,8 +434,7 @@ public:
 };
 
 // Represents a logical AND operation
-class AstLogicalAndOp : public AstBinaryOp {
-public:
+struct AstLogicalAndOp : AstBinaryOp {
     AstLogicalAndOp() {
         this->type = V_AstType::LogicalAnd;
         this->precedence = 11;
@@ -502,8 +445,7 @@ public:
 };
 
 // Represents a logical OR operation
-class AstLogicalOrOp : public AstBinaryOp {
-public:
+struct AstLogicalOrOp : AstBinaryOp {
     AstLogicalOrOp() {
         this->type = V_AstType::LogicalOr;
         this->precedence = 12;
@@ -514,17 +456,15 @@ public:
 };
 
 // Represents a character literal
-class AstChar : public AstExpression {
-public:
+struct AstChar : AstExpression {
     explicit AstChar(char val) : AstExpression(V_AstType::CharL) {
-        this->val = val;
+        this->value = val;
     }
     
-    char getValue() { return val; }
     void print();
     std::string dot(std::string parent) override;
-private:
-    char val = 0;
+    
+    char value = 0;
 };
 
 // Represents a byte literal
@@ -532,13 +472,13 @@ private:
 class AstI8 : public AstExpression {
 public:
     explicit AstI8(uint8_t val) : AstExpression(V_AstType::I8L) {
-        this->val = val;
+        this->value = val;
     }
     
-    uint8_t getValue() { return val; }
+    uint8_t getValue() { return value; }
     void print();
-private:
-    uint8_t val = 0;
+    
+    uint8_t value = 0;
 };
 
 // Represents a word literal
@@ -546,13 +486,13 @@ private:
 class AstI16 : public AstExpression {
 public:
     explicit AstI16(uint16_t val) : AstExpression(V_AstType::I16L) {
-        this->val = val;
+        this->value = val;
     }
     
-    uint16_t getValue() { return val; }
+    uint16_t getValue() { return value; }
     void print();
-private:
-    uint16_t val = 0;
+
+    uint16_t value = 0;
 };
 
 // Represents an integer literal
@@ -560,16 +500,16 @@ private:
 class AstI32 : public AstExpression {
 public:
     explicit AstI32(uint64_t val) : AstExpression(V_AstType::I32L) {
-        this->val = val;
+        this->value = val;
     }
     
-    void setValue(uint64_t val) { this->val = val; }
+    void setValue(uint64_t val) { this->value = val; }
     
-    uint64_t getValue() { return val; }
+    uint64_t getValue() { return value; }
     void print();
     std::string dot(std::string parent) override;
-private:
-    uint64_t val = 0;
+    
+    uint64_t value = 0;
 };
 
 // Represents a QWord literal
@@ -577,95 +517,79 @@ private:
 class AstI64 : public AstExpression {
 public:
     explicit AstI64(uint64_t val) : AstExpression(V_AstType::I64L) {
-        this->val = val;
+        this->value = val;
     }
     
-    uint64_t getValue() { return val; }
+    uint64_t getValue() { return value; }
     void print();
-private:
-    uint64_t val = 0;
+    
+    uint64_t value = 0;
 };
 
 // Represents a string literal
-class AstString : public AstExpression {
-public:
-    explicit AstString(std::string val) : AstExpression(V_AstType::StringL) {
-        this->val = val;
+struct AstString : AstExpression {
+    explicit AstString(std::string value) : AstExpression(V_AstType::StringL) {
+        this->value = value;
     }
     
-    std::string getValue() { return val; }
     void print();
     std::string dot(std::string parent) override;
-private:
-    std::string val = "";
+    
+    std::string value = "";
 };
 
 // Represents a variable reference
-class AstID: public AstExpression {
-public:
+struct AstID: AstExpression {
     explicit AstID(std::string val) : AstExpression(V_AstType::ID) {
-        this->val = val;
+        this->value = val;
     }
     
-    std::string getValue() { return val; }
     void print();
     std::string dot(std::string parent) override;
-private:
-    std::string val = "";
+    
+    std::string value = "";
 };
 
 // Represents an array access
-class AstArrayAccess : public AstExpression {
-public:
-    explicit AstArrayAccess(std::string val) : AstExpression(V_AstType::ArrayAccess) {
-        this->val = val;
+struct AstArrayAccess : AstExpression {
+    explicit AstArrayAccess(std::string value) : AstExpression(V_AstType::ArrayAccess) {
+        this->value = value;
     }
-    
-    void setIndex(std::shared_ptr<AstExpression> index) { this->index = index; }
-    
-    std::string getValue() { return val; }
-    std::shared_ptr<AstExpression> getIndex() { return index; }
     
     void print();
     std::string dot(std::string parent) override;
-private:
-    std::string val = "";
+    
+    // Member variables
+    std::string value = "";
     std::shared_ptr<AstExpression> index;
 };
 
 // Represents a structure access
-class AstStructAccess : public AstExpression {
-public:
+struct AstStructAccess : AstExpression {
     explicit AstStructAccess(std::string var, std::string member) : AstExpression(V_AstType::StructAccess) {
         this->var = var;
         this->member = member;
     }
 
-    std::string getName() { return var; }
-    std::string getMember() { return member; }
-
     void print();
     std::string dot(std::string parent) override;
-private:
+    
+    // Member variables
     std::string var = "";
     std::string member = "";
 };
 
 // Represents a function call
-class AstFuncCallExpr : public AstExpression {
-public:
+struct AstFuncCallExpr : AstExpression {
     explicit AstFuncCallExpr(std::string name) : AstExpression(V_AstType::FuncCallExpr) {
         this->name = name;
     }
     
-    void setArgExpression(std::shared_ptr<AstExpression> expr) { this->expr = expr; }
-    std::shared_ptr<AstExpression> getArgExpression() { return expr; }
-    std::string getName() { return name; }
-    
     void print();
     std::string dot(std::string parent) override;
-private:
-    std::shared_ptr<AstExpression> expr;
+    
+    // Member variables
+    std::shared_ptr<AstExpression> args;
     std::string name = "";
 };
 
@@ -677,96 +601,54 @@ private:
 //
 
 // Represents an AST statement
-class AstStatement : public AstNode {
-public:
+struct AstStatement : AstNode {
     explicit AstStatement();
     explicit AstStatement(V_AstType type);
-    
-    void setExpression(std::shared_ptr<AstExpression> expr);
-    std::shared_ptr<AstExpression> getExpression();
     bool hasExpression();
     
     virtual void print() {}
     virtual std::string dot(std::string parent) { return ""; }
-private:
-    std::shared_ptr<AstExpression> expr = nullptr;
-};
-
-// Represents a function, external declaration, or global variable
-// TODO: Delete
-class AstGlobalStatement : public AstNode {
-public:
-    explicit AstGlobalStatement() : AstNode(V_AstType::None) {}
-    explicit AstGlobalStatement(V_AstType type) : AstNode(type) {}
     
-    virtual void print() {}
-    virtual std::string dot(std::string parent) { return ""; }
+    std::shared_ptr<AstExpression> expression = nullptr;
 };
 
 // Represents an extern function
-// TODO: Rebase
-class AstExternFunction : public AstGlobalStatement {
-public:
-    explicit AstExternFunction(std::string name) : AstGlobalStatement(V_AstType::ExternFunc) {
+struct AstExternFunction : AstStatement {
+    explicit AstExternFunction(std::string name) : AstStatement(V_AstType::ExternFunc) {
         this->name = name;
     }
     
     void addArgument(Var arg) { this->args.push_back(arg); }
-    void setArguments(std::vector<Var> args) { this->args = args; }
-    
-    void setDataType(std::shared_ptr<AstDataType> dataType) {
-        this->dataType = dataType;
-    }
-    
-    void setVarArgs() { this->varargs = true; }
-    bool isVarArgs() { return this->varargs; }
-    
-    std::string getName() { return name; }
-    std::shared_ptr<AstDataType> getDataType() { return dataType; }
-    std::vector<Var> getArguments() { return args; }
     
     void print() override;
     std::string dot(std::string parent) override;
-private:
+    
+    // Member variables
     std::string name = "";
     std::vector<Var> args;
-    std::shared_ptr<AstDataType> dataType;
+    std::shared_ptr<AstDataType> data_type;
     bool varargs = false;
 };
 
 // Represents a function
-// TODO: Rebase
-class AstFunction : public AstGlobalStatement {
-public:
-    explicit AstFunction(std::string name) : AstGlobalStatement(V_AstType::Func) {
+struct AstFunction : AstStatement {
+    explicit AstFunction(std::string name) : AstStatement(V_AstType::Func) {
         this->name = name;
         block = std::make_shared<AstBlock>();
     }
-    
-    std::string getName() { return name; }
-    std::shared_ptr<AstDataType> getDataType() { return dataType; }
-    std::vector<Var> getArguments() { return args; }
-    std::shared_ptr<AstBlock> getBlock() { return block; }
-    
-    void setName(std::string name) { this->name = name; }
-    
-    void setArguments(std::vector<Var> args) { this->args = args; }
     
     void addStatement(std::shared_ptr<AstStatement> statement) {
         block->addStatement(statement);
     }
     
-    void setDataType(std::shared_ptr<AstDataType> dataType) {
-        this->dataType = dataType;
-    }
-    
     void print() override;
     std::string dot(std::string parent) override;
-private:
+
+    // Member variables
     std::string name = "";
     std::vector<Var> args;
     std::shared_ptr<AstBlock> block;
-    std::shared_ptr<AstDataType> dataType;
+    std::shared_ptr<AstDataType> data_type;
     std::string dtName = "";
 };
 
@@ -789,8 +671,7 @@ private:
 };
 
 // Represents a function call statement
-class AstFuncCallStmt : public AstStatement {
-public:
+struct AstFuncCallStmt : AstStatement {
     explicit AstFuncCallStmt(std::string name) : AstStatement(V_AstType::FuncCallStmt) {
         this->name = name;
     }
@@ -798,7 +679,7 @@ public:
     std::string getName() { return name; }
     void print();
     std::string dot(std::string parent) override;
-private:
+    
     std::string name = "";
 };
 
@@ -914,19 +795,19 @@ public:
     
     std::string getFile();
     
-    std::vector<std::shared_ptr<AstGlobalStatement>> getGlobalStatements();
+    std::vector<std::shared_ptr<AstStatement>> getGlobalStatements();
     std::vector<std::shared_ptr<AstStruct>> getStructs();
     
     bool hasStruct(std::string name);
     
-    void addGlobalStatement(std::shared_ptr<AstGlobalStatement> stmt);
+    void addGlobalStatement(std::shared_ptr<AstStatement> stmt);
     void addStruct(std::shared_ptr<AstStruct> s);
     
     void print();
     void dot();
 private:
     std::string file = "";
-    std::vector<std::shared_ptr<AstGlobalStatement>> global_statements;
+    std::vector<std::shared_ptr<AstStatement>> global_statements;
     std::vector<std::shared_ptr<AstStruct>> structs;
 };
 

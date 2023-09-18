@@ -10,6 +10,8 @@ The following is our to-do list for Riya:
 * Replace the C-based lexer with C++ lexer
 * Rebase AST- all functions in "ast.cpp"
 * Rebase AST- functions inherit from statements, blocks on the global scope
+* (DONE) Rebase AST- merge all AST headers into one
+* Rebase AST- use struct instead of class/helper functions
 
 
 ### Features

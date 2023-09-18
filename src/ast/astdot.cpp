@@ -38,7 +38,7 @@ std::string AstStruct::dot(std::string parent) {
     std::string name = "struct" + std::to_string(idx);
     ++idx;
     
-    std::string output = name + "[shape=rect, label=\"struct " + getName() + "\"];\n";
+    std::string output = name + "[shape=rect, label=\"struct " + this->name + "\"];\n";
     output += parent + " -> " + name + ";\n";
     
     for (auto item : items) {
@@ -48,7 +48,7 @@ std::string AstStruct::dot(std::string parent) {
         output += item_name + "[label=\"" + item.name + "\"];\n";
         output += name + " -> " + item_name + ";\n";
         
-        output += defaultExpressions[item.name]->dot(item_name);
+        output += default_expressions[item.name]->dot(item_name);
     }
     
     return output;
@@ -58,13 +58,13 @@ std::string AstStruct::dot(std::string parent) {
 // Global statements (functions)
 //
 std::string AstExternFunction::dot(std::string parent) {
-    return parent + " -> " + getName() + "[shape=rect];\n";
+    return parent + " -> " + name + "[shape=rect];\n";
 }
 
 std::string AstFunction::dot(std::string parent) {
-    std::string output = getName() + "[shape=box];\n";
-    output += parent + " -> " + getName() + ";\n";
-    output += getBlock()->dot(getName());
+    std::string output = name + "[shape=box];\n";
+    output += parent + " -> " + name + ";\n";
+    output += block->dot(name);
     
     return output;
 }
@@ -95,7 +95,7 @@ std::string AstExprStatement::dot(std::string parent) {
     
     std::string output = name + "[label=\"expression\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getExpression()->dot(name);
+    output += expression->dot(name);
     
     return output;
 }
@@ -107,7 +107,7 @@ std::string AstFuncCallStmt::dot(std::string parent) {
     std::string output = name + "[label=\"" + getName() + "\"];\n";
     output += parent + " -> " + name + ";\n";
     
-    output += getExpression()->dot(name);
+    output += expression->dot(name);
     
     return output;
 }
@@ -119,7 +119,7 @@ std::string AstReturnStmt::dot(std::string parent) {
     std::string output = name + "[label=\"return\"];\n";
     output += parent + " -> " + name + ";\n";
     
-    if (hasExpression()) output += getExpression()->dot(name);
+    if (hasExpression()) output += expression->dot(name);
     
     return output;
 }
@@ -151,7 +151,7 @@ std::string AstIfStmt::dot(std::string parent) {
     std::string output = name + "[label=\"if\"];\n";
     output += parent + " -> " + name + ";\n";
     
-    output += getExpression()->dot(name);
+    output += expression->dot(name);
     output += trueBlock->dot(name);
     output += falseBlock->dot(name);
     
@@ -165,7 +165,7 @@ std::string AstWhileStmt::dot(std::string parent) {
     std::string output = name + "[label=\"while\"];\n";
     output += parent + " -> " + name + ";\n";
     
-    output += getExpression()->dot(name);
+    output += expression->dot(name);
     output += block->dot(name);
     
     return output;
@@ -212,7 +212,7 @@ std::string AstNegOp::dot(std::string parent) {
     
     std::string output = name + "[label=\"-\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getVal()->dot(name);
+    output += value->dot(name);
     return output;
 }
 
@@ -222,8 +222,8 @@ std::string AstAssignOp::dot(std::string parent) {
     
     std::string output = name + "[label=\":=\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -233,8 +233,8 @@ std::string AstAddOp::dot(std::string parent) {
     
     std::string output = name + "[label=\"+\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -244,8 +244,8 @@ std::string AstSubOp::dot(std::string parent) {
     
     std::string output = name + "[label=\"-\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -255,8 +255,8 @@ std::string AstMulOp::dot(std::string parent) {
     
     std::string output = name + "[label=\"*\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -266,8 +266,8 @@ std::string AstDivOp::dot(std::string parent) {
     
     std::string output = name + "[label=\"/\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -277,8 +277,8 @@ std::string AstModOp::dot(std::string parent) {
     
     std::string output = name + "[label=\"%\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -288,8 +288,8 @@ std::string AstAndOp::dot(std::string parent) {
     
     std::string output = name + "[label=\"&\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -299,8 +299,8 @@ std::string AstOrOp::dot(std::string parent) {
     
     std::string output = name + "[label=\"|\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -310,8 +310,8 @@ std::string AstXorOp::dot(std::string parent) {
     
     std::string output = name + "[label=\"^\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -321,8 +321,8 @@ std::string AstEQOp::dot(std::string parent) {
     
     std::string output = name + "[label=\"=\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -332,8 +332,8 @@ std::string AstNEQOp::dot(std::string parent) {
     
     std::string output = name + "[label=\"!=\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -343,8 +343,8 @@ std::string AstGTOp::dot(std::string parent) {
     
     std::string output = name + "[label=\">\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -354,8 +354,8 @@ std::string AstLTOp::dot(std::string parent) {
     
     std::string output = name + "[label=\"<\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -365,8 +365,8 @@ std::string AstGTEOp::dot(std::string parent) {
     
     std::string output = name + "[label=\">=\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -376,8 +376,8 @@ std::string AstLTEOp::dot(std::string parent) {
     
     std::string output = name + "[label=\"<=\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -387,8 +387,8 @@ std::string AstLogicalAndOp::dot(std::string parent) {
     
     std::string output = name + "[label=\"and\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -398,8 +398,8 @@ std::string AstLogicalOrOp::dot(std::string parent) {
     
     std::string output = name + "[label=\"or\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getLVal()->dot(name);
-    output += getRVal()->dot(name);
+    output += lval->dot(name);
+    output += rval->dot(name);
     return output;
 }
 
@@ -407,7 +407,7 @@ std::string AstChar::dot(std::string parent) {
     std::string name = "char" + std::to_string(idx);
     ++idx;
     
-    std::string output = name + "[label=\"\'" + getValue() + "\'\"];\n";
+    std::string output = name + "[label=\"\'" + value + "\'\"];\n";
     output += parent + " -> " + name + ";\n";
     return output;
 }
@@ -416,7 +416,7 @@ std::string AstString::dot(std::string parent) {
     std::string name = "string" + std::to_string(idx);
     ++idx;
     
-    std::string output = name + "[label=\"\\\"" + getValue() + "\\\"\"];\n";
+    std::string output = name + "[label=\"\\\"" + value + "\\\"\"];\n";
     output += parent + " -> " + name + ";\n";
     return output;
 }
@@ -434,7 +434,7 @@ std::string AstID::dot(std::string parent) {
     std::string name = "id" + std::to_string(idx);
     ++idx;
     
-    std::string output = name + "[label=\"" + getValue() + "\"];\n";
+    std::string output = name + "[label=\"" + value + "\"];\n";
     output += parent + " -> " + name + ";\n";
     return output;
 }
@@ -443,9 +443,9 @@ std::string AstArrayAccess::dot(std::string parent) {
     std::string name = "array_acc" + std::to_string(idx);
     ++idx;
     
-    std::string output = name + "[label=\"" + getValue() + "\"];\n";
+    std::string output = name + "[label=\"" + value + "\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getIndex()->dot(name);
+    output += index->dot(name);
     return output;
 }
 
@@ -453,7 +453,7 @@ std::string AstStructAccess::dot(std::string parent) {
     std::string name = "struct_acc" + std::to_string(idx);
     ++idx;
     
-    std::string output = name + "[label=\"" + getName() + "." + getMember() + "\"];\n";
+    std::string output = name + "[label=\"" + var + "." + member + "\"];\n";
     output += parent + " -> " + name + ";\n";
     return output;
 }
@@ -462,9 +462,9 @@ std::string AstFuncCallExpr::dot(std::string parent) {
     std::string name = "func_call_expr" + std::to_string(idx);
     ++idx;
     
-    std::string output = name + "[label=\"" + getName() + "\"];\n";
+    std::string output = name + "[label=\"" + this->name + "\"];\n";
     output += parent + " -> " + name + ";\n";
-    output += getArgExpression()->dot(name);
+    output += args->dot(name);
     return output;
 }
 

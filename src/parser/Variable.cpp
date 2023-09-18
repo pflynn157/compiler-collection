@@ -57,7 +57,7 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
         std::shared_ptr<AstVarDec> empty = std::make_shared<AstVarDec>("", dataType);
         std::shared_ptr<AstExpression> arg = buildExpression(block, AstBuilder::buildInt32Type(), t_rbracket);
         if (!arg) return false;
-        empty->setExpression(arg); 
+        empty->expression = arg; 
         
         tk = lex_get_next(scanner);
         if (tk != t_semicolon) {
@@ -68,7 +68,7 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
         for (std::string name : toDeclare) {
             std::shared_ptr<AstVarDec> vd = std::make_shared<AstVarDec>(name, dataType);
             block->addStatement(vd);
-            vd->setExpression(empty->getExpression());
+            vd->expression = empty->expression;
             
             // Create an assignment to a malloc call
             std::shared_ptr<AstExprStatement> va = std::make_shared<AstExprStatement>();
@@ -79,27 +79,27 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
             std::shared_ptr<AstFuncCallExpr> callMalloc = std::make_shared<AstFuncCallExpr>("malloc");
             std::shared_ptr<AstAssignOp> assign = std::make_shared<AstAssignOp>(id, callMalloc);
             
-            va->setExpression(assign);
+            va->expression = assign;
             
             // In order to get a proper malloc, we need to multiply the argument by
             // the size of the type. Get the arguments, and do that
             std::shared_ptr<AstExprList> list = std::make_shared<AstExprList>();
-            callMalloc->setArgExpression(list);
+            callMalloc->args = list;
             
             std::shared_ptr<AstI32> size;
-            std::shared_ptr<AstDataType> baseType = std::static_pointer_cast<AstPointerType>(dataType)->getBaseType();
-            if (baseType->getType() == V_AstType::Int32) size = std::make_shared<AstI32>(4);
-            else if (baseType->getType() == V_AstType::Int64) size = std::make_shared<AstI32>(8);
-            else if (baseType->getType() == V_AstType::String) size = std::make_shared<AstI32>(8);
+            std::shared_ptr<AstDataType> baseType = std::static_pointer_cast<AstPointerType>(dataType)->base_type;
+            if (baseType->type == V_AstType::Int32) size = std::make_shared<AstI32>(4);
+            else if (baseType->type == V_AstType::Int64) size = std::make_shared<AstI32>(8);
+            else if (baseType->type == V_AstType::String) size = std::make_shared<AstI32>(8);
             else size = std::make_shared<AstI32>(1);
             
             std::shared_ptr<AstMulOp> op = std::make_shared<AstMulOp>();
-            op->setLVal(size);
-            op->setRVal(vd->getExpression());
-            list->addExpression(op);
+            op->lval = size;
+            op->rval = vd->expression;
+            list->add_expression(op);
             
             // Finally, set the size of the declaration
-            vd->setPtrSize(vd->getExpression());
+            vd->setPtrSize(vd->expression);
             
             block->addSymbol(name, dataType);
         }
@@ -123,7 +123,7 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
             
             std::shared_ptr<AstExprStatement> va = std::make_shared<AstExprStatement>();
             va->setDataType(dataType);
-            va->setExpression(assign);
+            va->expression = assign;
             block->addStatement(va);
             
             // Add the variable to the blocks symbol table
@@ -143,7 +143,7 @@ bool Parser::buildVariableAssign(std::shared_ptr<AstBlock> block, token t_idToke
     
     std::shared_ptr<AstExprStatement> stmt = std::make_shared<AstExprStatement>();
     stmt->setDataType(dataType);
-    stmt->setExpression(expr);
+    stmt->expression = expr;
     block->addStatement(stmt);
     
     return true;

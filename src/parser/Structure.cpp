@@ -112,7 +112,7 @@ bool Parser::buildStructDec(std::shared_ptr<AstBlock> block) {
     std::shared_ptr<AstStruct> str = nullptr;
     
     for (auto s : tree->getStructs()) {
-        if (s->getName() == structName) {
+        if (s->name == structName) {
             str = s;
             break;
         }    
@@ -141,7 +141,7 @@ bool Parser::buildStructDec(std::shared_ptr<AstBlock> block) {
         std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
         std::shared_ptr<AstAssignOp> assign = std::make_shared<AstAssignOp>(id, arg);
         
-        empty->setExpression(assign);
+        empty->expression = assign;
         block->addStatement(empty);
         
         // TODO: The body should only be a function call expression or an ID

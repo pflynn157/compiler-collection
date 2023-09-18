@@ -10,17 +10,17 @@
 //
 // Compiles a function and its body
 //
-void Compiler::compileFunction(std::shared_ptr<AstGlobalStatement> global) {
+void Compiler::compileFunction(std::shared_ptr<AstStatement> global) {
     symtable.clear();
     typeTable.clear();
     structVarTable.clear();
     
     std::shared_ptr<AstFunction> astFunc = std::static_pointer_cast<AstFunction>(global);
 
-    std::vector<Var> astVarArgs = astFunc->getArguments();
+    std::vector<Var> astVarArgs = astFunc->args;
     FunctionType *FT;
-    Type *funcType = translateType(astFunc->getDataType());
-    currentFuncType = astFunc->getDataType();
+    Type *funcType = translateType(astFunc->data_type);
+    currentFuncType = astFunc->data_type;
     
     if (astVarArgs.size() == 0) {
         FT = FunctionType::get(funcType, false);
@@ -28,7 +28,7 @@ void Compiler::compileFunction(std::shared_ptr<AstGlobalStatement> global) {
         std::vector<Type *> args;
         for (auto var : astVarArgs) {
             Type *type = translateType(var.type);
-            if (var.type->getType() == V_AstType::Struct) {
+            if (var.type->type == V_AstType::Struct) {
                 type = PointerType::getUnqual(type);
             }
             args.push_back(type);
@@ -37,7 +37,7 @@ void Compiler::compileFunction(std::shared_ptr<AstGlobalStatement> global) {
         FT = FunctionType::get(funcType, args, false);
     }
     
-    Function *func = Function::Create(FT, Function::ExternalLinkage, astFunc->getName(), mod.get());
+    Function *func = Function::Create(FT, Function::ExternalLinkage, astFunc->name, mod.get());
     currentFunc = func;
 
     BasicBlock *mainBlock = BasicBlock::Create(*context, "entry", func);
@@ -50,10 +50,10 @@ void Compiler::compileFunction(std::shared_ptr<AstGlobalStatement> global) {
             
             // Build the alloca for the local var
             Type *type = translateType(var.type);
-            if (var.type->getType() == V_AstType::Struct) {
+            if (var.type->type == V_AstType::Struct) {
                 symtable[var.name] = (AllocaInst *)func->getArg(i);
                 typeTable[var.name] = var.type;
-                structVarTable[var.name] = std::static_pointer_cast<AstStructType>(var.type)->getName();
+                structVarTable[var.name] = std::static_pointer_cast<AstStructType>(var.type)->name;
                 continue;
             }
             
@@ -67,7 +67,7 @@ void Compiler::compileFunction(std::shared_ptr<AstGlobalStatement> global) {
         }
     }
 
-    for (auto stmt : astFunc->getBlock()->getBlock()) {
+    for (auto stmt : astFunc->block->getBlock()) {
         compileStatement(stmt);
     }
 }
@@ -75,16 +75,16 @@ void Compiler::compileFunction(std::shared_ptr<AstGlobalStatement> global) {
 //
 // Compiles an extern function declaration
 //
-void Compiler::compileExternFunction(std::shared_ptr<AstGlobalStatement> global) {
+void Compiler::compileExternFunction(std::shared_ptr<AstStatement> global) {
     std::shared_ptr<AstExternFunction> astFunc = std::static_pointer_cast<AstExternFunction>(global);
     
-    std::vector<Var> astVarArgs = astFunc->getArguments();
+    std::vector<Var> astVarArgs = astFunc->args;
     FunctionType *FT;
     
-    Type *retType = translateType(astFunc->getDataType());
+    Type *retType = translateType(astFunc->data_type);
     
     if (astVarArgs.size() == 0) {
-        FT = FunctionType::get(retType, astFunc->isVarArgs());
+        FT = FunctionType::get(retType, astFunc->varargs);
     } else {
         std::vector<Type *> args;
         for (auto var : astVarArgs) {
@@ -92,10 +92,10 @@ void Compiler::compileExternFunction(std::shared_ptr<AstGlobalStatement> global)
             args.push_back(type);
         }
         
-        FT = FunctionType::get(retType, args, astFunc->isVarArgs());
+        FT = FunctionType::get(retType, args, astFunc->varargs);
     }
     
-    Function::Create(FT, Function::ExternalLinkage, astFunc->getName(), mod.get());
+    Function::Create(FT, Function::ExternalLinkage, astFunc->name, mod.get());
 }
 
 //
@@ -112,13 +112,13 @@ void Compiler::compileFuncCallStatement(std::shared_ptr<AstStatement> stmt) {
         Value *val = compileValue(stmt);
         args.push_back(val);
     }*/
-    std::shared_ptr<AstExprList> list = std::static_pointer_cast<AstExprList>(fc->getExpression());
-    for (auto arg : list->getList()) {
+    std::shared_ptr<AstExprList> list = std::static_pointer_cast<AstExprList>(fc->expression);
+    for (auto arg : list->list) {
         Value *val = compileValue(arg);
         args.push_back(val);
     }
     
-    Function *callee = mod->getFunction(fc->getName());
+    Function *callee = mod->getFunction(fc->name);
     if (!callee) std::cerr << "Invalid function call statement." << std::endl;
     builder->CreateCall(callee, args);
 }
@@ -131,10 +131,10 @@ void Compiler::compileReturnStatement(std::shared_ptr<AstStatement> stmt) {
     if (!stmt->hasExpression()) {
         builder->CreateRetVoid();
     } else if (stmt->hasExpression()) {
-        Value *val = compileValue(stmt->getExpression());
-        if (currentFuncType->getType() == V_AstType::Struct) {
+        Value *val = compileValue(stmt->expression);
+        if (currentFuncType->type == V_AstType::Struct) {
             std::shared_ptr<AstStructType> sType = std::static_pointer_cast<AstStructType>(currentFuncType);
-            StructType *type = structTable[sType->getName()];
+            StructType *type = structTable[sType->name];
             Value *ld = builder->CreateLoad(type, val);
             builder->CreateRet(ld);
         } else {

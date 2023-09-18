@@ -23,7 +23,7 @@ void Compiler::compileStructDeclaration(std::shared_ptr<AstStatement> stmt) {
     // Find the corresponding AST structure
     std::shared_ptr<AstStruct> str = nullptr;
     for (auto const &s : tree->getStructs()) {
-        if (s->getName() == sd->getStructName()) {
+        if (s->name == sd->getStructName()) {
             str = s;
             break;
         }
@@ -32,7 +32,7 @@ void Compiler::compileStructDeclaration(std::shared_ptr<AstStatement> stmt) {
     
     // Create a malloc call
     std::vector<Value *> args;
-    args.push_back(builder->getInt32(str->getSize()));
+    args.push_back(builder->getInt32(str->size));
     
     Function *callee = mod->getFunction("malloc");
     if (!callee) std::cerr << "Unable to allocate structure." << std::endl;
@@ -44,8 +44,8 @@ void Compiler::compileStructDeclaration(std::shared_ptr<AstStatement> stmt) {
         int index = 0;
         ptr = builder->CreateLoad(type, var);
         
-        for (Var member : str->getItems()) {
-            std::shared_ptr<AstExpression> defaultExpr = str->getDefaultExpression(member.name);
+        for (Var member : str->items) {
+            std::shared_ptr<AstExpression> defaultExpr = str->default_expressions[member.name];
             Value *defaultVal = compileValue(defaultExpr);
             
             Value *ep = builder->CreateStructGEP(type1, ptr, index);
@@ -59,10 +59,10 @@ void Compiler::compileStructDeclaration(std::shared_ptr<AstStatement> stmt) {
 // Compiles a structure access expression
 Value *Compiler::compileStructAccess(std::shared_ptr<AstExpression> expr, bool isAssign) {
     std::shared_ptr<AstStructAccess> sa = std::static_pointer_cast<AstStructAccess>(expr);
-    Value *ptr = symtable[sa->getName()];
-    int pos = getStructIndex(sa->getName(), sa->getMember());
+    Value *ptr = symtable[sa->var];
+    int pos = getStructIndex(sa->var, sa->member);
     
-    std::string strTypeName = structVarTable[sa->getName()];
+    std::string strTypeName = structVarTable[sa->var];
     StructType *strType = structTable[strTypeName];
     Type *elementType = structElementTypeTable[strTypeName][pos];
     

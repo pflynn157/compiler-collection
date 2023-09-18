@@ -103,27 +103,27 @@ bool Parser::buildFunction(token startToken, std::string className) {
     
     if (isExtern) {
         std::shared_ptr<AstExternFunction> ex = std::make_shared<AstExternFunction>(funcName);
-        ex->setArguments(args);
-        ex->setDataType(dataType);
+        ex->args = args;
+        ex->data_type = dataType;
         tree->addGlobalStatement(ex);
         return true;
     }
     
     std::shared_ptr<AstFunction> func = std::make_shared<AstFunction>(funcName);
-    func->setDataType(dataType);
-    func->setArguments(args);
+    func->data_type = dataType;
+    func->args = args;
     tree->addGlobalStatement(func);
-    func->getBlock()->mergeSymbols(block);
+    func->block->mergeSymbols(block);
     
     // Build the body
     int stopLayer = 0;
-    if (!buildBlock(func->getBlock())) return false;
+    if (!buildBlock(func->block)) return false;
     
     // Make sure we end with a return statement
-    V_AstType lastType = func->getBlock()->getBlock().back()->getType();
+    V_AstType lastType = func->block->getBlock().back()->type;
     if (lastType == V_AstType::Return) {
-        std::shared_ptr<AstStatement> ret = func->getBlock()->getBlock().back();
-        if (func->getDataType()->getType() == V_AstType::Void && ret->hasExpression()) {
+        std::shared_ptr<AstStatement> ret = func->block->getBlock().back();
+        if (func->data_type->type == V_AstType::Void && ret->hasExpression()) {
             syntax->addError(0, "Cannot return from void function.");
             return false;
         } else if (!ret->hasExpression()) {
@@ -131,7 +131,7 @@ bool Parser::buildFunction(token startToken, std::string className) {
             return false;
         }
     } else {
-        if (func->getDataType()->getType() == V_AstType::Void) {
+        if (func->data_type->type == V_AstType::Void) {
             func->addStatement(std::make_shared<AstReturnStmt>());
         } else {
             syntax->addError(0, "Expected return statement.");
@@ -155,7 +155,7 @@ bool Parser::buildFunctionCallStmt(std::shared_ptr<AstBlock> block, token idToke
     
     std::shared_ptr<AstExpression> args = buildExpression(block, nullptr, t_semicolon, false, true);
     if (!args) return false;
-    fc->setExpression(args);
+    fc->expression = args;
     
     return true;
 }
@@ -167,7 +167,7 @@ bool Parser::buildReturn(std::shared_ptr<AstBlock> block) {
     
     std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr);
     if (!arg) return false;
-    stmt->setExpression(arg);
+    stmt->expression = arg;
     
     return true;
 }

@@ -18,19 +18,19 @@ extern "C" {
 std::shared_ptr<AstExpression> Parser::checkCondExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstExpression> toCheck) {
     std::shared_ptr<AstExpression> expr = toCheck;
     
-    switch (toCheck->getType()) {
+    switch (toCheck->type) {
         case V_AstType::ID: {
             std::shared_ptr<AstID> id = std::static_pointer_cast<AstID>(toCheck);
-            std::shared_ptr<AstDataType> dataType = block->getDataType(id->getValue());            
+            std::shared_ptr<AstDataType> dataType = block->getDataType(id->value);            
             std::shared_ptr<AstEQOp> eq = std::make_shared<AstEQOp>();
-            eq->setLVal(id);
+            eq->lval = id;
             
-            switch (dataType->getType()) {
-                case V_AstType::Bool: eq->setRVal(std::make_shared<AstI32>(1)); break;
-                case V_AstType::Int8: eq->setRVal(std::make_shared<AstI8>(1)); break;
-                case V_AstType::Int16: eq->setRVal(std::make_shared<AstI16>(1)); break;
-                case V_AstType::Int32: eq->setRVal(std::make_shared<AstI32>(1)); break;
-                case V_AstType::Int64: eq->setRVal(std::make_shared<AstI64>(1)); break;
+            switch (dataType->type) {
+                case V_AstType::Bool: eq->rval = std::make_shared<AstI32>(1); break;
+                case V_AstType::Int8: eq->rval = std::make_shared<AstI8>(1); break;
+                case V_AstType::Int16: eq->rval = std::make_shared<AstI16>(1); break;
+                case V_AstType::Int32: eq->rval = std::make_shared<AstI32>(1); break;
+                case V_AstType::Int64: eq->rval = std::make_shared<AstI64>(1); break;
                 
                 default: {}
             }
@@ -40,8 +40,8 @@ std::shared_ptr<AstExpression> Parser::checkCondExpression(std::shared_ptr<AstBl
         
         case V_AstType::I32L: {
             std::shared_ptr<AstEQOp> eq = std::make_shared<AstEQOp>();
-            eq->setLVal(expr);
-            eq->setRVal(std::make_shared<AstI32>(1));
+            eq->lval = expr;
+            eq->rval = std::make_shared<AstI32>(1);
             expr = eq;
         } break;
         
@@ -56,11 +56,11 @@ bool Parser::buildConditional(std::shared_ptr<AstBlock> block) {
     std::shared_ptr<AstIfStmt> cond = std::make_shared<AstIfStmt>();
     std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr, t_then);
     if (!arg) return false;
-    cond->setExpression(arg);
+    cond->expression = arg;
     block->addStatement(cond);
     
-    std::shared_ptr<AstExpression> expr = checkCondExpression(block, cond->getExpression());
-    cond->setExpression(expr);
+    std::shared_ptr<AstExpression> expr = checkCondExpression(block, cond->expression);
+    cond->expression = expr;
     
     std::shared_ptr<AstBlock> trueBlock = std::make_shared<AstBlock>();
     trueBlock->mergeSymbols(block);
@@ -79,11 +79,11 @@ bool Parser::buildWhile(std::shared_ptr<AstBlock> block) {
     std::shared_ptr<AstWhileStmt> loop = std::make_shared<AstWhileStmt>();
     std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr, t_do);
     if (!arg) return false;
-    loop->setExpression(arg);
+    loop->expression = arg;
     block->addStatement(loop);
     
-    std::shared_ptr<AstExpression> expr = checkCondExpression(block, loop->getExpression());
-    loop->setExpression(expr);
+    std::shared_ptr<AstExpression> expr = checkCondExpression(block, loop->expression);
+    loop->expression = expr;
     
     std::shared_ptr<AstBlock> block2 = std::make_shared<AstBlock>();
     block2->mergeSymbols(block);

@@ -19,7 +19,7 @@ void Compiler::compileIfStatement(std::shared_ptr<AstStatement> stmt) {
     logicalOrStack.push(trueBlock);
     logicalAndStack.push(falseBlock);
     
-    Value *cond = compileValue(condStmt->getExpression());
+    Value *cond = compileValue(condStmt->expression);
     builder->CreateCondBr(cond, trueBlock, falseBlock);
     
     logicalAndStack.pop();
@@ -35,8 +35,8 @@ void Compiler::compileIfStatement(std::shared_ptr<AstStatement> stmt) {
     bool branchEnd = true;
     for (auto stmt2 : astTrueBlock->getBlock()) {
         compileStatement(stmt2);
-        if (stmt2->getType() == V_AstType::Return) branchEnd = false;
-        if (stmt2->getType() == V_AstType::Break) branchEnd = false;
+        if (stmt2->type == V_AstType::Return) branchEnd = false;
+        if (stmt2->type == V_AstType::Break) branchEnd = false;
     }
     if (branchEnd) builder->CreateBr(endBlock);
     
@@ -45,8 +45,8 @@ void Compiler::compileIfStatement(std::shared_ptr<AstStatement> stmt) {
     branchEnd = true;
     for (auto stmt2 : astFalseBlock->getBlock()) {
         compileStatement(stmt2);
-        if (stmt2->getType() == V_AstType::Return) branchEnd = false;
-        if (stmt2->getType() == V_AstType::Break) branchEnd = false;
+        if (stmt2->type == V_AstType::Return) branchEnd = false;
+        if (stmt2->type == V_AstType::Break) branchEnd = false;
     }
     if (branchEnd) builder->CreateBr(endBlock);
     
@@ -73,7 +73,7 @@ void Compiler::compileWhileStatement(std::shared_ptr<AstStatement> stmt) {
 
     builder->CreateBr(loopCmp);
     builder->SetInsertPoint(loopCmp);
-    Value *cond = compileValue(stmt->getExpression());
+    Value *cond = compileValue(stmt->expression);
     builder->CreateCondBr(cond, loopBlock, loopEnd);
 
     builder->SetInsertPoint(loopBlock);

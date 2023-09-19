@@ -111,7 +111,7 @@ bool Parser::buildStructDec(std::shared_ptr<AstBlock> block) {
     // Make sure the given structure exists
     std::shared_ptr<AstStruct> str = nullptr;
     
-    for (auto s : tree->getStructs()) {
+    for (auto s : tree->structs) {
         if (s->name == structName) {
             str = s;
             break;
@@ -133,7 +133,7 @@ bool Parser::buildStructDec(std::shared_ptr<AstBlock> block) {
     if (tk == t_semicolon) {
         return true;
     } else if (tk == t_assign) {
-        dec->setNoInit(true);
+        dec->no_init = true;
         std::shared_ptr<AstExprStatement> empty = std::make_shared<AstExprStatement>();
         std::shared_ptr<AstExpression> arg = buildExpression(block, AstBuilder::buildStructType(structName));
         if (!arg) return false;

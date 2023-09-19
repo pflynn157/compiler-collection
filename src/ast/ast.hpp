@@ -90,8 +90,8 @@ enum class V_AstType {
 };
 
 // Forward declarations
-class AstExpression;
-class AstStatement;
+struct AstExpression;
+struct AstStatement;
 
 //
 // The base of all AST nodes
@@ -166,7 +166,7 @@ struct AstStruct : AstNode {
 // Represents an AstBlock
 // Blocks hold tables and symbol information
 //
-class AstBlock : public AstNode {
+struct AstBlock : AstNode {
 public:
     AstBlock() : AstNode(V_AstType::Block) {}
 
@@ -469,8 +469,7 @@ struct AstChar : AstExpression {
 
 // Represents a byte literal
 // TODO: Remove
-class AstI8 : public AstExpression {
-public:
+struct AstI8 : AstExpression {
     explicit AstI8(uint8_t val) : AstExpression(V_AstType::I8L) {
         this->value = val;
     }
@@ -483,8 +482,7 @@ public:
 
 // Represents a word literal
 // TODO: Remove
-class AstI16 : public AstExpression {
-public:
+struct AstI16 : AstExpression {
     explicit AstI16(uint16_t val) : AstExpression(V_AstType::I16L) {
         this->value = val;
     }
@@ -497,8 +495,7 @@ public:
 
 // Represents an integer literal
 // TODO: Convert to uint64, rename AstInt
-class AstI32 : public AstExpression {
-public:
+struct AstI32 : AstExpression {
     explicit AstI32(uint64_t val) : AstExpression(V_AstType::I32L) {
         this->value = val;
     }
@@ -514,8 +511,7 @@ public:
 
 // Represents a QWord literal
 // TODO: Remove
-class AstI64 : public AstExpression {
-public:
+struct AstI64 : AstExpression {
     explicit AstI64(uint64_t val) : AstExpression(V_AstType::I64L) {
         this->value = val;
     }
@@ -654,8 +650,7 @@ struct AstFunction : AstStatement {
 
 // Represents an AST expression statement
 // This is basically the same as a statement
-class AstExprStatement : public AstStatement {
-public:
+struct AstExprStatement : AstStatement {
     explicit AstExprStatement() : AstStatement(V_AstType::ExprStmt) {}
     
     void setDataType(std::shared_ptr<AstDataType> dataType) {
@@ -666,7 +661,7 @@ public:
     
     void print();
     std::string dot(std::string parent) override;
-private:
+    
     std::shared_ptr<AstDataType> dataType;
 };
 
@@ -684,8 +679,7 @@ struct AstFuncCallStmt : AstStatement {
 };
 
 // Represents a return statement
-class AstReturnStmt : public AstStatement {
-public:
+struct AstReturnStmt : AstStatement {
     explicit AstReturnStmt() : AstStatement(V_AstType::Return) {}
     
     void print();
@@ -693,93 +687,65 @@ public:
 };
 
 // Represents a variable declaration
-class AstVarDec : public AstStatement {
-public:
-    explicit AstVarDec(std::string name, std::shared_ptr<AstDataType> dataType) : AstStatement(V_AstType::VarDec) {
+struct AstVarDec : AstStatement {
+    explicit AstVarDec(std::string name, std::shared_ptr<AstDataType> data_type) : AstStatement(V_AstType::VarDec) {
         this->name = name;
-        this->dataType = dataType;
+        this->data_type = data_type;
     }
-    
-    void setDataType(std::shared_ptr<AstDataType> dataType) { this->dataType = dataType; }
-    void setPtrSize(std::shared_ptr<AstExpression> size) { this->size = size; }
-    
-    std::string getName() { return name; }
-    std::shared_ptr<AstDataType> getDataType() { return dataType; }
-    std::shared_ptr<AstExpression> getPtrSize() { return size; }
     
     void print();
     std::string dot(std::string parent) override;
-private:
+    
     std::string name = "";
     std::shared_ptr<AstExpression> size = nullptr;
-    std::shared_ptr<AstDataType> dataType;
+    std::shared_ptr<AstDataType> data_type;
 };
 
 // Represents a structure declaration
-class AstStructDec : public AstStatement {
-public:
-    explicit AstStructDec(std::string varName, std::string structName) : AstStatement(V_AstType::StructDec) {
-        this->varName = varName;
-        this->structName = structName;
+struct AstStructDec : AstStatement {
+    explicit AstStructDec(std::string var_name, std::string struct_name) : AstStatement(V_AstType::StructDec) {
+        this->var_name = var_name;
+        this->struct_name = struct_name;
     }
-    
-    void setNoInit(bool init) { noInit = init; }
-    
-    std::string getVarName() { return varName; }
-    std::string getStructName() { return structName; }
-    bool isNoInit() { return noInit; }
     
     void print();
     std::string dot(std::string parent) override;
-private:
-    std::string varName = "";
-    std::string structName = "";
-    bool noInit = false;
+    
+    std::string var_name = "";
+    std::string struct_name = "";
+    bool no_init = false;
 };
 
 // Represents a conditional statement
-class AstIfStmt : public AstStatement {
-public:
+struct AstIfStmt : AstStatement {
     explicit AstIfStmt() : AstStatement(V_AstType::If) {}
-    
-    void setTrueBlock(std::shared_ptr<AstBlock> block) { trueBlock = block; }
-    void setFalseBlock(std::shared_ptr<AstBlock> block) { falseBlock = block; }
-    
-    std::shared_ptr<AstBlock> getTrueBlock() { return trueBlock; }
-    std::shared_ptr<AstBlock> getFalseBlock() { return falseBlock; }
     
     void print(int indent);
     std::string dot(std::string parent) override;
-private:
-    std::shared_ptr<AstBlock> trueBlock = nullptr;
-    std::shared_ptr<AstBlock> falseBlock = nullptr;
+    
+    std::shared_ptr<AstBlock> true_block = nullptr;
+    std::shared_ptr<AstBlock> false_block = nullptr;
 };
 
 // Represents a while statement
-class AstWhileStmt : public AstStatement {
-public:
+struct AstWhileStmt : AstStatement {
     explicit AstWhileStmt() : AstStatement(V_AstType::While) {}
-    
-    void setBlock(std::shared_ptr<AstBlock> block) { this->block = block; }
-    std::shared_ptr<AstBlock> getBlock() { return block; }
     
     void print(int indent = 0);
     std::string dot(std::string parent) override;
-private:
+
     std::shared_ptr<AstBlock> block = nullptr;
 };
 
 // Represents a break statement for a loop
-class AstBreak : public AstStatement {
-public:
+struct AstBreak : AstStatement {
     explicit AstBreak() : AstStatement(V_AstType::Break) {}
     void print();
     std::string dot(std::string parent) override;
 };
 
 // Represents a continue statement for a loop
-class AstContinue : public AstStatement {
-public:
+struct AstContinue : AstStatement {
     explicit AstContinue() : AstStatement(V_AstType::Continue) {}
     void print();
     std::string dot(std::string parent) override;
@@ -788,24 +754,22 @@ public:
 //
 // Represents an AST tree
 //
-class AstTree {
-public:
+struct AstTree {
     explicit AstTree(std::string file);
     ~AstTree();
-    
-    std::string getFile();
-    
-    std::vector<std::shared_ptr<AstStatement>> getGlobalStatements();
-    std::vector<std::shared_ptr<AstStruct>> getStructs();
-    
     bool hasStruct(std::string name);
     
-    void addGlobalStatement(std::shared_ptr<AstStatement> stmt);
-    void addStruct(std::shared_ptr<AstStruct> s);
+    void addGlobalStatement(std::shared_ptr<AstStatement> stmt) {
+        global_statements.push_back(stmt);
+    }
+    
+    void addStruct(std::shared_ptr<AstStruct> s) {
+        structs.push_back(s);
+    }
     
     void print();
     void dot();
-private:
+    
     std::string file = "";
     std::vector<std::shared_ptr<AstStatement>> global_statements;
     std::vector<std::shared_ptr<AstStruct>> structs;

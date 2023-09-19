@@ -62,14 +62,14 @@ bool Parser::buildConditional(std::shared_ptr<AstBlock> block) {
     std::shared_ptr<AstExpression> expr = checkCondExpression(block, cond->expression);
     cond->expression = expr;
     
-    std::shared_ptr<AstBlock> trueBlock = std::make_shared<AstBlock>();
-    trueBlock->mergeSymbols(block);
-    cond->setTrueBlock(trueBlock);
+    std::shared_ptr<AstBlock> true_block = std::make_shared<AstBlock>();
+    true_block->mergeSymbols(block);
+    cond->true_block = true_block;
     
-    std::shared_ptr<AstBlock> falseBlock = std::make_shared<AstBlock>();
-    falseBlock->mergeSymbols(block);
-    cond->setFalseBlock(falseBlock);
-    buildBlock(trueBlock, cond);
+    std::shared_ptr<AstBlock> false_block = std::make_shared<AstBlock>();
+    false_block->mergeSymbols(block);
+    cond->false_block = false_block;
+    buildBlock(true_block, cond);
     
     return true;
 }
@@ -88,7 +88,7 @@ bool Parser::buildWhile(std::shared_ptr<AstBlock> block) {
     std::shared_ptr<AstBlock> block2 = std::make_shared<AstBlock>();
     block2->mergeSymbols(block);
     buildBlock(block2);
-    loop->setBlock(block2);
+    loop->block = block2;
     
     return true;
 }

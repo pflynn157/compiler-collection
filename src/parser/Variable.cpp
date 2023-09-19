@@ -99,7 +99,7 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
             list->add_expression(op);
             
             // Finally, set the size of the declaration
-            vd->setPtrSize(vd->expression);
+            vd->size = vd->expression;
             
             block->addSymbol(name, dataType);
         }

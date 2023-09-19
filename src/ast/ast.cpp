@@ -74,29 +74,11 @@ void AstStruct::addItem(Var var, std::shared_ptr<AstExpression> default_expressi
 AstTree::AstTree(std::string file) { this-> file = file; }
 AstTree::~AstTree() {}
 
-std::string AstTree::getFile() { return file; }
-
-std::vector<std::shared_ptr<AstStatement>> AstTree::getGlobalStatements() {
-    return global_statements;
-}
-
-std::vector<std::shared_ptr<AstStruct>> AstTree::getStructs() {
-    return structs;
-}
-
 bool AstTree::hasStruct(std::string name) {
     for (auto const &s : structs) {
         if (s->name == name) return true;
     }
     return false;
-}
-
-void AstTree::addGlobalStatement(std::shared_ptr<AstStatement> stmt) {
-    global_statements.push_back(stmt);
-}
-
-void AstTree::addStruct(std::shared_ptr<AstStruct> s) {
-    structs.push_back(s);
 }
 
 //

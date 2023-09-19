@@ -9,13 +9,13 @@ int idx = 0;
 
 void AstTree::dot() {
     std::string output = "digraph AST {\n";
-    output += "tree[shape=box, label=\"" + getFile() + "\"]\n";
+    output += "tree[shape=box, label=\"" + file + "\"]\n";
     
-    for (auto s : getStructs()) {
+    for (auto s : structs) {
         output += s->dot("tree");
     }
     
-    for (auto global : getGlobalStatements()) {
+    for (auto global : global_statements) {
         output += global->dot("tree");
     }
     
@@ -138,7 +138,7 @@ std::string AstStructDec::dot(std::string parent) {
     std::string name = "struct" + std::to_string(idx);
     ++idx;
     
-    std::string output = name + "[label=\"struct " + this->varName + " : " + this->structName + "\"];\n";
+    std::string output = name + "[label=\"struct " + this->var_name + " : " + this->struct_name + "\"];\n";
     output += parent + " -> " + name + ";\n";
     
     return output;
@@ -152,8 +152,8 @@ std::string AstIfStmt::dot(std::string parent) {
     output += parent + " -> " + name + ";\n";
     
     output += expression->dot(name);
-    output += trueBlock->dot(name);
-    output += falseBlock->dot(name);
+    output += true_block->dot(name);
+    output += false_block->dot(name);
     
     return output;
 }

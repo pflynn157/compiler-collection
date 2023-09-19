@@ -150,8 +150,8 @@ void AstReturnStmt::print() {
 
 void AstVarDec::print() {
     std::cout << "VAR_DEC " << name << " : ";
-    dataType->print();
-    if (dataType->type == V_AstType::Ptr) {
+    data_type->print();
+    if (data_type->type == V_AstType::Ptr) {
         std::cout << "[";
         size->print();
         std::cout << "]";
@@ -160,8 +160,8 @@ void AstVarDec::print() {
 }
 
 void AstStructDec::print() {
-    std::cout << "STRUCT " << varName << " : " << structName;
-    if (noInit) std::cout << " NOINIT";
+    std::cout << "STRUCT " << var_name << " : " << struct_name;
+    if (no_init) std::cout << " NOINIT";
     std::cout << std::endl;
 }
 
@@ -169,8 +169,8 @@ void AstIfStmt::print(int indent) {
     std::cout << "IF ";
     expression->print();
     std::cout << " THEN" << std::endl;
-    trueBlock->print(indent+4);
-    falseBlock->print(indent+4);
+    true_block->print(indent+4);
+    false_block->print(indent+4);
 }
 
 void AstWhileStmt::print(int indent) {

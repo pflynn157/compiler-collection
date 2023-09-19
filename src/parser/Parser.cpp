@@ -163,12 +163,12 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
             case t_if: code = buildConditional(block); break;
             case t_elif: {
                 std::shared_ptr<AstIfStmt> condParent = std::static_pointer_cast<AstIfStmt>(parent);
-                code = buildConditional(condParent->getFalseBlock());
+                code = buildConditional(condParent->false_block);
                 end = true;
             } break;
             case t_else: {
                 std::shared_ptr<AstIfStmt> condParent = std::static_pointer_cast<AstIfStmt>(parent);
-                buildBlock(condParent->getFalseBlock());
+                buildBlock(condParent->false_block);
                 end = true;
             } break;
             
@@ -278,7 +278,7 @@ std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
         
         case t_id: {
             bool isStruct = false;
-            for (auto s : tree->getStructs()) {
+            for (auto s : tree->structs) {
                 if (s->name == lex_get_id(scanner)) {
                     isStruct = true;
                     break;

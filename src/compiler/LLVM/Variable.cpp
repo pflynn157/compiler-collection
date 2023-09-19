@@ -12,18 +12,18 @@
 // Compiles a structure declaration
 void Compiler::compileStructDeclaration(std::shared_ptr<AstStatement> stmt) {
     std::shared_ptr<AstStructDec> sd = std::static_pointer_cast<AstStructDec>(stmt);
-    StructType *type1 = structTable[sd->getStructName()];
+    StructType *type1 = structTable[sd->struct_name];
     PointerType *type = PointerType::getUnqual(type1);
     
     AllocaInst *var = builder->CreateAlloca(type);
-    symtable[sd->getVarName()] = var;
-    typeTable[sd->getVarName()] = AstBuilder::buildStructType(sd->getStructName());
-    structVarTable[sd->getVarName()] = sd->getStructName();
+    symtable[sd->var_name] = var;
+    typeTable[sd->var_name] = AstBuilder::buildStructType(sd->struct_name);
+    structVarTable[sd->var_name] = sd->struct_name;
     
     // Find the corresponding AST structure
     std::shared_ptr<AstStruct> str = nullptr;
-    for (auto const &s : tree->getStructs()) {
-        if (s->name == sd->getStructName()) {
+    for (auto const &s : tree->structs) {
+        if (s->name == sd->struct_name) {
             str = s;
             break;
         }
@@ -40,7 +40,7 @@ void Compiler::compileStructDeclaration(std::shared_ptr<AstStatement> stmt) {
     builder->CreateStore(ptr, var);
     
     // Init the elements
-    if (!sd->isNoInit()) {
+    if (!sd->no_init) {
         int index = 0;
         ptr = builder->CreateLoad(type, var);
         

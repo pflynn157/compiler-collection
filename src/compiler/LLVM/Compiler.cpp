@@ -30,7 +30,7 @@ Compiler::Compiler(std::shared_ptr<AstTree> tree, CFlags cflags) {
 
 void Compiler::compile() {
     // Build the structures used by the program
-    for (auto str : tree->getStructs()) {
+    for (auto str : tree->structs) {
         std::vector<Type *> elementTypes;
         
         for (auto v : str->items) {
@@ -46,7 +46,7 @@ void Compiler::compile() {
     }
 
     // Build all other functions
-    for (auto global : tree->getGlobalStatements()) {
+    for (auto global : tree->global_statements) {
         switch (global->type) {
             case V_AstType::Func: {
                 symtable.clear();
@@ -87,11 +87,11 @@ void Compiler::compileStatement(std::shared_ptr<AstStatement> stmt) {
         // A variable declaration (alloca) statement
         case V_AstType::VarDec: {
             std::shared_ptr<AstVarDec> vd = std::static_pointer_cast<AstVarDec>(stmt);
-            Type *type = translateType(vd->getDataType());
+            Type *type = translateType(vd->data_type);
             
             AllocaInst *var = builder->CreateAlloca(type);
-            symtable[vd->getName()] = var;
-            typeTable[vd->getName()] = vd->getDataType();
+            symtable[vd->name] = var;
+            typeTable[vd->name] = vd->data_type;
         } break;
         
         // A structure declaration
@@ -404,7 +404,7 @@ int Compiler::getStructIndex(std::string name, std::string member) {
     std::string name2 = structVarTable[name];
     if (name2 != "") name = name2;
     
-    for (auto s : tree->getStructs()) {
+    for (auto s : tree->structs) {
         if (s->name != name) continue;
 
         std::vector<Var> members = s->items;

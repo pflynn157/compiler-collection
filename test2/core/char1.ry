@@ -1,0 +1,7 @@
+
+func main -> i32 is
+    var c1 : char := 'A';
+    var c2 : char := c1;
+    
+    return c1 - c2;
+end

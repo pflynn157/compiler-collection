@@ -1,0 +1,5 @@
+
+func main -> i32 is
+    var x : i32 := -1 + -2;
+    return x + 3;
+end

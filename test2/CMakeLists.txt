@@ -1,7 +1,16 @@
 set(TEST_SRC
     test1
-    test2
-    test3
+    bitwise_and bitwise_or bitwise_xor
+    bool1 bool2
+    ret_math1 ret_math2 ret_math3 ret_math4 ret_math5
+    byte1 ubyte1
+    #char1
+    const1 const2
+    int64_1 uint64_t
+    neg1
+    short1 ushort1
+    uint1
+    op_pred mod math
 )
 
 foreach(ITEM ${TEST_SRC})

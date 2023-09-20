@@ -1,0 +1,10 @@
+
+func main -> i32 is
+    var x : bool := false;
+    
+    if x then return 1;
+    else return 0;
+    end
+    
+    return 2;
+end

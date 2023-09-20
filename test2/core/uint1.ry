@@ -1,0 +1,6 @@
+
+func main -> i32 is
+    var x : u32 := 0x1234;    
+    return x - 0x1234;
+end
+

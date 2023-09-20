@@ -1,0 +1,5 @@
+
+func main -> i32 is
+    var x : i8 := 0x21;
+    return x - 0x21;
+end

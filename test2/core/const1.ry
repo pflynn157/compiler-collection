@@ -1,0 +1,7 @@
+
+const c1 : i32 := 20;
+
+func main -> i32 is
+    return c1 - 20;
+end
+

@@ -1,0 +1,33 @@
+
+func compare(x:i32) -> i32 is
+    var ret : i32 := 0;
+    if x > 10 then
+        ret := ret + 1;
+        if x > 15 then
+            ret := ret + 2;
+        else
+            ret := ret + 4;
+        end
+        ret := ret + 10;
+    else
+        ret := ret + 7;
+    end
+    return ret;
+end
+
+func main -> i32 is
+    var x : i32 := 40;
+    var ret : i32 := 0;
+    
+    # add on 13
+    ret := ret + compare(x);
+    
+    # add on 7
+    ret := ret + compare(3);
+    
+    # add on 15
+    ret := ret + compare(11);
+    
+    return 35 - ret;
+end
+

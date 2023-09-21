@@ -1,0 +1,90 @@
+
+func cmp1(x:i32) -> i32 is
+    if x = 10 then
+        return 1;
+    else
+        return 2;
+    end
+    return 0;
+end
+
+func cmp2(x:i32) -> i32 is
+    if x > 10 then
+        return 1;
+    else
+        return 2;
+    end
+    return 0;
+end
+
+func cmp3(x:i32) -> i32 is
+    if x < 10 then
+        return 1;
+    else
+        return 2;
+    end
+    return 0;
+end
+
+func cmp4(x:i32) -> i32 is
+    if x != 10 then
+        return 1;
+    else
+        return 2;
+    end
+    return 0;
+end
+
+func cmp5(x:i32) -> i32 is
+    if x >= 10 then
+        return 1;
+    else
+        return 2;
+    end
+    return 0;
+end
+
+func cmp6(x:i32) -> i32 is
+    if x <= 10 then
+        return 1;
+    else
+        return 2;
+    end
+    return 0;
+end
+
+func main -> i32 is
+    var ret : i32 := 0;
+    
+    # Add 1 and 2 for each
+    # 3 * 12 + (1 + 1) = 36 + 2 = 38
+    
+    # 3
+    ret := ret + cmp1(10);
+    ret := ret + cmp1(0);
+    
+    # 3 = 6
+    ret := ret + cmp2(20);
+    ret := ret + cmp2(0);
+    
+    # 3 = 9
+    ret := ret + cmp3(5);
+    ret := ret + cmp3(50);
+    
+    # 3 = 12
+    ret := ret + cmp4(11);
+    ret := ret + cmp4(10);
+    
+    # 4 = 16
+    ret := ret + cmp5(20);
+    ret := ret + cmp5(10);
+    ret := ret + cmp5(0);
+    
+    # 4 = 20
+    ret := ret + cmp6(10);
+    ret := ret + cmp6(0);
+    ret := ret + cmp6(20);
+    
+    return 20 - ret;
+end
+

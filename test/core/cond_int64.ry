@@ -1,0 +1,26 @@
+
+func test1(x:i64) -> i32 is
+    if x = 20 then return 1;
+    else return 2;
+    end
+    
+    return 0;
+end
+
+func test2(x:i64) -> i32 is
+    if x = 20 then return 1;
+    else return 2;
+    end
+    
+    return 0;
+end
+
+func main -> i32 is
+    var x1 : i64 := 20;
+    var x2 : i64 := 31;
+    var ret : i32 := 0;
+    
+    ret := ret + test1(x1);
+    ret := ret + test2(x2);
+    return 3 - ret;
+end

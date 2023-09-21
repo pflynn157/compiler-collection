@@ -1,0 +1,36 @@
+
+func cmp(x:i32) -> i32 is
+    if x > 20 then
+        return 1;
+    elif x > 10 then
+        return 2;
+    elif x > 5 then
+        return 3;
+    else
+        return 4;
+    end
+    return 0;
+end
+
+func main -> i32 is
+    var ret : i32 := 0;
+
+    # Add 1
+    ret := ret + cmp(25);
+    
+    # Add 4
+    ret := ret + cmp(4);
+    
+    # Add 2
+    ret := ret + cmp(15);
+    
+    # Add 3
+    ret := ret + cmp(7);
+    
+    # Add 4
+    ret := ret + cmp(1);
+    
+    
+    return 14 - ret;
+end
+

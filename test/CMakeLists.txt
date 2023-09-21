@@ -1,4 +1,4 @@
-set(TEST_SRC
+set(CORE_TEST_SRC
     test1
     bitwise_and bitwise_or bitwise_xor
     bool1 bool2
@@ -11,9 +11,15 @@ set(TEST_SRC
     short1 ushort1
     uint1
     op_pred mod math
+    
+    cond1 cond2 cond3 cond4
+    cond_byte cond_ubyte
+    cond_short cond_ushort
+    cond_int64 cond_uint64
+    lg_and1 lg_or1
 )
 
-foreach(ITEM ${TEST_SRC})
+foreach(ITEM ${CORE_TEST_SRC})
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ITEM}.exe
         COMMAND ${CMAKE_BINARY_DIR}/src/tlc ${CMAKE_CURRENT_SOURCE_DIR}/core/${ITEM}.ry -o ${ITEM}.exe

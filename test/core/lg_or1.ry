@@ -1,0 +1,28 @@
+#OUTPUT
+#False
+#False
+#True
+#True
+#False
+#END
+
+#RET 0
+
+func test1(x:i32) -> i32 is
+    if x = 20 or x = 30 then
+        return 1;
+    else
+        return 2;
+    end
+    return 0;
+end
+
+func main -> i32 is
+    var ret : i32 := 0;
+    ret := ret + test1(21);
+    ret := ret + test1(25);
+    ret := ret + test1(30);
+    ret := ret + test1(20);
+    ret := ret + test1(100);
+    return 8 - ret;
+end

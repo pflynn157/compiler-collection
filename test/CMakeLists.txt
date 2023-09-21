@@ -11,6 +11,7 @@ set(CORE_TEST_SRC
     short1 ushort1
     uint1
     op_pred mod math
+    call1
     
     associative1 comma_var1 parens1
     

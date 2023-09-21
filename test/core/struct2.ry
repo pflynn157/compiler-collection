@@ -1,0 +1,25 @@
+
+struct S1 is
+    x : i32 := 10;
+    y : i32 := 20;
+end
+
+func printStruct(s:S1) -> i32 is
+    var ret : i32 := s.x + s.y;
+    return ret;
+end
+
+func main -> i32 is
+    struct s : S1;
+    var ret : i32 := 0;
+    
+    # 10 + 20 = 30
+    ret := ret + printStruct(s);
+    
+    s.x := 25;
+    
+    # 30 + (25 + 20) = 30 + 45 = 75
+    ret := ret + printStruct(s);
+    
+    return 75 - ret;
+end

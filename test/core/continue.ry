@@ -1,17 +1,4 @@
 
-#OUTPUT
-#0
-#1
-#2
-#3
-#4
-#7
-#8
-#9
-#END
-
-#RET 0
-
 func main -> i32 is
     var x : i32 := 0;
     
@@ -21,10 +8,9 @@ func main -> i32 is
             continue;
         end
         
-        println("%d", x);
         x := x + 1;
     end
     
-    return 0;
+    return 10 - x;
 end
 

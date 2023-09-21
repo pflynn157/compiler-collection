@@ -1,0 +1,10 @@
+
+func main -> i32 is
+    var i : i32 := 0;
+    while i < 10 do
+        i := i + 1;
+    end
+    
+    return 10 - i;
+end
+

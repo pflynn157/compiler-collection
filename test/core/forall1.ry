@@ -1,19 +1,4 @@
 
-#OUTPUT
-#0
-#2
-#4
-#6
-#8
-#10
-#12
-#14
-#16
-#18
-#END
-
-#RET 0
-
 func main -> i32 is
     var numbers : i32[10];
     var x : i32 := 0;
@@ -24,12 +9,13 @@ func main -> i32 is
         i := i + 1;
     end
     
+    var ret : i32 := 0;
     i := 0;
     while i < 10 do
-        println("%d", numbers[i]);
+        ret := ret + numbers[i];
         i := i + 1;
     end
     
-    return 0;
+    return 90 - ret;
 end
 

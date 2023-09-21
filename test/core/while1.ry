@@ -1,0 +1,16 @@
+
+func main -> i32 is
+    var x : i32 := 0;
+    var ret : i32 := 0;
+    
+    while x < 10 do
+        if x > 5 then
+            ret := ret + 2;
+        end
+        ret := ret + 1;
+        x := x + 1;
+    end
+
+    return 18 - ret;
+end
+

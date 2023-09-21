@@ -19,6 +19,10 @@ set(CORE_TEST_SRC
     cond_short cond_ushort
     cond_int64 cond_uint64
     lg_and1 lg_or1
+    
+    break continue for1 forall1
+    nested1 nested2 nested3
+    repeat1 step1 while1
 )
 
 foreach(ITEM ${CORE_TEST_SRC})

@@ -12,6 +12,8 @@ set(CORE_TEST_SRC
     uint1
     op_pred mod math
     
+    associative1 comma_var1 parens1
+    
     cond1 cond2 cond3 cond4
     cond_byte cond_ubyte
     cond_short cond_ushort

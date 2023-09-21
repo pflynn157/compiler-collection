@@ -8,13 +8,10 @@
 
 func main -> i32 is
     var x, y : i32 := 20;
-    
-    println("X: %d | Y: %d", x, y);
-    
     x := 22;
     y := x * 3;
     
-    println("X: %d | Y: %d", x, y);
+    var ret : i32 := x + y;
     
-    return 0;
+    return 88 - ret;
 end

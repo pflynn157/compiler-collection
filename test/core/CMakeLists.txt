@@ -35,6 +35,7 @@ foreach(ITEM ${CORE_TEST_SRC})
         COMMAND ${CMAKE_BINARY_DIR}/src/tlc ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.exe
         COMMAND ./${ITEM}.exe
         COMMAND rm ${ITEM}.exe
+        COMMAND echo "[PASS] ${ITEM}.ry"
     )
     
     set(TEST_OUTPUTS

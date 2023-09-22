@@ -10,23 +10,20 @@
 
 #include <parser/Parser.hpp>
 #include <ast/ast_builder.hpp>
-
-extern "C" {
-#include <lex/lex.h>
-}
+#include <lex/lex.hpp>
 
 Parser::Parser(std::string input) {
     this->input = input;
     
-    std::string input_str = "";
+    /*std::string input_str = "";
     std::ifstream reader(input.c_str());
     if (reader.is_open()) {
         std::string line = "";
         while (std::getline(reader, line)) {
             input_str += line + '\n';
         }
-    }
-    scanner = lex_init_string(strdup(input_str.c_str()));
+    }*/
+    scanner = std::make_unique<Scanner>(input);
     
     tree = std::make_shared<AstTree>(input);
     syntax = std::make_shared<ErrorManager>();
@@ -88,16 +85,15 @@ Parser::Parser(std::string input) {
 }
 
 Parser::~Parser() {
-    lex_close(scanner);
 }
 
 bool Parser::parse() {
-    token tk;
+    Token tk;
     do {
-        tk = lex_get_next(scanner);
+        tk = scanner->getNext();
         bool code = true;
         
-        switch (tk) {
+        switch (tk.type) {
             case t_extern:
             case t_func: {
                 code = buildFunction(tk);
@@ -110,13 +106,13 @@ bool Parser::parse() {
             
             default: {
                 syntax->addError(0, "Invalid token in global scope.");
-                lex_debug(tk, scanner);
+                tk.print();
                 code = false;
             }
         }
         
         if (!code) break;
-    } while (tk != t_eof);
+    } while (tk.type != t_eof);
     
     // Check for errors, and print if so
     if (syntax->errorsPresent()) {
@@ -130,25 +126,25 @@ bool Parser::parse() {
 
 // Builds a statement block
 bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent) {
-    token tk = lex_get_next(scanner);
-    while (tk != t_end && tk != t_eof) {
+    Token tk = scanner->getNext();
+    while (tk.type != t_end && tk.type != t_eof) {
         bool code = true;
         bool end = false;
         
-        switch (tk) {
+        switch (tk.type) {
             case t_var: code = buildVariableDec(block); break;
             case t_struct: code = buildStructDec(block); break;
             case t_const: code = buildConst(false); break;
             
             case t_id: {
-                token idtoken = tk;
-                tk = lex_get_next(scanner);
+                Token idtoken = tk;
+                tk = scanner->getNext();
                 
-                if (tk == t_assign || tk == t_lbracket || tk == t_dot) {
-                    lex_rewind(scanner, tk);
-                    lex_rewind(scanner, idtoken);
+                if (tk.type == t_assign || tk.type == t_lbracket || tk.type == t_dot) {
+                    scanner->rewind(tk);
+                    scanner->rewind(idtoken);
                     code = buildVariableAssign(block, idtoken);
-                } else if (tk == t_lparen) {
+                } else if (tk.type == t_lparen) {
                     code = buildFunctionCallStmt(block, idtoken);
                 } else {
                     syntax->addError(0, "Invalid use of identifier.");
@@ -186,7 +182,7 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
         
         if (end) break;
         if (!code) return false;
-        tk = lex_get_next(scanner);
+        tk = scanner->getNext();
     }
     
     return true;
@@ -229,11 +225,11 @@ std::shared_ptr<AstExpression> Parser::checkExpression(std::shared_ptr<AstExpres
 void Parser::debugScanner() {
     std::cout << "Debugging scanner..." << std::endl;
     
-    token t;
+    Token t;
     do {
-        t = lex_get_next(scanner);
-        lex_debug(t, scanner);
-    } while (t != t_eof);
+        t = scanner->getNext();
+        t.print();
+    } while (t.type != t_eof);
 }
 
 // Checks to see if a string is a constant
@@ -260,10 +256,10 @@ bool Parser::isFunc(std::string name) {
 // Builds a data type from the token stream
 //
 std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
-    token tk = lex_get_next(scanner);
+    Token tk = scanner->getNext();
     std::shared_ptr<AstDataType> dataType = nullptr;
     
-    switch (tk) {
+    switch (tk.type) {
         case t_bool: dataType = AstBuilder::buildBoolType(); break;
         case t_char: dataType = AstBuilder::buildCharType(); break;
         case t_i8: dataType = AstBuilder::buildInt8Type(); break;
@@ -279,14 +275,14 @@ std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
         case t_id: {
             bool isStruct = false;
             for (auto s : tree->structs) {
-                if (s->name == lex_get_id(scanner)) {
+                if (s->name == tk.id_val) {
                     isStruct = true;
                     break;
                 }
             }
                 
             if (isStruct) {
-                dataType = AstBuilder::buildStructType(lex_get_id(scanner));
+                dataType = AstBuilder::buildStructType(tk.id_val);
             }
         } break;
         
@@ -294,17 +290,17 @@ std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
     }
 
     if (checkBrackets) {
-        tk = lex_get_next(scanner);
-        if (tk == t_lbracket) {
-            tk = lex_get_next(scanner);
-            if (tk != t_rbracket) {
+        tk = scanner->getNext();
+        if (tk.type == t_lbracket) {
+            tk = scanner->getNext();
+            if (tk.type != t_rbracket) {
                 syntax->addError(0, "Invalid pointer type.");
                 return nullptr;
             }
             
             dataType = AstBuilder::buildPointerType(dataType);
         } else {
-            lex_rewind(scanner, tk);
+            scanner->rewind(tk);
         }
     }
     

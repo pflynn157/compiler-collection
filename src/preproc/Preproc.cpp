@@ -7,10 +7,6 @@
 #include <iostream>
 #include <cstdio>
 
-extern "C" {
-#include <lex/lex.h>
-}
-
 std::string getInputPath(std::string input) {
     std::string name = "";
     for (int i = 0; i<input.length() - 3; i++) {

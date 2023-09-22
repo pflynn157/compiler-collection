@@ -7,10 +7,7 @@
 
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
-
-extern "C" {
-#include <lex/lex.h>
-}
+#include <lex/lex.hpp>
 
 // Called if a conditional statement has only one operand. If it does,
 // we have to expand to have two operands before we get down to the
@@ -98,8 +95,8 @@ bool Parser::buildLoopCtrl(std::shared_ptr<AstBlock> block, bool isBreak) {
     if (isBreak) block->addStatement(std::make_shared<AstBreak>());
     else block->addStatement(std::make_shared<AstContinue>());
     
-    token tk = lex_get_next(scanner);
-    if (tk != t_semicolon) {
+    Token tk = scanner->getNext();
+    if (tk.type != t_semicolon) {
         syntax->addError(0, "Expected \';\' after break or continue.");
         return false;
     }

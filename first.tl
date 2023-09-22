@@ -1,10 +1,25 @@
-extern printf(ln : string, x : i32);
 
-func main -> i32 is
-    var c1 : char := 'A';
-    var c2 : char := c1;
-    var c3 : char := c1 - c2;
+#OUTPUT
+#Hello!
+# How are you?
+#Hello! How are you?
+#Hello!!
+#END
+
+#RET 0
+
+func main(args:string[]) -> i32 is
+    var str1 : string := "Hello!";
+    var str2 : string := " How are you?";
     
-    return c3;
+    println(str1);
+    println(str2);
+    
+    var str3 : string := str1 + str2;
+    println(str3);
+    
+    var str4 : string := str1 + '!';
+    println(str4);
+    
+    return 0;
 end
-

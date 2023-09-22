@@ -11,34 +11,31 @@
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
 #include <ast/ast_builder.hpp>
-
-extern "C" {
-#include <lex/lex.h>
-}
+#include <lex/lex.hpp>
 
 // Parses and builds a structure
 bool Parser::buildStruct() {
-    token tk = lex_get_next(scanner);
-    std::string name = lex_get_id(scanner);
+    Token tk = scanner->getNext();
+    std::string name = tk.id_val;
     
-    if (tk != t_id) {
+    if (tk.type != t_id) {
         syntax->addError(0, "Expected name for struct.");
         return false;
     }
     
     // Next token should be "is"
-    tk = lex_get_next(scanner);
-    if (tk != t_is) {
+    tk = scanner->getNext();
+    if (tk.type != t_is) {
         syntax->addError(0, "Expected \"is\".");
     }
     
     // Builds the struct items
     std::shared_ptr<AstStruct> str = std::make_shared<AstStruct>(name);
-    tk = lex_get_next(scanner);
+    tk = scanner->getNext();
     
-    while (tk != t_end && tk != t_eof) {
+    while (tk.type != t_end && tk.type != t_eof) {
         if (!buildStructMember(str, tk)) return false;
-        tk = lex_get_next(scanner);
+        tk = scanner->getNext();
     }
     
     tree->addStruct(str);
@@ -46,18 +43,18 @@ bool Parser::buildStruct() {
     return true;
 }
 
-bool Parser::buildStructMember(std::shared_ptr<AstStruct> str, token tk) {
-    std::string valName = lex_get_id(scanner);
+bool Parser::buildStructMember(std::shared_ptr<AstStruct> str, Token tk) {
+    std::string valName = tk.id_val;
     
-    if (tk != t_id) {
+    if (tk.type != t_id) {
         syntax->addError(0, "Expected id value.");
         //token.print();
         return false;
     }
         
     // Get the data type
-    tk = lex_get_next(scanner);
-    if (tk != t_colon) {
+    tk = scanner->getNext();
+    if (tk.type != t_colon) {
         syntax->addError(0, "Expected \':\' in structure member.");
         //token.print();
         return false;
@@ -66,9 +63,9 @@ bool Parser::buildStructMember(std::shared_ptr<AstStruct> str, token tk) {
     std::shared_ptr<AstDataType> dataType = buildDataType();
         
     // If its an array, build that. Otherwise, build the default value
-    tk = lex_get_next(scanner);
+    tk = scanner->getNext();
         
-    if (tk == t_assign) {
+    if (tk.type == t_assign) {
         std::shared_ptr<AstExpression> expr = buildExpression(nullptr, dataType, t_semicolon, true);
         if (!expr) return false;
                 
@@ -86,24 +83,24 @@ bool Parser::buildStructMember(std::shared_ptr<AstStruct> str, token tk) {
 }
 
 bool Parser::buildStructDec(std::shared_ptr<AstBlock> block) {
-    token tk = lex_get_next(scanner);
-    std::string name = lex_get_id(scanner);
+    Token tk = scanner->getNext();
+    std::string name = tk.id_val;
     
-    if (tk != t_id) {
+    if (tk.type != t_id) {
         syntax->addError(0, "Expected structure name.");
         return false;
     }
     
-    tk = lex_get_next(scanner);
-    if (tk != t_colon) {
+    tk = scanner->getNext();
+    if (tk.type != t_colon) {
         syntax->addError(0, "Expected \':\'");
         return false;
     }
     
-    tk = lex_get_next(scanner);
-    std::string structName = lex_get_id(scanner);
+    tk = scanner->getNext();
+    std::string structName = tk.id_val;
     
-    if (tk != t_id) {
+    if (tk.type != t_id) {
         syntax->addError(0, "Expected structure type.");
         return false;
     }
@@ -129,10 +126,10 @@ bool Parser::buildStructDec(std::shared_ptr<AstBlock> block) {
     block->addStatement(dec);
     
     // Final syntax check
-    tk = lex_get_next(scanner);
-    if (tk == t_semicolon) {
+    tk = scanner->getNext();
+    if (tk.type == t_semicolon) {
         return true;
-    } else if (tk == t_assign) {
+    } else if (tk.type == t_assign) {
         dec->no_init = true;
         std::shared_ptr<AstExprStatement> empty = std::make_shared<AstExprStatement>();
         std::shared_ptr<AstExpression> arg = buildExpression(block, AstBuilder::buildStructType(structName));

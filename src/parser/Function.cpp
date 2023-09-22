@@ -9,28 +9,25 @@
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
 #include <ast/ast_builder.hpp>
-
-extern "C" {
-#include <lex/lex.h>
-}
+#include <lex/lex.hpp>
 
 // Returns the function arguments
 bool Parser::getFunctionArgs(std::shared_ptr<AstBlock> block, std::vector<Var> &args) {
-    token tk = lex_get_next(scanner);
-    if (tk == t_lparen) {
-        tk = lex_get_next(scanner);
-        while (tk != t_eof && tk != t_rparen) {
-            token t1 = tk;
-            char *name = lex_get_id(scanner);
-            token t2 = lex_get_next(scanner);
+    Token tk = scanner->getNext();
+    if (tk.type == t_lparen) {
+        tk = scanner->getNext();
+        while (tk.type != t_eof && tk.type != t_rparen) {
+            Token t1 = tk;
+            std::string name = t1.id_val;
+            Token t2 = scanner->getNext();
             Var v;
             
-            if (t1 != t_id) {
+            if (t1.type != t_id) {
                 syntax->addError(0, "Invalid function argument: Expected name.");
                 return false;
             }
             
-            if (t2 != t_colon) {
+            if (t2.type != t_colon) {
                 syntax->addError(0, "Invalid function argument: Expected \':\'.");
                 return false;
             }
@@ -38,38 +35,38 @@ bool Parser::getFunctionArgs(std::shared_ptr<AstBlock> block, std::vector<Var> &
             v.type = buildDataType();
             v.name = name;
             
-            tk = lex_get_next(scanner);
-            if (tk == t_comma) {
-                tk = lex_get_next(scanner);
+            tk = scanner->getNext();
+            if (tk.type == t_comma) {
+                tk = scanner->getNext();
             }
             
             args.push_back(v);
             block->addSymbol(v.name, v.type);
         }
     } else {
-        lex_rewind(scanner, tk);
+        scanner->rewind(tk);
     }
     
     return true;
 }
 
 // Builds a function
-bool Parser::buildFunction(token startToken, std::string className) {
+bool Parser::buildFunction(Token startToken, std::string className) {
     localConsts.clear();
     
-    token tk;
+    Token tk;
     bool isExtern = false;
 
     // Handle extern function
-    if (startToken == t_extern) {
+    if (startToken.type == t_extern) {
         isExtern = true;
     }
 
     // Make sure we have a function name
-    tk = lex_get_next(scanner);
-    std::string funcName = lex_get_id(scanner);
+    tk = scanner->getNext();
+    std::string funcName = tk.id_val;
     
-    if (tk != t_id) {
+    if (tk.type != t_id) {
         syntax->addError(0, "Expected function name.");
         return false;
     }
@@ -81,19 +78,19 @@ bool Parser::buildFunction(token startToken, std::string className) {
 
     // Check to see if there's any return type
     //std::string retName = "";       // TODO: Do we need this?
-    tk = lex_get_next(scanner);
+    tk = scanner->getNext();
     std::shared_ptr<AstDataType> dataType;
-    if (tk == t_arrow) {
+    if (tk.type == t_arrow) {
         dataType = buildDataType();
-        tk = lex_get_next(scanner);
+        tk = scanner->getNext();
     }
     else dataType = AstBuilder::buildVoidType();
     
     // Do syntax error check
-    if (tk == t_semicolon && !isExtern) {
+    if (tk.type == t_semicolon && !isExtern) {
         syntax->addError(0, "Expected \';\' for extern function.");
         return false;
-    } else if (tk == t_is && isExtern) {
+    } else if (tk.type == t_is && isExtern) {
         syntax->addError(0, "Expected \'is\' keyword.");
         return false;
     }
@@ -143,14 +140,14 @@ bool Parser::buildFunction(token startToken, std::string className) {
 }
 
 // Builds a function call
-bool Parser::buildFunctionCallStmt(std::shared_ptr<AstBlock> block, token idToken) {
+bool Parser::buildFunctionCallStmt(std::shared_ptr<AstBlock> block, Token idToken) {
     // Make sure the function exists
-    if (!isFunc(lex_get_id(scanner))) {
+    if (!isFunc(idToken.id_val)) {
         syntax->addError(0, "Unknown function.");
         return false;
     }
 
-    std::shared_ptr<AstFuncCallStmt> fc = std::make_shared<AstFuncCallStmt>(lex_get_id(scanner));
+    std::shared_ptr<AstFuncCallStmt> fc = std::make_shared<AstFuncCallStmt>(idToken.id_val);
     block->addStatement(fc);
     
     std::shared_ptr<AstExpression> args = buildExpression(block, nullptr, t_semicolon, false, true);

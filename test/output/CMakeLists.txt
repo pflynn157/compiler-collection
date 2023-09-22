@@ -19,6 +19,8 @@ foreach(ITEM ${CORE_TEST_SRC})
         COMMAND ./${ITEM}.exe > output.txt
         COMMAND rm ${ITEM}.exe
         COMMAND diff ${CMAKE_CURRENT_SOURCE_DIR}/out/${ITEM}.out ./output.txt
+        COMMAND rm output.txt
+        COMMAND echo "[PASS] ${ITEM}.ry"
     )
     
     set(TEST_OUTPUTS

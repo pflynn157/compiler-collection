@@ -18,8 +18,6 @@ else()
     )
 endif()
 
-set(LEX_SRC lex/lex.c)
-
 set(SRC
     ast/ast.cpp
     ast/ast_builder.cpp
@@ -36,15 +34,15 @@ set(SRC
     
     preproc/Preproc.cpp
     
+    lex/lex.cpp
+    lex/lex_debug.cpp
+    
     # Compile sources
     ${COMPILER_SRC}
 )
 
-add_library(tlclex STATIC ${LEX_SRC})
-
 if(PTASM)
     add_executable(tlc ${SRC} ptasm_main.cpp)
-    target_link_libraries(tlc tlclex)
 else()
     add_executable(tlc ${SRC} main.cpp)
 
@@ -55,7 +53,6 @@ else()
     )
 
     target_link_libraries(tlc
-        tlclex
         ${llvm_libs}
     )
 endif()

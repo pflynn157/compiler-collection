@@ -6,8 +6,8 @@ The following is our to-do list for Riya:
 #### Codebase Changes
 
 * (DONE) Redesigned test system
-* Add a dedicated lexical analysis test
-* Replace the C-based lexer with C++ lexer
+* (DONE) Add a dedicated lexical analysis test
+* (DONE) Replace the C-based lexer with C++ lexer
 * (DONE) Rebase AST- all functions in "ast.cpp"
 * (DONE) Rebase AST- functions inherit from statements, blocks on the global scope
 * (DONE) Rebase AST- merge all AST headers into one

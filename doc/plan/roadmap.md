@@ -5,7 +5,7 @@ The following is our to-do list for Riya:
 
 #### Codebase Changes
 
-* Move the output tests into their own directory
+* (DONE) Redesigned test system
 * Add a dedicated lexical analysis test
 * Replace the C-based lexer with C++ lexer
 * (DONE) Rebase AST- all functions in "ast.cpp"

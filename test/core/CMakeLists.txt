@@ -43,9 +43,9 @@ foreach(ITEM ${CORE_TEST_SRC})
     )
 endforeach()
 
-add_custom_target(test
+add_custom_target(test_core
     DEPENDS ${TEST_OUTPUTS}
 )
 
-add_dependencies(test tlc)
+add_dependencies(test_core tlc)
 

@@ -27,6 +27,8 @@ set(CORE_TEST_SRC
     
     struct1 struct2
     struct3 struct4
+    
+    array1
 )
 
 foreach(ITEM ${CORE_TEST_SRC})

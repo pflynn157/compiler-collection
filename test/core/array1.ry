@@ -1,0 +1,9 @@
+
+func main -> i32 is
+    var numbers : i32[5];
+    numbers[2] := 10;
+    
+    var x : i32 := numbers[2];
+    return 10 - x;
+end
+

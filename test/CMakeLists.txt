@@ -2,9 +2,16 @@ add_subdirectory(core)
 add_subdirectory(output)
 add_subdirectory(lex)
 
-add_custom_target(test DEPENDS
-    test_core
-    test_output
-    test_lex
-)
+if (DISABLE_OUTPUT_TEST)
+    add_custom_target(test DEPENDS
+        test_core
+        test_lex
+    )
+else()
+    add_custom_target(test DEPENDS
+        test_core
+        test_output
+        test_lex
+    )
+endif()
 

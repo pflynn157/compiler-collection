@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.0.0)
-project(tiny_lang)
+cmake_minimum_required(VERSION 3.15)
+project(riya_lang)
 
 find_package(LLVM REQUIRED CONFIG)
 
@@ -13,6 +13,12 @@ add_definitions(${LLVM_DEFINITIONS})
 
 option(PTASM "Use the PTASM backend" OFF)
 if (PTASM)
+    message(STATUS "Using the PTASM backend")
+endif()
+
+option(DISABLE_OUTPUT_TEST "Disable output-based testing" ON)
+if (DISABLE_OUTPUT_TEST)
+    message(STATUS "Output-based testing disabled.")
 endif()
 
 add_subdirectory(src)

@@ -9,7 +9,7 @@
 func printArray(str:char[], size:i32) is
     var i : i32 := 0;
     while i < size do
-        print("%c", str[i]);
+        print(str[i]);
         i := i + 1;
     end
 end
@@ -36,7 +36,7 @@ func main -> i32 is
     
     i := 0;
     while i < 10 do
-        print("%c", str[i]);
+        print(str[i]);
         i := i + 1;
     end
     

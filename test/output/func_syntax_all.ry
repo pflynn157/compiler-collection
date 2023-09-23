@@ -12,34 +12,34 @@
 #RET 0
 
 func func1 is
-    println("Func1");
+    print("Func1");
 end
 
 func func2 -> i32 is
-    println("Func2");
+    print("Func2");
     return 0;
 end
 
 func func3(x:i32) is
-    println("Func3: %d", x);
+    print("Func3: ", x);
 end
 
 func func4(x:i32, y:i32) is
-    println("Func4: %d, %d", x, y);
+    print("Func4: ", x, ", ", y);
 end
 
 func func5(x:i32) -> i32 is
-    println("Func5: %d", x);
+    print("Func5: ", x);
     return 0;
 end
 
 func func6(x:i32, y:i32) -> i32 is
-    println("Func6: %d, %d", x, y);
+    print("Func6: ", x, ", ", y);
     return 0;
 end
 
 func main -> i32 is
-    println("Main!");
+    print("Main!");
     
     func1();
     func2();

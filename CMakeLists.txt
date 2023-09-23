@@ -16,7 +16,7 @@ if (PTASM)
     message(STATUS "Using the PTASM backend")
 endif()
 
-option(DISABLE_OUTPUT_TEST "Disable output-based testing" ON)
+option(DISABLE_OUTPUT_TEST "Disable output-based testing" OFF)
 if (DISABLE_OUTPUT_TEST)
     message(STATUS "Output-based testing disabled.")
 endif()

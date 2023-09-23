@@ -12,14 +12,14 @@ func main(args:string[]) -> i32 is
     var str1 : string := "Hello!";
     var str2 : string := " How are you?";
     
-    println(str1);
-    println(str2);
+    print(str1);
+    print(str2);
     
     var str3 : string := str1 + str2;
-    println(str3);
+    print(str3);
     
     var str4 : string := str1 + '!';
-    println(str4);
+    print(str4);
     
     return 0;
 end

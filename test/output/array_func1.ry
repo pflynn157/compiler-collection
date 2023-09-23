@@ -9,8 +9,8 @@
 func printArray(numbers:i32[], size:i32) is
     var x : i32 := numbers[2];
     
-    println("%d", x);
-    println("Size: %d", size);
+    print(x);
+    print("Size: ", size);
 end
 
 func main -> i32 is

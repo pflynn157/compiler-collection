@@ -27,7 +27,7 @@ func main -> i32 is
     i := 0;
     while i < 10 do
         var n : u64 := numbers[i];
-        println("%d", n);
+        print(n);
         i := i + 1;
     end
     

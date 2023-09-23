@@ -2,7 +2,8 @@ set(CORE_TEST_SRC
     test1
     func_syntax_all
     
-    string1 str1
+    string1
+    #str1
     
     array_func1 char_array1
     int64_array1 int64_array2

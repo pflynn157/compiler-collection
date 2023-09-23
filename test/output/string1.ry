@@ -10,8 +10,8 @@ func main -> i32 is
     var str : string := "Hello!";
     var c : char := str[3];
     
-    println(str);
-    println("%c", c);
+    print(str);
+    print(c);
     
     return 0;
 end

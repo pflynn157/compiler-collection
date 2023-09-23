@@ -10,7 +10,7 @@ func main -> i32 is
     numbers[2] := 242;
     
     var x : i32 := numbers[2];
-    println("%d", x);
+    print(x);
     return 0;
 end
 

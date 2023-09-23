@@ -1,5 +1,8 @@
 project(stdlib)
 
+##
+## Start file
+##
 add_custom_command(
     OUTPUT amd64_start.o
     COMMAND as ${CMAKE_CURRENT_SOURCE_DIR}/amd64.asm -o amd64_start.o
@@ -7,5 +10,10 @@ add_custom_command(
 )
 
 add_custom_target(lib_start ALL DEPENDS amd64_start.o)
+
+##---------------------------------------
+## The standard library
+##---------------------------------------
+add_subdirectory(corelib)
 
 

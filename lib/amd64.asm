@@ -7,7 +7,7 @@
 .global invoke_syscall
 .global malloc
 .global free
-.global debug
+.global output
 .global realloc
 .extern main
 
@@ -60,7 +60,7 @@ free:
     syscall
     ret
 
-debug:
+output:
     mov rdx, rsi
     mov rsi, rdi
     mov rax, 1

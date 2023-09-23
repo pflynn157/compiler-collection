@@ -85,6 +85,7 @@ void Compiler::link() {
     std::string cmd = "ld ";
     cmd += "lib/amd64_start.o ";
     cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
+    cmd += " -Llib/corelib -lcorelib ";
     system(cmd.c_str());
 }
 

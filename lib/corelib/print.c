@@ -50,6 +50,17 @@ void print(char *fmt, ...) {
                 print_int(val);
             } break;
             
+            case 'b': {
+                int val = va_arg(argp, int);
+                if (val) output("true", 4);
+                else output("false", 5);
+            } break;
+            
+            case 'c': {
+                char val = va_arg(argp, int);
+                output(&val, 1);
+            } break;
+            
             default: {}
         }
     }

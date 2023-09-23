@@ -97,12 +97,12 @@ void Compiler::link() {
 #else
 
 void Compiler::link() {
-    std::string cmd = "ld ";
+    /*std::string cmd = "ld ";
     cmd += "/usr/local/lib/tinylang/ti_start.o ";
     cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
     cmd += " -dynamic-linker /lib64/ld-linux-x86-64.so.2 ";
     cmd += "-ltinylang -lc";
-    system(cmd.c_str());
+    system(cmd.c_str());*/
 }
 
 #endif

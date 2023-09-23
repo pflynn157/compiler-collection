@@ -1,5 +1,0 @@
-
-extern print(line:string, x1:i64, x2:i64, x3:i64, x4:i64, x5:i64);
-extern println(line:string, x1:i64, x2:i64, x3:i64, x4:i64, x5:i64);
-extern readline() -> string;
-extern readint() -> i32;

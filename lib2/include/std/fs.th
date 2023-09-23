@@ -1,8 +1,0 @@
-
-
-extern fs_open(input:string, mode:i32) -> i32;
-extern fs_eof(f:i32) -> bool;
-extern fs_get(f:i32) -> i32;
-extern fs_writeln(f:i32, input:string);
-extern fs_write(f:i32, input:u8[], size:i32, count:i32);
-extern fs_close(f:i32);

@@ -21,6 +21,12 @@ if (DISABLE_OUTPUT_TEST)
     message(STATUS "Output-based testing disabled.")
 endif()
 
+option(DEV_LINK_MODE "Enable development linking" ON)
+if (DEV_LINK_MODE)
+    add_definitions(-DDEV_LINK_MODE)
+    message(STATUS "Using development linking.")
+endif()
+
 add_subdirectory(src)
 add_subdirectory(lib)
 add_subdirectory(test)

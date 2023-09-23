@@ -79,6 +79,17 @@ void Compiler::assemble() {
 
 // Link
 // TODO: Same as above...
+#ifdef DEV_LINK_MODE
+
+void Compiler::link() {
+    std::string cmd = "ld ";
+    cmd += "lib/amd64_start.o ";
+    cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
+    system(cmd.c_str());
+}
+
+#else
+
 void Compiler::link() {
     std::string cmd = "ld ";
     cmd += "/usr/local/lib/tinylang/ti_start.o ";
@@ -87,4 +98,6 @@ void Compiler::link() {
     cmd += "-ltinylang -lc";
     system(cmd.c_str());
 }
+
+#endif
 

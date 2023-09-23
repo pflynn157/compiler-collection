@@ -40,8 +40,9 @@ The following is our to-do list for Riya:
 
 ### Standard Library
 
-* Create core object with "_start"
-* Create corelib with "out", "syscall", "malloc", and "free"
+* (DONE) Create core object with "_start"
+* (DONE) Create corelib with "out", "syscall", "malloc", and "free"
+* (DONE) Redesign the print function
 * Corelib with file IO
 * Corelib with terminal IO (use print only)
 * Corelib with math (math.h)

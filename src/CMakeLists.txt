@@ -54,5 +54,11 @@ else()
     target_link_libraries(tlc
         ${llvm_libs}
     )
+    
+    if (DEV_LINK_MODE)
+        target_compile_options(tlc PUBLIC
+            -DLINK_LOCATION="${CMAKE_BINARY_DIR}/lib"
+        )
+    endif()
 endif()
 

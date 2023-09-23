@@ -81,12 +81,17 @@ void Compiler::assemble() {
 // TODO: Same as above...
 #ifdef DEV_LINK_MODE
 
+#ifndef LINK_LOCATION
+#define LINK_LOCATION = "."
+#endif
+
 void Compiler::link() {
     std::string cmd = "ld ";
-    cmd += "lib/amd64_start.o ";
+    cmd += std::string(LINK_LOCATION) + "/amd64_start.o ";
     cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
-    cmd += " -Llib/corelib -lcorelib ";
+    cmd += " -L" + std::string(LINK_LOCATION) + "/corelib -lcorelib ";
     system(cmd.c_str());
+    //printf("LINK: %s\n", cmd.c_str());
 }
 
 #else

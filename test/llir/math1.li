@@ -1,0 +1,34 @@
+#module a.out
+
+extern void printf(%0:*i8);
+
+global i32 main() {
+entry:
+  %0 = alloca i32 ;
+  store i32 20, %0;
+  %1 = alloca i32 ;
+  %2 = load i32 %0;
+  %3 = add i32 %2, 10;
+  store i32 %3, %1;
+  %4 = alloca i32 ;
+  %5 = load i32 %0;
+  %6 = sub i32 %5, 10;
+  store i32 %6, %4;
+  %7 = alloca i32 ;
+  %8 = load i32 %0;
+  %9 = smul i32 %8, 10;
+  store i32 %9, %7;
+  %10 = alloca i32 ;
+  %11 = load i32 %0;
+  %12 = sdiv i32 %11, 10;
+  store i32 %12, %10;
+  %13 = load i32 %1;
+  call void printf($STR0("X1: %d\n"), %13);
+  %14 = load i32 %4;
+  call void printf($STR1("X2: %d\n"), %14);
+  %15 = load i32 %7;
+  call void printf($STR2("X3: %d\n"), %15);
+  %16 = load i32 %10;
+  call void printf($STR3("X4: %d\n"), %16);
+  ret i32 0;
+}

@@ -1,0 +1,9 @@
+#module a.out
+
+extern void puts(%0:*i8);
+
+global i32 main() {
+entry:
+  call void puts($STR0("Hi!"));
+  ret i32 2;
+}

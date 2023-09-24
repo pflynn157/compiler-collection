@@ -1,0 +1,45 @@
+#module a.out
+
+extern void printf(%0:*i8);
+extern void puts(%0:*i8);
+
+global void compare(%0:i32) {
+entry:
+  %1 = alloca i32 ;
+  store i32 %0, %1;
+  %2 = load i32 %1;
+  %3 = bgt i32 %2, 10, true0;
+  br void false0;
+true0:
+  call void puts($STR0("Greater than 10"));
+  %4 = load i32 %1;
+  %5 = bgt i32 %4, 15, true1;
+  br void false1;
+true1:
+  call void puts($STR1("Greater than 15"));
+  br void end1;
+false1:
+  call void puts($STR2("Less than 15"));
+  br void end1;
+end1:
+  call void puts($STR3("Done"));
+  br void end0;
+false0:
+  call void puts($STR4("Less"));
+  br void end0;
+end0:
+  ret void ;
+}
+global i32 main() {
+entry:
+  %0 = alloca i32 ;
+  store i32 40, %0;
+  %1 = load i32 %0;
+  call void compare(%1);
+  call void puts($STR5("---"));
+  call void compare(3);
+  call void puts($STR6("---"));
+  call void compare(11);
+  call void puts($STR7("---"));
+  ret i32 0;
+}

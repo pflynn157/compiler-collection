@@ -1,0 +1,53 @@
+#module a.out
+
+extern void printf(%0:*i8);
+extern void puts(%0:*i8);
+
+global void test1(%0:i8) {
+entry:
+  %1 = alloca i8 ;
+  store i8 %0, %1;
+  %2 = load i8 %1;
+  %3 = beq i8 %2, 20, true0;
+  br void false0;
+true0:
+  call void puts($STR0("True"));
+  br void end0;
+false0:
+  call void puts($STR1("False"));
+  br void end0;
+end0:
+  %4 = load i8 %1;
+  call void printf($STR2("%d\n"), %4);
+  ret void ;
+}
+global void test2(%0:i8) {
+entry:
+  %1 = alloca i8 ;
+  store i8 %0, %1;
+  %2 = load i8 %1;
+  %3 = beq i8 %2, 20, true1;
+  br void false1;
+true1:
+  call void puts($STR3("True"));
+  br void end1;
+false1:
+  call void puts($STR4("False"));
+  br void end1;
+end1:
+  %4 = load i8 %1;
+  call void printf($STR5("%d\n"), %4);
+  ret void ;
+}
+global i32 main() {
+entry:
+  %0 = alloca i8 ;
+  store i8 20, %0;
+  %1 = alloca i8 ;
+  store i8 31, %1;
+  %2 = load i8 %0;
+  call void test1(%2);
+  %3 = load i8 %1;
+  call void test2(%3);
+  ret i32 0;
+}

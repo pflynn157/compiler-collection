@@ -1,0 +1,119 @@
+#module a.out
+
+extern void printf(%0:*i8);
+extern void puts(%0:*i8);
+
+global void cmp1(%0:i32) {
+entry:
+  %1 = alloca i32 ;
+  store i32 %0, %1;
+  %2 = load i32 %1;
+  %3 = beq i32 %2, 10, true0;
+  br void false0;
+true0:
+  call void puts($STR0("Equal"));
+  br void end0;
+false0:
+  call void puts($STR1("NEQ"));
+  br void end0;
+end0:
+  ret void ;
+}
+global void cmp2(%0:i32) {
+entry:
+  %1 = alloca i32 ;
+  store i32 %0, %1;
+  %2 = load i32 %1;
+  %3 = bgt i32 %2, 10, true1;
+  br void false1;
+true1:
+  call void puts($STR2("GT"));
+  br void end1;
+false1:
+  call void puts($STR3("Not"));
+  br void end1;
+end1:
+  ret void ;
+}
+global void cmp3(%0:i32) {
+entry:
+  %1 = alloca i32 ;
+  store i32 %0, %1;
+  %2 = load i32 %1;
+  %3 = blt i32 %2, 10, true2;
+  br void false2;
+true2:
+  call void puts($STR4("LT"));
+  br void end2;
+false2:
+  call void puts($STR5("Not"));
+  br void end2;
+end2:
+  ret void ;
+}
+global void cmp4(%0:i32) {
+entry:
+  %1 = alloca i32 ;
+  store i32 %0, %1;
+  %2 = load i32 %1;
+  %3 = bne i32 %2, 10, true3;
+  br void false3;
+true3:
+  call void puts($STR6("NEQ"));
+  br void end3;
+false3:
+  call void puts($STR7("Not"));
+  br void end3;
+end3:
+  ret void ;
+}
+global void cmp5(%0:i32) {
+entry:
+  %1 = alloca i32 ;
+  store i32 %0, %1;
+  %2 = load i32 %1;
+  %3 = bge i32 %2, 10, true4;
+  br void false4;
+true4:
+  call void puts($STR8("GTE"));
+  br void end4;
+false4:
+  call void puts($STR9("Not"));
+  br void end4;
+end4:
+  ret void ;
+}
+global void cmp6(%0:i32) {
+entry:
+  %1 = alloca i32 ;
+  store i32 %0, %1;
+  %2 = load i32 %1;
+  %3 = ble i32 %2, 10, true5;
+  br void false5;
+true5:
+  call void puts($STR10("LTE"));
+  br void end5;
+false5:
+  call void puts($STR11("Not"));
+  br void end5;
+end5:
+  ret void ;
+}
+global i32 main() {
+entry:
+  call void cmp1(10);
+  call void cmp1(0);
+  call void cmp2(20);
+  call void cmp2(0);
+  call void cmp3(5);
+  call void cmp3(50);
+  call void cmp4(11);
+  call void cmp4(10);
+  call void cmp5(20);
+  call void cmp5(10);
+  call void cmp5(0);
+  call void cmp6(10);
+  call void cmp6(0);
+  call void cmp6(20);
+  ret i32 0;
+}

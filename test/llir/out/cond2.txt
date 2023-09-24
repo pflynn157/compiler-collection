@@ -1,0 +1,5 @@
+X greater than 20.
+IDK
+X greater than 10.
+X greater than 5.
+IDK

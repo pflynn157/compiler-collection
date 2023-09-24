@@ -1,6 +1,7 @@
 add_subdirectory(core)
 add_subdirectory(output)
 add_subdirectory(lex)
+add_subdirectory(llir)
 
 if (DISABLE_OUTPUT_TEST)
     add_custom_target(test DEPENDS
@@ -20,5 +21,9 @@ add_custom_target(test_llir DEPENDS
     test_core_llir
     test_output_llir
     test_lex
+)
+
+add_custom_target(test_libllir DEPENDS
+    test_llir_base
 )
 

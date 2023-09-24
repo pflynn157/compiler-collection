@@ -1,0 +1,9 @@
+#module a.out
+
+extern void printf(%0:*i8);
+
+global i32 main() {
+entry:
+  call void printf($STR0("CONST: %d, %d\n"), 20, 30);
+  ret i32 0;
+}

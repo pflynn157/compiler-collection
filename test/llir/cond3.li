@@ -1,0 +1,43 @@
+#module a.out
+
+extern void printf(%0:*i8);
+extern void puts(%0:*i8);
+
+global void cmp(%0:i32) {
+entry:
+  %1 = alloca i32 ;
+  store i32 %0, %1;
+  %2 = load i32 %1;
+  %3 = bgt i32 %2, 20, true0;
+  br void false0;
+true0:
+  call void puts($STR0("X greater than 20."));
+  br void end0;
+false0:
+  %4 = load i32 %1;
+  %5 = bgt i32 %4, 10, 0true1;
+  br void 0false1;
+0true1:
+  call void puts($STR1("X greater than 10."));
+  br void end0;
+0false1:
+  %6 = load i32 %1;
+  %7 = bgt i32 %6, 5, 1true1;
+  br void 1false1;
+1true1:
+  call void puts($STR2("X greater than 5."));
+  br void end0;
+1false1:
+  br void end0;
+end0:
+  ret void ;
+}
+global i32 main() {
+entry:
+  call void cmp(25);
+  call void cmp(4);
+  call void cmp(15);
+  call void cmp(7);
+  call void cmp(1);
+  ret i32 0;
+}

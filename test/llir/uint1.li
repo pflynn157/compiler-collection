@@ -1,0 +1,14 @@
+#module a.out
+
+extern void printf(%0:*i8);
+
+global i32 main() {
+entry:
+  %0 = alloca i32 ;
+  store i32 4660, %0;
+  %1 = load i32 %0;
+  call void printf($STR0("%x\n"), %1);
+  %2 = load i32 %0;
+  call void printf($STR1("%d\n"), %2);
+  ret i32 0;
+}

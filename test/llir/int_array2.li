@@ -1,0 +1,50 @@
+#module a.out
+
+extern *i8 malloc(%0:*i8);
+extern void printf(%0:*i8);
+extern void puts(%0:*i8);
+
+global i32 main() {
+entry:
+  %0 = alloca *i32 ;
+  %1 = call *void malloc(40);
+  store *void %1, %0;
+  %2 = alloca i32 ;
+  store i32 0, %2;
+  %3 = alloca i32 ;
+  store i32 0, %3;
+  br void loop_cmp0;
+loop_body0:
+  %6 = load i32 %3;
+  %7 = load i32 %3;
+  %8 = load *i32 %0;
+  %9 = getelementptr *i32 %8, %6;
+  store i32 %7, %9;
+  %10 = load i32 %3;
+  %11 = add i32 %10, 1;
+  store i32 %11, %3;
+  br void loop_cmp0;
+loop_cmp0:
+  %4 = load i32 %3;
+  %5 = blt i32 %4, 10, loop_body0;
+  br void loop_end0;
+loop_end0:
+  store i32 0, %3;
+  br void loop_cmp1;
+loop_body1:
+  %14 = load i32 %3;
+  %15 = load *i32 %0;
+  %16 = getelementptr *i32 %15, %14;
+  %17 = load i32 %16;
+  call void printf($STR0("%d\n"), %17);
+  %18 = load i32 %3;
+  %19 = add i32 %18, 1;
+  store i32 %19, %3;
+  br void loop_cmp1;
+loop_cmp1:
+  %12 = load i32 %3;
+  %13 = blt i32 %12, 10, loop_body1;
+  br void loop_end1;
+loop_end1:
+  ret i32 0;
+}

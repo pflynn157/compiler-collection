@@ -1,0 +1,14 @@
+Equal
+NEQ
+GT
+Not
+LT
+Not
+NEQ
+Not
+GTE
+GTE
+Not
+LTE
+LTE
+Not

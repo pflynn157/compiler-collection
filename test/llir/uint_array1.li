@@ -1,0 +1,23 @@
+#module a.out
+
+extern *i8 malloc(%0:*i8);
+extern void printf(%0:*i8);
+extern void puts(%0:*i8);
+
+global i32 main() {
+entry:
+  %0 = alloca *i32 ;
+  %1 = call *void malloc(20);
+  store *void %1, %0;
+  %2 = load *i32 %0;
+  %3 = getelementptr *i32 %2, 2;
+  store i32 243, %3;
+  %4 = alloca i32 ;
+  %5 = load *i32 %0;
+  %6 = getelementptr *i32 %5, 2;
+  %7 = load i32 %6;
+  store i32 %7, %4;
+  %8 = load i32 %4;
+  call void printf($STR0("%d\n"), %8);
+  ret i32 0;
+}

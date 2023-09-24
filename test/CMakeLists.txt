@@ -16,5 +16,9 @@ else()
 endif()
 
 ## For LLIR
-add_custom_target(test_llir DEPENDS test_core_llir)
+add_custom_target(test_llir DEPENDS
+    test_core_llir
+    test_output_llir
+    test_lex
+)
 

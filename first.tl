@@ -1,6 +1,10 @@
-func main -> i32 is
-    var x : i32 := 20;
-    print(x);
-    return 0;
-end
 
+func main -> i32 is
+    var x : bool := true;
+    
+    if x then return 0;
+    else return 1;
+    end
+    
+    return 2;
+end

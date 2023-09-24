@@ -7,7 +7,7 @@
 
 // Translates an AST IF statement to LLVM
 void Compiler::compileIfStatement(std::shared_ptr<AstStatement> stmt) {
-    /*AstIfStmt *condStmt = static_cast<AstIfStmt *>(stmt);
+    /*auto condStmt = std::static_pointer_cast<AstIfStmt>(stmt);
     bool hasBranches = condStmt->getBranches().size();
 
     LLIR::Block *trueBlock = new LLIR::Block("true" + std::to_string(blockCount));

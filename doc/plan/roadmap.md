@@ -23,6 +23,7 @@ The following is our to-do list for Riya:
 * Fix- equations with function calls may not load in the right order. Calls should always come first
 * Conflict with return register
 * Mod operation doesn't work
+* Switch to smart/safe pointers
 
 
 ### Features

@@ -11,6 +11,7 @@
 #include <preproc/Preproc.hpp>
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
+#include <midend/midend.hpp>
 
 #include <compiler/LLVM/Compiler.hpp>
 
@@ -18,7 +19,7 @@ bool isError = false;
 
 // TODO: I'm not sure actually if the lex testing actually works
 //
-std::shared_ptr<AstTree> getAstTree(std::string input, bool testLex, bool printAst, bool emitDot) {
+std::shared_ptr<AstTree> getAstTree(std::string input, bool testLex, bool printAst1, bool printAst, bool emitDot) {
     std::unique_ptr<Parser> frontend = std::make_unique<Parser>(input);
     std::shared_ptr<AstTree> tree;
     
@@ -34,6 +35,15 @@ std::shared_ptr<AstTree> getAstTree(std::string input, bool testLex, bool printA
     }
     
     tree = frontend->getTree();
+    
+    if (printAst1) {
+        tree->print();
+        return nullptr;
+    }
+    
+    std::unique_ptr<Midend> midend = std::make_unique<Midend>(tree);
+    midend->run();
+    tree = midend->tree;
     
     if (printAst) {
         tree->print();
@@ -88,6 +98,7 @@ int main(int argc, char **argv) {
     std::string input = "";
     bool emitPreproc = false;
     bool testLex = false;
+    bool printAst1 = false;
     bool printAst = false;
     bool emitDot = false;
     bool printLLVM = false;
@@ -100,6 +111,8 @@ int main(int argc, char **argv) {
             emitPreproc = true;
         } else if (arg == "--test-lex") {
             testLex = true;
+        } else if (arg == "--ast1") {
+            printAst1 = true;
         } else if (arg == "--ast") {
             printAst = true;
         } else if (arg == "--dot") {
@@ -124,7 +137,7 @@ int main(int argc, char **argv) {
         return 1;
     }
     
-    std::shared_ptr<AstTree> tree = getAstTree(newInput, testLex, printAst, emitDot);
+    std::shared_ptr<AstTree> tree = getAstTree(newInput, testLex, printAst1, printAst, emitDot);
     if (tree == nullptr) {
         if (isError) return 1;
         return 0;

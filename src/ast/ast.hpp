@@ -167,7 +167,6 @@ struct AstStruct : AstNode {
 // Blocks hold tables and symbol information
 //
 struct AstBlock : AstNode {
-public:
     AstBlock() : AstNode(V_AstType::Block) {}
 
     void addStatement(std::shared_ptr<AstStatement> stmt);
@@ -189,7 +188,8 @@ public:
     
     void print(int indent = 4);
     std::string dot(std::string parent);
-protected:
+    
+    // Members
     std::vector<std::shared_ptr<AstStatement>> block;
     std::map<std::string, std::shared_ptr<AstDataType>> symbolTable;
     std::vector<std::string> vars;

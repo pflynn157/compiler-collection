@@ -36,6 +36,9 @@ set(SRC
     lex/lex.cpp
     lex/lex_debug.cpp
     
+    midend/ast_processor.cpp
+    midend/midend.cpp
+    
     # Compile sources
     ${COMPILER_SRC}
 )

@@ -27,3 +27,9 @@ add_custom_target(test_libllir DEPENDS
     test_llir_base
 )
 
+add_custom_target(test_all DEPENDS
+    test
+    test_llir
+    test_libllir
+)
+

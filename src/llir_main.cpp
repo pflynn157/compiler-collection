@@ -1,5 +1,5 @@
 //
-// Copyright 2021 Patrick Flynn
+// Copyright 2022 Patrick Flynn
 // This file is part of the Tiny Lang compiler.
 // Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
 //
@@ -13,7 +13,7 @@
 #include <ast/ast.hpp>
 #include <midend/midend.hpp>
 
-#include <compiler/LLVM/Compiler.hpp>
+#include <llir/Compiler.hpp>
 
 bool isError = false;
 
@@ -56,26 +56,16 @@ std::shared_ptr<AstTree> getAstTree(std::string input, bool testLex, bool printA
     return tree;
 }
 
-int compileLLVM(std::shared_ptr<AstTree> tree, CFlags flags, bool printLLVM, bool emitLLVM) {
-    std::unique_ptr<Compiler> compiler = std::make_unique<Compiler>(tree, flags);
+int compileLLIR(std::shared_ptr<AstTree> tree, CFlags flags, bool printLLVM, bool printLLIR2) {
+    Compiler *compiler = new Compiler(tree, flags);
     compiler->compile();
         
     if (printLLVM) {
         compiler->debug();
         return 0;
     }
-    
-    if (emitLLVM) {
-        std::string output = flags.name;
-        if (output == "a.out") {
-            output = "./out.ll";
-        }
-            
-        compiler->emitLLVM(output);
-        return 0;
-    }
         
-    compiler->writeAssembly();
+    compiler->writeAssembly(printLLIR2);
     compiler->assemble();
     compiler->link();
     
@@ -100,7 +90,7 @@ int main(int argc, char **argv) {
     bool printAst = false;
     bool emitDot = false;
     bool printLLVM = false;
-    bool emitLLVM = false;
+    bool printLLIR2 = false;
     
     for (int i = 1; i<argc; i++) {
         std::string arg = argv[i];
@@ -115,10 +105,10 @@ int main(int argc, char **argv) {
             printAst = true;
         } else if (arg == "--dot") {
             emitDot = true;
-        } else if (arg == "--llvm") {
+        } else if (arg == "--llir") {
             printLLVM = true;
-        } else if (arg == "--emit-llvm") {
-            emitLLVM = true;
+        } else if (arg == "--llir2") {
+            printLLIR2 = true;
         } else if (arg == "-o") {
             flags.name = argv[i+1];
             i += 1;
@@ -142,6 +132,6 @@ int main(int argc, char **argv) {
     }
 
     // Compile
-    return compileLLVM(tree, flags, printLLVM, emitLLVM);
+    return compileLLIR(tree, flags, printLLVM, printLLIR2);
 }
 

@@ -8,14 +8,22 @@ if(PTASM)
         compiler/PTASM/x86.cpp
     )
 else()
-    set(COMPILER_SRC
-        compiler/LLVM/Builder.cpp
-        compiler/LLVM/Compiler.cpp
-        compiler/LLVM/Flow.cpp
-        compiler/LLVM/Function.cpp
-        compiler/LLVM/Variable.cpp
-    )
 endif()
+
+set(LLVM_COMPILER_SRC
+    compiler/LLVM/Builder.cpp
+    compiler/LLVM/Compiler.cpp
+    compiler/LLVM/Flow.cpp
+    compiler/LLVM/Function.cpp
+    compiler/LLVM/Variable.cpp
+)
+
+set(LLIR_COMPILER_SRC
+    llir/Builder.cpp
+    llir/Compiler.cpp
+    llir/Flow.cpp
+    llir/Function.cpp
+)
 
 set(SRC
     ast/ast.cpp
@@ -37,16 +45,14 @@ set(SRC
     lex/lex_debug.cpp
     
     midend/ast_processor.cpp
-    midend/midend.cpp
-    
-    # Compile sources
-    ${COMPILER_SRC}
+    midend/midend.cpp    
 )
 
 if(PTASM)
     add_executable(tlc ${SRC} ptasm_main.cpp)
 else()
-    add_executable(tlc ${SRC} main.cpp)
+    # Build the LLVM-based compiler
+    add_executable(tlc ${SRC} ${LLVM_COMPILER_SRC} main.cpp)
 
     llvm_map_components_to_libnames(llvm_libs support core irreader target asmparser
         X86AsmParser
@@ -58,9 +64,18 @@ else()
         ${llvm_libs}
     )
     
+    # Build the LLIR-based compiler
+    add_executable(ocllir ${SRC} ${LLIR_COMPILER_SRC} llir_main.cpp)
+    target_link_libraries(ocllir llir)
+    
+    # Enable dev linking mode
     if (DEV_LINK_MODE)
         target_compile_options(tlc PUBLIC
-            -DLINK_LOCATION="${CMAKE_BINARY_DIR}/lib"
+            -DLINK_LOCATION="${CMAKE_BINARY_DIR}/stdlib"
+        )
+        
+        target_compile_options(ocllir PUBLIC
+            -DLINK_LOCATION="${CMAKE_BINARY_DIR}/stdlib"
         )
     endif()
 endif()

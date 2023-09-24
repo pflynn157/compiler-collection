@@ -196,6 +196,7 @@ LLIR::Operand *Compiler::compileValue(std::shared_ptr<AstExpression> expr, std::
             //}
             
             //if (typeTable[id->value] == V_AstType::Struct || isAssign) return ptr;
+            if (isAssign) return ptr;
             return builder->createLoad(type, ptr);
         } break;
         

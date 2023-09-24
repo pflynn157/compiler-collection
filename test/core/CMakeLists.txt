@@ -34,8 +34,8 @@ set(CORE_TEST_SRC
 set(LLIR_CORE_TEST_SRC
     test1
     bitwise_and bitwise_or bitwise_xor
-    #bool1
-    #bool2
+    bool1
+    bool2
     ret_math1 ret_math2 ret_math3 ret_math4 #ret_math5
     byte1 ubyte1
     #char1
@@ -51,13 +51,17 @@ set(LLIR_CORE_TEST_SRC
     
     associative1 comma_var1 parens1
     
-    #cond1 cond2 cond3 cond4
+    #cond1
+    #cond2
+    #cond3
+    #cond4
     #cond_byte cond_ubyte
     #cond_short cond_ushort
     #cond_int64 cond_uint64
     #lg_and1 lg_or1
     
-    #break continue
+    #break
+    #continue
     #for1
     #forall1
     #nested1

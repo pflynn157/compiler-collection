@@ -12,6 +12,17 @@ The following is our to-do list for Riya:
 * (DONE) Rebase AST- functions inherit from statements, blocks on the global scope
 * (DONE) Rebase AST- merge all AST headers into one
 * (DONE) Rebase AST- use struct instead of class/helper functions
+* Create common functions between various compiler entry points
+* Rename compiler output
+* Redo license headers
+* Remove PTASM
+
+
+### LLIR
+* (DONE) Add LLIR base to compiler
+* Fix- equations with function calls may not load in the right order. Calls should always come first
+* Conflict with return register
+* Mod operation doesn't work
 
 
 ### Features
@@ -36,6 +47,7 @@ The following is our to-do list for Riya:
 * Switch "|" or bor
 * Latex-based comments
 * Switch parens in function calls to curly braces
+* Variadiac arguments
 
 
 ### Standard Library

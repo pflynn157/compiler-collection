@@ -7,113 +7,53 @@
 
 // Translates an AST IF statement to LLVM
 void Compiler::compileIfStatement(std::shared_ptr<AstStatement> stmt) {
-    /*auto condStmt = std::static_pointer_cast<AstIfStmt>(stmt);
-    bool hasBranches = condStmt->getBranches().size();
-
-    LLIR::Block *trueBlock = new LLIR::Block("true" + std::to_string(blockCount));
-    LLIR::Block *falseBlock = nullptr;
-    LLIR::Block *endBlock = new LLIR::Block("end" + std::to_string(blockCount));
+    std::shared_ptr<AstIfStmt> condStmt = std::static_pointer_cast<AstIfStmt>(stmt);
+    std::shared_ptr<AstBlock> astTrueBlock = condStmt->true_block;
+    std::shared_ptr<AstBlock> astFalseBlock = condStmt->false_block;
     
-    // The break stack pushes are for the logical boolean expressions
-    logicalOrStack.push(trueBlock);
-    if (hasBranches) {
-        falseBlock = new LLIR::Block("false" + std::to_string(blockCount));
-        logicalAndStack.push(falseBlock);
-    } else {
-        logicalAndStack.push(endBlock);
-    }
+    LLIR::Block *trueBlock = new LLIR::Block("true" + std::to_string(blockCount));
+    LLIR::Block *falseBlock = new LLIR::Block("false" + std::to_string(blockCount));
+    LLIR::Block *endBlock = new LLIR::Block("end" + std::to_string(blockCount));
     ++blockCount;
-
-    LLIR::Operand *cond = compileValue(stmt->getExpression(), V_AstType::Void, trueBlock);
-    if (hasBranches) builder->createBr(falseBlock);
-    else builder->createBr(endBlock);
+    
+    logicalOrStack.push(trueBlock);
+    logicalAndStack.push(falseBlock);
+    
+    std::shared_ptr<AstDataType> dtype = std::make_shared<AstDataType>(V_AstType::Void);
+    LLIR::Operand *cond = compileValue(stmt->expression, dtype, trueBlock);
+    builder->createBr(falseBlock);
     
     logicalAndStack.pop();
     logicalOrStack.pop();
-
+    
     // Align the blocks
     LLIR::Block *current = builder->getInsertPoint();
     builder->addBlockAfter(current, trueBlock);
-
-    if (hasBranches) {
-        builder->addBlockAfter(trueBlock, falseBlock);
-        builder->addBlockAfter(falseBlock, endBlock);
-    } else {
-        builder->addBlockAfter(trueBlock, endBlock);
-    }
-
+    builder->addBlockAfter(trueBlock, falseBlock);
+    builder->addBlockAfter(falseBlock, endBlock);
+    
+    // True block
     builder->setInsertPoint(trueBlock);
-    bool hasBreak = false;
-    bool hasEndingRet = false;
-    for (auto stmt : condStmt->getBlock()) {
-        compileStatement(stmt);
-        if (stmt->getType() == AstType::Break) hasBreak = true;
+    bool branchEnd = true;
+    for (auto stmt2 : astTrueBlock->getBlock()) {
+        compileStatement(stmt2);
+        if (stmt2->type == V_AstType::Return) branchEnd = false;
+        if (stmt2->type == V_AstType::Break) branchEnd = false;
     }
-    if (condStmt->getBlock().back()->getType() == AstType::Return) hasEndingRet = true;
-    if (!hasBreak && !hasEndingRet) builder->createBr(endBlock);
-
-    // Branches
-    bool hadElif = false;
-    bool hadElse = false;
-    int subCount = 0;
-
-    for (auto stmt : condStmt->getBranches()) {
-        if (stmt->getType() == AstType::Elif) {
-            AstElifStmt *elifStmt = static_cast<AstElifStmt *>(stmt);
-            
-            LLIR::Block *trueBlock2 = new LLIR::Block(std::to_string(subCount) + "true" + std::to_string(blockCount));
-            LLIR::Block *falseBlock2 = new LLIR::Block(std::to_string(subCount) + "false" + std::to_string(blockCount));
-            ++subCount;
-            
-            logicalAndStack.push(falseBlock2);
-            logicalOrStack.push(trueBlock2);
-            
-            // Align
-            if (!hadElif) builder->setInsertPoint(falseBlock);
-            LLIR::Block *current = builder->getInsertPoint();
-            builder->addBlockAfter(current, trueBlock2);
-            builder->addBlockAfter(trueBlock2, falseBlock2);
-            
-            LLIR::Operand *cond = compileValue(stmt->getExpression(), V_AstType::Void, trueBlock2);
-            builder->createBr(falseBlock2);
-            
-            logicalAndStack.pop();
-            logicalOrStack.pop();
-            
-            builder->setInsertPoint(trueBlock2);
-            bool hasBreak = false;
-            bool hasEndingRet = false;
-            for (auto stmt2 : elifStmt->getBlock()) {
-                compileStatement(stmt2);
-            }
-            if (elifStmt->getBlock().back()->getType() == AstType::Return) hasEndingRet = true;
-            if (!hasBreak && !hasEndingRet) builder->createBr(endBlock);
-            
-            builder->setInsertPoint(falseBlock2);
-            hadElif = true;
-        } else if (stmt->getType() == AstType::Else) {
-            AstElseStmt *elseStmt = static_cast<AstElseStmt *>(stmt);
-            
-            if (!hadElif) builder->setInsertPoint(falseBlock);
-            
-            bool hasBreak = false;
-            bool hasEndingRet = false;
-            for (auto stmt2 : elseStmt->getBlock()) {
-                compileStatement(stmt2);
-            }
-            if (elseStmt->getBlock().back()->getType() == AstType::Return) hasEndingRet = true;
-            if (!hasBreak && !hasEndingRet) builder->createBr(endBlock);
-            
-            hadElse = true;
-        }
+    if (branchEnd) builder->createBr(endBlock);
+    
+    // False block
+    builder->setInsertPoint(falseBlock);
+    branchEnd = true;
+    for (auto stmt2 : astFalseBlock->getBlock()) {
+        compileStatement(stmt2);
+        if (stmt2->type == V_AstType::Return) branchEnd = false;
+        if (stmt2->type == V_AstType::Break) branchEnd = false;
     }
-
-    if (hadElif && !hadElse) {
-        builder->createBr(endBlock);
-    }
-
-    // Start at the end block
-    builder->setInsertPoint(endBlock);*/
+    if (branchEnd) builder->createBr(endBlock);
+    
+    // End block
+    builder->setInsertPoint(endBlock);
 }
 
 // Translates a while statement to LLVM

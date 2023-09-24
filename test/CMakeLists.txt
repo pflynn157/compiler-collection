@@ -15,3 +15,6 @@ else()
     )
 endif()
 
+## For LLIR
+add_custom_target(test_llir DEPENDS test_core_llir)
+

@@ -1,16 +1,18 @@
 #!/bin/bash
 
-if [[ ! -f ./build/src/asx86 ]]; then
+if [[ ! -f ./build/as/asx86 ]]; then
     echo "Error: No assembler built!"
     exit 1
 fi
+
+cd test
 
 echo "Running all tests..."
 echo ""
 
 total=0
 
-for d in ./test/*; do
+for d in ./as/*; do
     for file in $d/*; do
         echo "`basename $d` `basename $file`"
         
@@ -20,7 +22,7 @@ for d in ./test/*; do
             OBJS="build/lib_test.o"
         fi
         
-        build/src/asx86 $file
+        ../build/as/asx86 $file
         ld a.out $OBJS -o out
         
         as $file -o test.out
@@ -89,4 +91,7 @@ echo "$total tests passed!"
 
 echo ""
 echo "Done"
+
+cd ..
+
 

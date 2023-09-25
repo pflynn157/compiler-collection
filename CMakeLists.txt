@@ -28,7 +28,11 @@ if (DEV_LINK_MODE)
     message(STATUS "Using development linking.")
 endif()
 
+# Build supporting projects
+add_subdirectory(libelf)
 add_subdirectory(llir)
+
+# Build the core compiler
 add_subdirectory(src)
 add_subdirectory(stdlib)
 add_subdirectory(test)

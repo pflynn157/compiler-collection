@@ -1,10 +1,16 @@
-cmake_minimum_required(VERSION 3.0.0)
 project(asx86)
 
-add_compile_options(-std=c++17)
+set(SRC
+    encoding.cpp
+    lex.cpp
+    lex_debug.cpp
+    main.cpp
+    parser.cpp
+    register.cpp
+    symbol.cpp
+)
 
-include_directories(.)
+add_executable(asx86 ${SRC})
 
-add_subdirectory(libelf)
-add_subdirectory(src)
+target_link_libraries(asx86 elf)
 

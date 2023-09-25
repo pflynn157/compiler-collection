@@ -7,6 +7,7 @@ add_compile_options(-std=c++17 -g)
 
 include_directories(src)
 include_directories(llir/src)
+include_directories(.)
 
 include_directories(${LLVM_INCLUDE_DIRS})
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
@@ -30,6 +31,7 @@ endif()
 
 # Build supporting projects
 add_subdirectory(libelf)
+add_subdirectory(as)
 add_subdirectory(llir)
 
 # Build the core compiler

@@ -56,7 +56,7 @@ std::shared_ptr<AstTree> getAstTree(std::string input, bool testLex, bool printA
     return tree;
 }
 
-int compileLLIR(std::shared_ptr<AstTree> tree, CFlags flags, bool printLLVM, bool printLLIR2) {
+int compileLLIR(std::shared_ptr<AstTree> tree, CFlags flags, bool printLLVM, bool printLLIR2, bool use_as) {
     Compiler *compiler = new Compiler(tree, flags);
     compiler->compile();
         
@@ -66,7 +66,7 @@ int compileLLIR(std::shared_ptr<AstTree> tree, CFlags flags, bool printLLVM, boo
     }
         
     compiler->writeAssembly(printLLIR2);
-    compiler->assemble();
+    compiler->assemble(use_as);
     compiler->link();
     
     return 0;
@@ -91,6 +91,7 @@ int main(int argc, char **argv) {
     bool emitDot = false;
     bool printLLVM = false;
     bool printLLIR2 = false;
+    bool use_as = false;
     
     for (int i = 1; i<argc; i++) {
         std::string arg = argv[i];
@@ -109,6 +110,8 @@ int main(int argc, char **argv) {
             printLLVM = true;
         } else if (arg == "--llir2") {
             printLLIR2 = true;
+        } else if (arg == "--builtin-as" || arg == "-ba") {
+            use_as = true;
         } else if (arg == "-o") {
             flags.name = argv[i+1];
             i += 1;
@@ -132,6 +135,6 @@ int main(int argc, char **argv) {
     }
 
     // Compile
-    return compileLLIR(tree, flags, printLLVM, printLLIR2);
+    return compileLLIR(tree, flags, printLLVM, printLLIR2, use_as);
 }
 

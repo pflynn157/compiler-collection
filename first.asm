@@ -4,22 +4,10 @@
     
 .text
 
-.global test1
-test1:
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, OFFSET FLAT:STR1
-    mov rdx, 7
-    syscall
-    ret
-
-.global _start
-_start:
-    call test1
-    
+.global main
+main:
+    mov rdi, 5
     mov eax, 60
     syscall
 done:
     ret
-    
-    

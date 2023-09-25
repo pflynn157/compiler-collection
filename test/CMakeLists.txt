@@ -2,7 +2,6 @@ add_subdirectory(core)
 add_subdirectory(output)
 add_subdirectory(lex)
 add_subdirectory(llir)
-add_subdirectory(as)
 
 if (DISABLE_OUTPUT_TEST)
     add_custom_target(test DEPENDS

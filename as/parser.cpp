@@ -70,6 +70,7 @@ void Parser::parseText() {
                 file->addCode8(0x05);
             } break;
             
+            case Leave: file->addCode8(0xC9); break;
             case Ret: file->addCode8(0xC3); break;
             
             default: {}

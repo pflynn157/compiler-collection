@@ -22,7 +22,7 @@ for d in ./as/*; do
             OBJS="build/lib_test.o"
         fi
         
-        ../build/as/asx86 $file
+        ../build/as/asx86 $file a.out
         ld a.out $OBJS -o out
         
         as $file -o test.out

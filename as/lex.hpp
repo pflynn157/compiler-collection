@@ -12,6 +12,7 @@ enum TokenType {
     Mov,
     Lea,
     Syscall,
+    Leave,
     Ret,
     Push,
     Add,

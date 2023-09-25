@@ -10,6 +10,7 @@ void Token::print() {
         case Mov: std::cout << "mov" << std::endl; break;
         case Lea: std::cout << "lea" << std::endl; break;
         case Syscall: std::cout << "syscall" << std::endl; break;
+        case Leave: std::cout << "leave" << std::endl; break;
         case Ret: std::cout << "ret" << std::endl; break;
         case Push: std::cout << "push" << std::endl; break;
         case Add: std::cout << "add" << std::endl; break;

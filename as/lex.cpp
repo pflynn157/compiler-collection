@@ -198,6 +198,7 @@ TokenType Scanner::getKeyword() {
     if (buffer == "mov") return Mov;
     else if (buffer == "lea") return Lea;
     else if (buffer == "syscall") return Syscall;
+    else if (buffer == "leave") return Leave;
     else if (buffer == "ret") return Ret;
     else if (buffer == "push") return Push;
     else if (buffer == "add") return Add;

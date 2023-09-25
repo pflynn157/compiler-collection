@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     }
     
     std::string input = argv[1];
-    std::string output = "a.out";
+    std::string output = argv[2];
 
     Elf64File *file = new Elf64File(output);
     

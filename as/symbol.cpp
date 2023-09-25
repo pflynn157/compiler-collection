@@ -120,6 +120,7 @@ void SymbolParser::parseText() {
             
             // Instructions where we know the size right off
             case Syscall: location += 2; break;
+            case Leave:
             case Ret: location += 1; break;
             
             // Other instructions
@@ -179,12 +180,19 @@ void SymbolParser::parseText() {
                     
                     symbols->global.push_back(token.id_val);
                     break;
+                } else if (name == ".type") {
+                    scanner->getNext();
+                    scanner->getNext();
+                    scanner->getNext();
+                    break;
                 }
                 
                 // Otherwise, we probably have a symbol
                 token = scanner->getNext();
                 if (token.type != Colon) {
                     std::cerr << "Error: Expected : after label name." << std::endl;
+                    token.print();
+                    std::cerr << "ID: " << name << std::endl;
                     return;
                 }
                 

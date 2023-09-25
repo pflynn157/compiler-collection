@@ -25,9 +25,16 @@ void Compiler::writeAssembly(bool printTransform) {
 
 // Assemble the file
 // TODO: This needs to be done properly. System() != proper. I was lazy
-void Compiler::assemble() {
-    std::string cmd = "as /tmp/" + cflags.name + ".asm -o /tmp/" + cflags.name + ".o";
-    system(cmd.c_str());
+void Compiler::assemble(bool use_as) {
+    if (use_as) {
+        printf("Using built-in assembler...\n");
+        std::string cmd = std::string(AS_LOCATION) + "/asx86 ";
+        cmd += "/tmp/" + cflags.name + ".asm /tmp/" + cflags.name + ".o";
+        system(cmd.c_str());
+    } else {
+        std::string cmd = "as /tmp/" + cflags.name + ".asm -o /tmp/" + cflags.name + ".o";
+        system(cmd.c_str());
+    }
 }
 
 // Link

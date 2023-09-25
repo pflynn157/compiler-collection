@@ -76,6 +76,7 @@ else()
         
         target_compile_options(ocllir PUBLIC
             -DLINK_LOCATION="${CMAKE_BINARY_DIR}/stdlib"
+            -DAS_LOCATION="${CMAKE_BINARY_DIR}/as"
         )
     endif()
 endif()

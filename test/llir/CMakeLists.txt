@@ -38,7 +38,7 @@ set(LLIR_TEST_SRC
 foreach(ITEM ${LLIR_TEST_SRC})
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ITEM}.exe
-        COMMAND ${CMAKE_BINARY_DIR}/lib/llir/compiler/llircc ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.li -o ${ITEM}.exe
+        COMMAND ${CMAKE_BINARY_DIR}/llir/compiler/llircc ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.li -o ${ITEM}.exe
         COMMAND ./${ITEM}.exe > output.txt
         COMMAND rm ${ITEM}.exe
         COMMAND diff ${CMAKE_CURRENT_SOURCE_DIR}/out/${ITEM}.txt ./output.txt

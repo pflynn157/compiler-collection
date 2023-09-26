@@ -140,7 +140,7 @@ private:
     // Utility functions
     int getSectionNamePos(std::string name);
     int getStringPos(std::string name);
-    void symtabSort();
+    int symtabSort();
     
     // Variables
     std::string name = "";

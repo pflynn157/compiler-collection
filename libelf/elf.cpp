@@ -188,20 +188,12 @@ void Elf64File::write() {
     codeOffset += size;
     
     // -> symtab
-    symtabSort();
+    int table_start_pos = symtabSort();
     size = sizeof(Elf64_Sym) * symtab->symbols.size();
     symtab->header->sh_offset = Elf64_Off(codeOffset);
     symtab->header->sh_size = Elf64_Xword(size);
     codeOffset += size;
-    
-    int startPos = getStringPos("_start");
-    for (int i = 0; i<symtab->symbols.size(); i++) {
-        auto sym = symtab->symbols.at(i);
-        if (sym->st_name == startPos) {
-            symtab->header->sh_info = i;
-            break;
-        }
-    }
+    symtab->header->sh_info = table_start_pos;
     
     // -> .rela_text
     size = sizeof(Elf64_Rela) * rela_text->symbols.size();
@@ -365,7 +357,7 @@ int Elf64File::getStringPos(std::string name) {
     return pos;
 }
 
-void Elf64File::symtabSort() {
+int Elf64File::symtabSort() {
     std::vector<Elf64_Sym *> local, global;
     
     for (auto sym : symtab->symbols) {
@@ -376,5 +368,6 @@ void Elf64File::symtabSort() {
     symtab->symbols.clear();
     for (auto sym : local) symtab->symbols.push_back(sym);
     for (auto sym : global) symtab->symbols.push_back(sym);
+    return local.size();
 }
 

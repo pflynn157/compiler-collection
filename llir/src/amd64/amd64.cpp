@@ -57,6 +57,8 @@ void Amd64Writer::compile() {
             case Linkage::Local: {} break;
             
             case Linkage::Extern: {
+                X86ExternFunc *ext = new X86ExternFunc(func->getName());
+                file->addCode(ext);
                 //assembly += ".extern " + func->getName() + "\n";
                 continue;
             } break;

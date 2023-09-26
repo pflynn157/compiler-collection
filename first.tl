@@ -1,7 +1,7 @@
-#extern output(s:string, len:i32);
+extern output(s:string, len:i32);
 
 func main -> i32 is
-    #output("Hi!\n", 4);
+    output("Hi!\n", 4);
     return 54;
 end
 

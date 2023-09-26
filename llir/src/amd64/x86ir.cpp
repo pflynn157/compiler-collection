@@ -46,6 +46,12 @@ std::string X86GlobalFunc::print() {
     return ret;
 }
 
+std::string X86ExternFunc::print() {
+    std::string ret = "";
+    ret += ".extern " + name + "\n";
+    return ret;
+}
+
 std::string X86Push::print() {
     return "push " + op1->print();
 }

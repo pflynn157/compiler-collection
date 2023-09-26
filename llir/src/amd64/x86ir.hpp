@@ -200,6 +200,18 @@ protected:
     std::string name = "";
 };
 
+// An extern function
+class X86ExternFunc : public X86Instr {
+public:
+    explicit X86ExternFunc(std::string name) : X86Instr(X86Type::Extern) {
+        this->name = name;
+    }
+    
+    std::string print();
+protected:
+    std::string name = "";
+};
+
 // A push instruction
 class X86Push : public X86Instr {
 public:

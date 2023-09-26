@@ -33,3 +33,8 @@ add_custom_target(test_all DEPENDS
     test_libllir
 )
 
+## For LLIR and the custom assembler
+add_custom_target(test_toolchain DEPENDS
+    test_core_toolchain
+)
+

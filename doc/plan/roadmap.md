@@ -53,6 +53,10 @@ The following is our to-do list for Riya:
 * Latex-based comments
 * Switch parens in function calls to curly braces
 * Variadiac arguments
+* Single line functions (I.E. matlab)
+* Euler angle 
+* Quaternion
+* Integrator- ie calculus
 
 
 ### Standard Library

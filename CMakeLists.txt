@@ -5,7 +5,7 @@ find_package(LLVM REQUIRED CONFIG)
 
 add_compile_options(-std=c++17 -g)
 
-include_directories(src)
+include_directories(compiler)
 include_directories(llir/src)
 include_directories(.)
 
@@ -28,9 +28,10 @@ endif()
 add_subdirectory(libelf)
 add_subdirectory(as)
 add_subdirectory(llir)
+add_subdirectory(compiler)
 
 # Build the core compiler
-add_subdirectory(src)
+add_subdirectory(occ)
 add_subdirectory(stdlib)
 add_subdirectory(test)
 

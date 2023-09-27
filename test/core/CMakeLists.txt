@@ -131,7 +131,7 @@ foreach(ITEM ${CORE_TEST_SRC})
     # Standard LLVM tests
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ITEM}.exe
-        COMMAND ${CMAKE_BINARY_DIR}/src/occ ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.exe
+        COMMAND ${CMAKE_BINARY_DIR}/occ/occ ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.exe
         COMMAND ./${ITEM}.exe
         COMMAND rm ${ITEM}.exe
         COMMAND echo "[PASS] ${ITEM}.ry"
@@ -147,7 +147,7 @@ foreach(ITEM ${LLIR_CORE_TEST_SRC})
     # LLIR tests
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ITEM}.llir.exe
-        COMMAND ${CMAKE_BINARY_DIR}/src/ocllir ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.llir.exe
+        COMMAND ${CMAKE_BINARY_DIR}/occ/ocllir ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.llir.exe
         COMMAND ./${ITEM}.llir.exe
         COMMAND rm ${ITEM}.llir.exe
         COMMAND echo "[PASS] ${ITEM}.ry"
@@ -163,7 +163,7 @@ foreach(ITEM ${TOOLCHAIN_CORE_TEST_SRC})
     # Toolchain tests
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ITEM}.as.exe
-        COMMAND ${CMAKE_BINARY_DIR}/src/ocllir -ba ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.as.exe
+        COMMAND ${CMAKE_BINARY_DIR}/occ/ocllir -ba ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.as.exe
         COMMAND ./${ITEM}.as.exe
         COMMAND rm ${ITEM}.as.exe
         COMMAND echo "[PASS] ${ITEM}.ry"

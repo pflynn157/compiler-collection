@@ -13,9 +13,9 @@ The following is our to-do list for Riya:
 * (DONE) Rebase AST- merge all AST headers into one
 * (DONE) Rebase AST- use struct instead of class/helper functions
 * Create common functions between various compiler entry points
-* Rename compiler output
+* (DONE) Rename compiler output
 * Redo license headers
-* Remove PTASM
+* (DONE) Remove PTASM
 
 
 ### LLIR
@@ -24,6 +24,10 @@ The following is our to-do list for Riya:
 * Conflict with return register
 * Mod operation doesn't work
 * Switch to smart/safe pointers
+
+
+## Assembler
+* (DONE) Add support for building x86-64 start file
 
 
 ### Features

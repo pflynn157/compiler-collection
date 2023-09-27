@@ -1,21 +1,11 @@
 project(tl_frontend)
 
-if(PTASM)
-    set(COMPILER_SRC
-        compiler/PTASM/compiler.cpp
-        compiler/PTASM/elf.cpp
-        compiler/PTASM/ptasm.cpp
-        compiler/PTASM/x86.cpp
-    )
-else()
-endif()
-
 set(LLVM_COMPILER_SRC
-    compiler/LLVM/Builder.cpp
-    compiler/LLVM/Compiler.cpp
-    compiler/LLVM/Flow.cpp
-    compiler/LLVM/Function.cpp
-    compiler/LLVM/Variable.cpp
+    llvm/Builder.cpp
+    llvm/Compiler.cpp
+    llvm/Flow.cpp
+    llvm/Function.cpp
+    llvm/Variable.cpp
 )
 
 set(LLIR_COMPILER_SRC
@@ -48,36 +38,32 @@ set(SRC
     midend/midend.cpp    
 )
 
-if(PTASM)
-    add_executable(tlc ${SRC} ptasm_main.cpp)
-else()
-    # Build the LLVM-based compiler
-    add_executable(tlc ${SRC} ${LLVM_COMPILER_SRC} main.cpp)
+# Build the LLVM-based compiler
+add_executable(occ ${SRC} ${LLVM_COMPILER_SRC} main.cpp)
 
-    llvm_map_components_to_libnames(llvm_libs support core irreader target asmparser
-        X86AsmParser
-        X86CodeGen
-        X86Info
-    )
+llvm_map_components_to_libnames(llvm_libs support core irreader target asmparser
+    X86AsmParser
+    X86CodeGen
+    X86Info
+)
 
-    target_link_libraries(tlc
-        ${llvm_libs}
+target_link_libraries(occ
+    ${llvm_libs}
+)
+
+# Build the LLIR-based compiler
+add_executable(ocllir ${SRC} ${LLIR_COMPILER_SRC} llir_main.cpp)
+target_link_libraries(ocllir llir)
+
+# Enable dev linking mode
+if (DEV_LINK_MODE)
+    target_compile_options(occ PUBLIC
+        -DLINK_LOCATION="${CMAKE_BINARY_DIR}/stdlib"
     )
     
-    # Build the LLIR-based compiler
-    add_executable(ocllir ${SRC} ${LLIR_COMPILER_SRC} llir_main.cpp)
-    target_link_libraries(ocllir llir)
-    
-    # Enable dev linking mode
-    if (DEV_LINK_MODE)
-        target_compile_options(tlc PUBLIC
-            -DLINK_LOCATION="${CMAKE_BINARY_DIR}/stdlib"
-        )
-        
-        target_compile_options(ocllir PUBLIC
-            -DLINK_LOCATION="${CMAKE_BINARY_DIR}/stdlib"
-            -DAS_LOCATION="${CMAKE_BINARY_DIR}/as"
-        )
-    endif()
+    target_compile_options(ocllir PUBLIC
+        -DLINK_LOCATION="${CMAKE_BINARY_DIR}/stdlib"
+        -DAS_LOCATION="${CMAKE_BINARY_DIR}/as"
+    )
 endif()
 

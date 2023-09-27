@@ -13,11 +13,6 @@ include_directories(${LLVM_INCLUDE_DIRS})
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions(${LLVM_DEFINITIONS})
 
-option(PTASM "Use the PTASM backend" OFF)
-if (PTASM)
-    message(STATUS "Using the PTASM backend")
-endif()
-
 option(DISABLE_OUTPUT_TEST "Disable output-based testing" OFF)
 if (DISABLE_OUTPUT_TEST)
     message(STATUS "Output-based testing disabled.")

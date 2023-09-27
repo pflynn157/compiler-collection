@@ -13,7 +13,7 @@
 #include <ast/ast.hpp>
 #include <midend/midend.hpp>
 
-#include <compiler/LLVM/Compiler.hpp>
+#include <llvm/Compiler.hpp>
 
 bool isError = false;
 

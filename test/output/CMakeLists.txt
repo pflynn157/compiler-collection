@@ -38,7 +38,7 @@ set(LLIR_CORE_TEST_SRC
 foreach(ITEM ${CORE_TEST_SRC})
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ITEM}.exe
-        COMMAND ${CMAKE_BINARY_DIR}/src/tlc ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.exe
+        COMMAND ${CMAKE_BINARY_DIR}/src/occ ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.exe
         COMMAND ./${ITEM}.exe > output.txt
         COMMAND rm ${ITEM}.exe
         COMMAND diff ${CMAKE_CURRENT_SOURCE_DIR}/out/${ITEM}.out ./output.txt
@@ -56,7 +56,7 @@ add_custom_target(test_output
     DEPENDS ${TEST_OUTPUTS}
 )
 
-add_dependencies(test_output tlc)
+add_dependencies(test_output occ)
 
 
 ## LLIR testing

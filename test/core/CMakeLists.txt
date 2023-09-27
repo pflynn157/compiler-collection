@@ -131,7 +131,7 @@ foreach(ITEM ${CORE_TEST_SRC})
     # Standard LLVM tests
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ITEM}.exe
-        COMMAND ${CMAKE_BINARY_DIR}/src/tlc ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.exe
+        COMMAND ${CMAKE_BINARY_DIR}/src/occ ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.exe
         COMMAND ./${ITEM}.exe
         COMMAND rm ${ITEM}.exe
         COMMAND echo "[PASS] ${ITEM}.ry"
@@ -180,7 +180,7 @@ add_custom_target(test_core
     DEPENDS ${TEST_OUTPUTS}
 )
 
-add_dependencies(test_core tlc)
+add_dependencies(test_core occ)
 
 # LLIR tests
 add_custom_target(test_core_llir

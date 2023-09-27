@@ -1,26 +1,57 @@
 .intel_syntax noprefix
 .data
-    STR1: .string "Hello!\n"
-    
-.text
 
+.text
 .global _start
+.global invoke_syscall
+
 _start:
-    mov rdi, 5
-    mov eax, 60
+    xor ebp, ebp
+    mov esi, DWORD PTR [rsp+0]
+    lea rdi, [rsp+8]
+    
+    mov rdi, rax
+    mov rax, 60
     syscall
-done:
+
+invoke_syscall:
+    mov rax, rdi
+    mov rdi, rsi
+    mov rsi, rdx
+    mov rdx, rcx
+    mov r10, r8
+    mov r8, r9
+    syscall
     ret
 
-.global func1
-func1:
-    mov rdi, 1
-    mov eax, 60
+malloc:
+    mov rsi, rdi
+    mov rax, 9
+    mov rdi, 0
+    mov rdx, 3
+    mov r10, 34
+    mov r8, -1
+    mov r9, 0
     syscall
+    ret
 
-.global func2
-func2:
-    mov rdi, 2
-    mov eax, 60
+realloc:
+    xor r10, r10
+    xor r8, r8
+    mov rax, 25
     syscall
+    ret
+
+free:
+    mov rax, 11
+    syscall
+    ret
+
+output:
+    mov rdx, rsi
+    mov rsi, rdi
+    mov rax, 1
+    mov rdi, 1
+    syscall
+    ret
     

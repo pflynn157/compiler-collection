@@ -1,5 +1,3 @@
-# For now, we just call the main function and
-# pass parameters
 .intel_syntax noprefix
 
 .text
@@ -14,7 +12,7 @@
 _start:
     xor ebp, ebp
     mov esi, DWORD PTR [rsp+0]
-    lea rdi, 8[rsp]
+    lea rdi, [rsp+8]
     call main
     
     mov rdi, rax
@@ -42,12 +40,6 @@ malloc:
     syscall
     ret
 
-/* unsigned long addr       rdi
-   unsigned long old_len    rsi
-   unsigned long new_len    rdx
-   unsigned long flags      = 0
-   unsigned long new_addr   = 9
-*/ 
 realloc:
     xor r10, r10
     xor r8, r8

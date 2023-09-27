@@ -329,10 +329,18 @@ void Elf64File::addCode16(uint16_t code) {
 }
 
 void Elf64File::addCode32(uint32_t code) {
-    text->code.push_back(code);
-    text->code.push_back(code << 8);
-    text->code.push_back(code << 16);
-    text->code.push_back(code << 24);
+    if ((signed)code < 0) {
+        // TODO: This is an incorrect hack
+        text->code.push_back(code);
+        text->code.push_back(0xFF);
+        text->code.push_back(0xFF);
+        text->code.push_back(0xFF);
+    } else {
+        text->code.push_back(code);
+        text->code.push_back(code << 8);
+        text->code.push_back(code << 16);
+        text->code.push_back(code << 24);
+    }
 }
 
 int Elf64File::getSectionNamePos(std::string name) {

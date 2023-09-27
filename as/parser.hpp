@@ -20,7 +20,7 @@ private:
     void parseText();
     void buildPush();
     void buildStdInstr(TokenType op);
-    void writeMovI(TokenType op, TokenType dest, int value);
+    void writeMovI(TokenType op, TokenType dest, unsigned int value);
     
     // In encoding.cpp
     void writeAluI(TokenType op, TokenType dest);

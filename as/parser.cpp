@@ -154,7 +154,13 @@ void Parser::buildStdInstr(TokenType op) {
             //
             // This one is a pain because it varies for each register type
             //
+            case Minus:
             case Int32: {
+                if (src.type == Minus) {
+                    src = scanner->getNext();
+                    src.i32_val *= -1;
+                }
+            
                 if (op == Mov) {
                     writeMovI(op, dest.type, src.i32_val);
                 } else {
@@ -272,7 +278,7 @@ void Parser::buildStdInstr(TokenType op) {
 
 // Mov-immediates are something else on Intel
 //
-void Parser::writeMovI(TokenType op, TokenType dest, int value) {
+void Parser::writeMovI(TokenType op, TokenType dest, unsigned int value) {
     // 8-bit mov-i
     if (isRegister8(dest)) {
         if (dest == Sil || dest == Dil || dest == Spl || dest == Bpl) {
@@ -347,7 +353,7 @@ void Parser::writeMovI(TokenType op, TokenType dest, int value) {
             default: {}
         }
     }
-
+    
     if (isRegister8(dest)) file->addCode8(value);
     else if (isRegister16(dest)) file->addCode16(value);
     else file->addCode32(value);

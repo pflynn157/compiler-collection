@@ -113,7 +113,7 @@ struct Token {
     TokenType type;
     std::string id_val;
     char i8_val;
-    int i32_val;
+    unsigned int i32_val;
     
     Token();
     void print();

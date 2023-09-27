@@ -200,7 +200,7 @@ void SymbolParser::parseText() {
             } break;
         
             default: {
-                std::cerr << "Error: Unknown token in text section." << std::endl;
+                std::cerr << "[SYMBOL] Error: Unknown token in text section." << std::endl;
                 token.print();
             }
         }
@@ -349,7 +349,12 @@ void SymbolParser::parseStdInstr(TokenType op) {
             location += 3;
         } break;
         
+        case Minus:     // If we see this, assume a negative number
         case Int32: {
+            if (token.type == Minus) {
+                token = scanner->getNext();
+            }
+        
             if (destMemory) {
                 location += 4;
             } else if (op == Mov) {

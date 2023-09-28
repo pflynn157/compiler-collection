@@ -16,8 +16,9 @@ The following is our to-do list for Riya:
 * (DONE) Rename compiler output
 * Redo license headers
 * (DONE) Remove PTASM
-* Move constants and functions to AST blocks
-* Create base parser to abstract AST-only things
+* (DONE) Move constants and functions to AST blocks
+* (DONE) Create base parser to abstract AST-only things
+* (DONE) Create tiny-lang
 
 
 ### LLIR

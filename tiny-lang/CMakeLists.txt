@@ -1,4 +1,4 @@
-project(occ_frontend)
+project(tlc_frontend)
 
 include_directories(.)
 
@@ -20,10 +20,10 @@ set(SRC
 )
 
 # Build the LLVM-based compiler
-add_executable(occ ${SRC} main.cpp)
-target_link_libraries(occ compiler_llvm)
+add_executable(tlc ${SRC} main.cpp)
+target_link_libraries(tlc compiler_llvm)
 
 # Build the LLIR-based compiler
-add_executable(ocllir ${SRC} llir_main.cpp)
-target_link_libraries(ocllir compiler_llir)
+add_executable(tlcllir ${SRC} llir_main.cpp)
+target_link_libraries(tlcllir compiler_llir)
 

@@ -38,7 +38,7 @@ set(LLIR_CORE_TEST_SRC
 foreach(ITEM ${CORE_TEST_SRC})
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ITEM}.exe
-        COMMAND ${CMAKE_BINARY_DIR}/occ/occ ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.exe
+        COMMAND ${CMAKE_BINARY_DIR}/tiny-lang/tlc ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.exe
         COMMAND ./${ITEM}.exe > output.txt
         COMMAND rm ${ITEM}.exe
         COMMAND diff ${CMAKE_CURRENT_SOURCE_DIR}/out/${ITEM}.out ./output.txt
@@ -56,14 +56,14 @@ add_custom_target(test_output
     DEPENDS ${TEST_OUTPUTS}
 )
 
-add_dependencies(test_output occ)
+add_dependencies(test_output tlc)
 
 
 ## LLIR testing
 foreach(ITEM ${LLIR_CORE_TEST_SRC})
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ITEM}.llir.exe
-        COMMAND ${CMAKE_BINARY_DIR}/occ/ocllir ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.llir.exe
+        COMMAND ${CMAKE_BINARY_DIR}/tiny-lang/tlcllir ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.llir.exe
         COMMAND ./${ITEM}.llir.exe > output.txt
         COMMAND rm ${ITEM}.llir.exe
         COMMAND diff ${CMAKE_CURRENT_SOURCE_DIR}/out/${ITEM}.out ./output.txt
@@ -81,5 +81,5 @@ add_custom_target(test_output_llir
     DEPENDS ${TEST_OUTPUTS_LLIR}
 )
 
-add_dependencies(test_output_llir ocllir)
+add_dependencies(test_output_llir tlcllir)
 

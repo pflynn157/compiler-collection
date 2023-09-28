@@ -11,9 +11,10 @@ public:
     explicit Parser(std::string input);
     bool parse();
     
-    bool parse_block(std::shared_ptr<AstBlock> block);
+    bool parse_block(std::shared_ptr<AstBlock> block, bool is_global = false);
+    bool parse_function(std::shared_ptr<AstBlock> block, token start);
     bool parse_return(std::shared_ptr<AstBlock> block);
-    std::shared_ptr<AstExpression> parse_expression(std::shared_ptr<AstBlock> block, token stop = t_nl);
+    std::shared_ptr<AstExpression> parse_expression(std::shared_ptr<AstBlock> block, token stop = t_dot);
     
     std::unique_ptr<Lex> lex;
 };

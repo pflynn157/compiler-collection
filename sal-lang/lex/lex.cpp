@@ -26,7 +26,7 @@ token Lex::get_next() {
     
     while (!reader.eof()) {
         char c = reader.get();
-        if (c == ' ' || is_symbol(c)) {
+        if (c == ' ' || c == '\n' || is_symbol(c)) {
             if (is_symbol(c)) {
                 token t = get_symbol(c);
                 if (buffer.length() > 0) {
@@ -39,7 +39,10 @@ token Lex::get_next() {
             if (buffer.length() == 0) continue;
             
             token t = t_none;
-            if (buffer == "return") t = t_return;
+            if (buffer == "func") t = t_func;
+            else if (buffer == "return") t = t_return;
+            else if (buffer == "of") t = t_of;
+            else if (buffer == "end") t = t_end;
             else if (is_int()) {
                 t = t_int_literal;
                 value = buffer;
@@ -63,7 +66,10 @@ token Lex::get_next() {
 //
 bool Lex::is_symbol(char c) {
     switch (c) {
-        case '\n': return true;
+        case '.':
+        case '{':
+        case '}':
+        case '#': return true;
         
         default: {}
     }
@@ -76,7 +82,10 @@ bool Lex::is_symbol(char c) {
 //
 token Lex::get_symbol(char c) {
     switch (c) {
-        case '\n': return t_nl;
+        case '.': return t_dot;
+        case '{': return t_lcbrace;
+        case '}': return t_rcbrace;
+        case '#': return t_numsym;
         
         default: {}
     }
@@ -102,10 +111,16 @@ void Lex::print(token t) {
         case t_eof: std::cout << "EOF" << std::endl; break;
     
         // Keywords
+        case t_func: std::cout << "FUNC" << std::endl; break;
         case t_return: std::cout << "RETURN" << std::endl; break;
+        case t_of: std::cout << "OF" << std::endl; break;
+        case t_end: std::cout << "END" << std::endl; break;
 
         // Symbols
-        case t_nl: std::cout << "NL" << std::endl; break;
+        case t_dot: std::cout << "." << std::endl; break;
+        case t_lcbrace: std::cout << "{" << std::endl; break;
+        case t_rcbrace: std::cout << "}" << std::endl; break;
+        case t_numsym: std::cout << "#" << std::endl; break;
 
         // Literals
         case t_id: std::cout << "ID(" << value << ")" << std::endl; break;

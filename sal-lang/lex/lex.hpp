@@ -12,10 +12,16 @@ enum token {
     t_eof,
     
     // Keywords
+    t_func,
     t_return,
+    t_of,
+    t_end,
     
     // Symbols
-    t_nl,
+    t_dot,
+    t_lcbrace,
+    t_rcbrace,
+    t_numsym,
     
     // Literals
     t_id,

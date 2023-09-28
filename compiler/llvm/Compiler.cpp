@@ -46,7 +46,7 @@ void Compiler::compile() {
     }
 
     // Build all other functions
-    for (auto global : tree->global_statements) {
+    for (auto global : tree->block->getBlock()) {
         switch (global->type) {
             case V_AstType::Func: {
                 symtable.clear();

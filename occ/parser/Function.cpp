@@ -52,8 +52,6 @@ bool Parser::getFunctionArgs(std::shared_ptr<AstBlock> block, std::vector<Var> &
 
 // Builds a function
 bool Parser::buildFunction(Token startToken, std::string className) {
-    localConsts.clear();
-    
     Token tk;
     bool isExtern = false;
 
@@ -96,7 +94,7 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     }
 
     // Create the function object
-    funcs.push_back(funcName);
+    tree->block->funcs.push_back(funcName);
     
     if (isExtern) {
         std::shared_ptr<AstExternFunction> ex = std::make_shared<AstExternFunction>(funcName);
@@ -110,6 +108,7 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     func->data_type = dataType;
     func->args = args;
     tree->addGlobalStatement(func);
+    func->block->mergeSymbols(tree->block);
     func->block->mergeSymbols(block);
     
     // Build the body
@@ -142,7 +141,7 @@ bool Parser::buildFunction(Token startToken, std::string className) {
 // Builds a function call
 bool Parser::buildFunctionCallStmt(std::shared_ptr<AstBlock> block, Token idToken) {
     // Make sure the function exists
-    if (!isFunc(idToken.id_val)) {
+    if (!block->isFunc(idToken.id_val)) {
         syntax->addError(0, "Unknown function.");
         return false;
     }

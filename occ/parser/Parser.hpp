@@ -14,10 +14,16 @@
 #include <ast/ast.hpp>
 #include <lex/lex.hpp>
 
+struct ExprContext {
+    std::stack<std::shared_ptr<AstExpression>> output;
+    std::stack<std::shared_ptr<AstOp>> opStack;
+    std::shared_ptr<AstDataType> varType;
+    bool lastWasOp = true;
+};
+
 // The parser class
 // The parser is in charge of performing all parsing and AST-building tasks
 // It is also in charge of the error manager
-
 class Parser {
 public:
     explicit Parser(std::string input);
@@ -38,7 +44,7 @@ protected:
     // Variable.cpp
     bool buildVariableDec(std::shared_ptr<AstBlock> block);
     bool buildVariableAssign(std::shared_ptr<AstBlock> block, Token idToken);
-    bool buildConst(bool isGlobal);
+    bool buildConst(std::shared_ptr<AstBlock> block, bool isGlobal);
     
     // Flow.cpp
     bool buildConditional(std::shared_ptr<AstBlock> block);
@@ -51,13 +57,6 @@ protected:
     bool buildStructDec(std::shared_ptr<AstBlock> block);
     
     // Expression.cpp
-    struct ExprContext {
-        std::stack<std::shared_ptr<AstExpression>> output;
-        std::stack<std::shared_ptr<AstOp>> opStack;
-        std::shared_ptr<AstDataType> varType;
-        bool lastWasOp = true;
-    };
-    
     std::shared_ptr<AstExpression> buildConstExpr(Token tk);
     bool buildOperator(Token tk, std::shared_ptr<ExprContext> ctx);
     bool buildIDExpr(std::shared_ptr<AstBlock> block, Token tk, std::shared_ptr<ExprContext> ctx);
@@ -72,18 +71,14 @@ protected:
     // Parser.cpp
     bool buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent = nullptr);
     std::shared_ptr<AstExpression> checkCondExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstExpression> toCheck);
-    int isConstant(std::string name);
-    bool isVar(std::string name);
-    bool isFunc(std::string name);
+    //int isConstant(std::string name);
+    //bool isVar(std::string name);
+    //bool isFunc(std::string name);
     std::shared_ptr<AstDataType> buildDataType(bool checkBrackets = true);
 private:
     std::string input = "";
     std::unique_ptr<Scanner> scanner;
     std::shared_ptr<AstTree> tree;
     std::shared_ptr<ErrorManager> syntax;
-    
-    std::map<std::string, std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>> globalConsts;
-    std::map<std::string, std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>> localConsts;
-    std::vector<std::string> funcs;
 };
 

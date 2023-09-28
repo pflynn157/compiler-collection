@@ -185,6 +185,8 @@ struct AstBlock : AstNode {
     std::shared_ptr<AstDataType> getDataType(std::string name);
     
     bool isVar(std::string name);
+    int isConstant(std::string name);
+    bool isFunc(std::string name);
     
     void print(int indent = 4);
     std::string dot(std::string parent);
@@ -193,6 +195,10 @@ struct AstBlock : AstNode {
     std::vector<std::shared_ptr<AstStatement>> block;
     std::map<std::string, std::shared_ptr<AstDataType>> symbolTable;
     std::vector<std::string> vars;
+    
+    std::map<std::string, std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>> globalConsts;
+    std::map<std::string, std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>> localConsts;
+    std::vector<std::string> funcs;
 };
 
 //
@@ -760,7 +766,7 @@ struct AstTree {
     bool hasStruct(std::string name);
     
     void addGlobalStatement(std::shared_ptr<AstStatement> stmt) {
-        global_statements.push_back(stmt);
+        block->addStatement(stmt);
     }
     
     void addStruct(std::shared_ptr<AstStruct> s) {
@@ -771,7 +777,7 @@ struct AstTree {
     void dot();
     
     std::string file = "";
-    std::vector<std::shared_ptr<AstStatement>> global_statements;
+    std::shared_ptr<AstBlock> block;
     std::vector<std::shared_ptr<AstStruct>> structs;
 };
 

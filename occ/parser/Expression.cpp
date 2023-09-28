@@ -124,7 +124,7 @@ bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, Token tk, std::shared_
             syntax->addWarning(0, "Function call on newline- possible logic error.");
         }
         
-        if (!isFunc(name)) {
+        if (!block->isFunc(name)) {
             syntax->addError(0, "Unknown function call.");
             return false;
         }
@@ -146,13 +146,13 @@ bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, Token tk, std::shared_
         std::shared_ptr<AstStructAccess> val = std::make_shared<AstStructAccess>(name, idToken.id_val);
         ctx->output.push(val);
     } else {
-        int constVal = isConstant(name);
+        int constVal = block->isConstant(name);
         if (constVal > 0) {
             if (constVal == 1) {
-                std::shared_ptr<AstExpression> expr = globalConsts[name].second;
+                std::shared_ptr<AstExpression> expr = block->globalConsts[name].second;
                 ctx->output.push(expr);
             } else if (constVal == 2) {
-                std::shared_ptr<AstExpression> expr = localConsts[name].second;
+                std::shared_ptr<AstExpression> expr = block->localConsts[name].second;
                 ctx->output.push(expr);
             }
         } else {

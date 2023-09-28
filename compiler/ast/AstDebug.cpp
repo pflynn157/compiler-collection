@@ -13,9 +13,7 @@ void AstTree::print() {
     
     for (auto str : structs) str->print();
     
-    for (auto stmt : global_statements) {
-        stmt->print();
-    }
+    block->print();
 }
 
 //

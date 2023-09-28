@@ -10,7 +10,7 @@ AstProcessor::AstProcessor(std::shared_ptr<AstTree> tree) {
 }
 
 void AstProcessor::run() {
-    for (auto gs : tree->global_statements) {
+    for (auto gs : tree->block->block) {
         proc_global_statement(gs);
     }
     

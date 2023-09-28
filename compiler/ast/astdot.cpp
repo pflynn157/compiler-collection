@@ -15,9 +15,7 @@ void AstTree::dot() {
         output += s->dot("tree");
     }
     
-    for (auto global : global_statements) {
-        output += global->dot("tree");
-    }
+    output += block->dot("tree");
     
     output += "}\n";
     

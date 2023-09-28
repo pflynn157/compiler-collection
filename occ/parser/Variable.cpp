@@ -147,7 +147,7 @@ bool Parser::buildVariableAssign(std::shared_ptr<AstBlock> block, Token t_idToke
 }
 
 // Builds a constant variable
-bool Parser::buildConst(bool isGlobal) {
+bool Parser::buildConst(std::shared_ptr<AstBlock> block, bool isGlobal) {
     Token tk = scanner->getNext();
     std::string name = tk.id_val;
     
@@ -180,9 +180,9 @@ bool Parser::buildConst(bool isGlobal) {
     
     // Put it all together
     if (isGlobal) {
-        globalConsts[name] = std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>(dataType, expr);
+        block->globalConsts[name] = std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>(dataType, expr);
     } else {
-        localConsts[name] = std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>(dataType, expr);
+        block->localConsts[name] = std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>(dataType, expr);
     }
     
     return true;

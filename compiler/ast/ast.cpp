@@ -71,7 +71,11 @@ void AstStruct::addItem(Var var, std::shared_ptr<AstExpression> default_expressi
 //
 // AstTree
 //
-AstTree::AstTree(std::string file) { this-> file = file; }
+AstTree::AstTree(std::string file) {
+    this-> file = file;
+    this->block = std::make_shared<AstBlock>();
+}
+
 AstTree::~AstTree() {}
 
 bool AstTree::hasStruct(std::string name) {
@@ -118,10 +122,27 @@ void AstBlock::addSymbol(std::string name, std::shared_ptr<AstDataType> dataType
 }
 
 void AstBlock::mergeSymbols(std::shared_ptr<AstBlock> parent) {
+    // Scoped variables
     auto map = parent->getSymbolTable();
     for (auto const &element : map) {
         symbolTable[element.first] = element.second;
         vars.push_back(element.first);
+    }
+    
+    // Global constants
+    for (auto const &element : parent->globalConsts) {
+        globalConsts[element.first] = element.second;
+    }
+    
+    // Scoped constants
+    for (auto const &element : parent->localConsts) {
+        localConsts[element.first] = element.second;
+    }
+    
+    // Functions
+    auto parent_funcs = parent->funcs;
+    for (auto func : parent_funcs) {
+        this->funcs.push_back(func);
     }
 }
 
@@ -135,6 +156,25 @@ std::shared_ptr<AstDataType> AstBlock::getDataType(std::string name) {
 
 bool AstBlock::isVar(std::string name) {
     if (std::find(vars.begin(), vars.end(), name) != vars.end()) {
+        return true;
+    }
+    return false;
+}
+
+int AstBlock::isConstant(std::string name) {
+    if (globalConsts.find(name) != globalConsts.end()) {
+        return 1;
+    }
+    
+    if (localConsts.find(name) != localConsts.end()) {
+        return 2;
+    }
+    
+    return 0;
+}
+
+bool AstBlock::isFunc(std::string name) {
+    if (std::find(funcs.begin(), funcs.end(), name) != funcs.end()) {
         return true;
     }
     return false;

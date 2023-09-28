@@ -30,7 +30,7 @@ Parser::Parser(std::string input) {
     
     // Add the built-in functions
     //string malloc(string)
-    funcs.push_back("malloc");
+    tree->block->funcs.push_back("malloc");
     std::shared_ptr<AstExternFunction> FT1 = std::make_shared<AstExternFunction>("malloc");
     FT1->addArgument(Var(AstBuilder::buildInt32Type(), "size"));
     FT1->data_type = AstBuilder::buildStringType();
@@ -45,7 +45,7 @@ Parser::Parser(std::string input) {
     tree->addGlobalStatement(FT2);*/
     
     //print(string)
-    funcs.push_back("print");
+    tree->block->funcs.push_back("print");
     std::shared_ptr<AstExternFunction> FT3 = std::make_shared<AstExternFunction>("print");
     FT3->varargs = true;
     FT3->addArgument(Var(AstBuilder::buildStringType(), "str"));
@@ -53,14 +53,14 @@ Parser::Parser(std::string input) {
     tree->addGlobalStatement(FT3);
     
     //i32 strlen(string)
-    funcs.push_back("strlen");
+    tree->block->funcs.push_back("strlen");
     std::shared_ptr<AstExternFunction> FT4 = std::make_shared<AstExternFunction>("strlen");
     FT4->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT4->data_type = AstBuilder::buildInt32Type();
     tree->addGlobalStatement(FT4);
     
     //i32 stringcmp(string, string)
-    funcs.push_back("stringcmp");
+    tree->block->funcs.push_back("stringcmp");
     std::shared_ptr<AstExternFunction> FT5 = std::make_shared<AstExternFunction>("stringcmp");
     FT5->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT5->addArgument(Var(AstBuilder::buildStringType(), "str"));
@@ -68,7 +68,7 @@ Parser::Parser(std::string input) {
     tree->addGlobalStatement(FT5);
     
     //string strcat_str(string, string)
-    funcs.push_back("strcat_str");
+    tree->block->funcs.push_back("strcat_str");
     std::shared_ptr<AstExternFunction> FT6 = std::make_shared<AstExternFunction>("strcat_str");
     FT6->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT6->addArgument(Var(AstBuilder::buildStringType(), "str"));
@@ -76,7 +76,7 @@ Parser::Parser(std::string input) {
     tree->addGlobalStatement(FT6);
     
     //string strcat_char(string, char)
-    funcs.push_back("strcat_char");
+    tree->block->funcs.push_back("strcat_char");
     std::shared_ptr<AstExternFunction> FT7 = std::make_shared<AstExternFunction>("strcat_char");
     FT7->addArgument(Var(AstBuilder::buildStringType(), "str"));
     FT7->addArgument(Var(AstBuilder::buildCharType(), "c"));
@@ -99,7 +99,7 @@ bool Parser::parse() {
                 code = buildFunction(tk);
             } break;
             
-            case t_const: code = buildConst(true); break;
+            case t_const: code = buildConst(tree->block, true); break;
             case t_struct: code = buildStruct(); break;
             
             case t_eof: break;
@@ -134,7 +134,7 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
         switch (tk.type) {
             case t_var: code = buildVariableDec(block); break;
             case t_struct: code = buildStructDec(block); break;
-            case t_const: code = buildConst(false); break;
+            case t_const: code = buildConst(block, false); break;
             
             case t_id: {
                 Token idtoken = tk;
@@ -233,7 +233,7 @@ void Parser::debugScanner() {
 }
 
 // Checks to see if a string is a constant
-int Parser::isConstant(std::string name) {
+/*int Parser::isConstant(std::string name) {
     if (globalConsts.find(name) != globalConsts.end()) {
         return 1;
     }
@@ -250,7 +250,7 @@ bool Parser::isFunc(std::string name) {
         return true;
     }
     return false;
-}
+}*/
 
 //
 // Builds a data type from the token stream

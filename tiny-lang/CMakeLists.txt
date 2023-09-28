@@ -1,5 +1,7 @@
 project(tlc_frontend)
 
+add_subdirectory(stdlib)
+
 include_directories(.)
 
 set(SRC

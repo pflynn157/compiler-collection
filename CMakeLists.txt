@@ -32,6 +32,5 @@ add_subdirectory(compiler)
 
 # Build the core compiler
 add_subdirectory(tiny-lang)
-add_subdirectory(stdlib)
 add_subdirectory(test)
 

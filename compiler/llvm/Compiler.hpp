@@ -29,8 +29,6 @@ public:
     void debug();
     void emitLLVM(std::string path);
     void writeAssembly();
-    void assemble();
-    void link();
 protected:
     void compileStatement(std::shared_ptr<AstStatement> stmt);
     Value *compileValue(std::shared_ptr<AstExpression> expr, bool isAssign = false);

@@ -25,8 +25,6 @@ public:
     void compile();
     void debug();
     void writeAssembly(bool printTransform = false);
-    void assemble(bool use_as = false);
-    void link();
 protected:
     void compileStatement(std::shared_ptr<AstStatement> stmt);
     LLIR::Operand *compileValue(std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> dataType = nullptr,

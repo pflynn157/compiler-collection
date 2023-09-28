@@ -1,7 +1,8 @@
-add_subdirectory(core)
-add_subdirectory(output)
-add_subdirectory(lex)
 add_subdirectory(llir)
+
+add_subdirectory(tiny-lang/core)
+add_subdirectory(tiny-lang/output)
+add_subdirectory(tiny-lang/lex)
 
 if (DISABLE_OUTPUT_TEST)
     add_custom_target(test_llvm DEPENDS

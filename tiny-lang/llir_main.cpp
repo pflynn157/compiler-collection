@@ -56,6 +56,51 @@ std::shared_ptr<AstTree> getAstTree(std::string input, bool testLex, bool printA
     return tree;
 }
 
+
+// Assemble the file
+// TODO: This needs to be done properly. System() != proper. I was lazy
+void assemble(CFlags cflags, bool use_as) {
+    if (use_as) {
+        printf("Using built-in assembler...\n");
+        std::string cmd = std::string(AS_LOCATION) + "/asx86 ";
+        cmd += "/tmp/" + cflags.name + ".asm /tmp/" + cflags.name + ".o";
+        system(cmd.c_str());
+    } else {
+        std::string cmd = "as /tmp/" + cflags.name + ".asm -o /tmp/" + cflags.name + ".o";
+        system(cmd.c_str());
+    }
+}
+
+// Link
+// TODO: Same as above...
+#ifdef DEV_LINK_MODE
+
+#ifndef LINK_LOCATION
+#define LINK_LOCATION = "."
+#endif
+
+void link(CFlags cflags) {
+    std::string cmd = "ld ";
+    cmd += std::string(LINK_LOCATION) + "/amd64_start.o ";
+    cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
+    cmd += " -L" + std::string(LINK_LOCATION) + "/corelib -lcorelib ";
+    system(cmd.c_str());
+    //printf("LINK: %s\n", cmd.c_str());
+}
+
+#else
+
+void link(CFlags cflags) {
+    /*std::string cmd = "ld ";
+    cmd += "/usr/local/lib/tinylang/ti_start.o ";
+    cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
+    cmd += " -dynamic-linker /lib64/ld-linux-x86-64.so.2 ";
+    cmd += "-ltinylang -lc";
+    system(cmd.c_str());*/
+}
+
+#endif
+
 int compileLLIR(std::shared_ptr<AstTree> tree, CFlags flags, bool printLLVM, bool printLLIR2, bool use_as) {
     Compiler *compiler = new Compiler(tree, flags);
     compiler->compile();
@@ -66,8 +111,8 @@ int compileLLIR(std::shared_ptr<AstTree> tree, CFlags flags, bool printLLVM, boo
     }
         
     compiler->writeAssembly(printLLIR2);
-    compiler->assemble(use_as);
-    compiler->link();
+    assemble(flags, use_as);
+    link(flags);
     
     return 0;
 }

@@ -7,6 +7,7 @@
 #include <string>
 #include <cstdio>
 #include <memory>
+#include <cstdlib>
 
 #include <preproc/Preproc.hpp>
 #include <parser/Parser.hpp>
@@ -56,6 +57,39 @@ std::shared_ptr<AstTree> getAstTree(std::string input, bool testLex, bool printA
     return tree;
 }
 
+void assemble(CFlags cflags) {
+    std::string cmd = "as /tmp/" + cflags.name + ".asm -o /tmp/" + cflags.name + ".o";
+    system(cmd.c_str());
+}
+
+#ifdef DEV_LINK_MODE
+
+#ifndef LINK_LOCATION
+#define LINK_LOCATION = "."
+#endif
+
+void link(CFlags cflags) {
+    std::string cmd = "ld ";
+    cmd += std::string(LINK_LOCATION) + "/amd64_start.o ";
+    cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
+    cmd += " -L" + std::string(LINK_LOCATION) + "/corelib -lcorelib ";
+    system(cmd.c_str());
+    //printf("LINK: %s\n", cmd.c_str());
+}
+
+#else
+
+void link(CFlags cflags) {
+    /*std::string cmd = "ld ";
+    cmd += "/usr/local/lib/tinylang/ti_start.o ";
+    cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
+    cmd += " -dynamic-linker /lib64/ld-linux-x86-64.so.2 ";
+    cmd += "-ltinylang -lc";
+    system(cmd.c_str());*/
+}
+
+#endif
+
 int compileLLVM(std::shared_ptr<AstTree> tree, CFlags flags, bool printLLVM, bool emitLLVM) {
     std::unique_ptr<Compiler> compiler = std::make_unique<Compiler>(tree, flags);
     compiler->compile();
@@ -76,8 +110,8 @@ int compileLLVM(std::shared_ptr<AstTree> tree, CFlags flags, bool printLLVM, boo
     }
         
     compiler->writeAssembly();
-    compiler->assemble();
-    compiler->link();
+    assemble(flags);
+    link(flags);
     
     return 0;
 }

@@ -3,7 +3,6 @@ project(occ_frontend)
 include_directories(.)
 
 set(SRC
-    parser/ErrorManager.cpp
     parser/Expression.cpp
     parser/Flow.cpp
     parser/Function.cpp

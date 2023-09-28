@@ -5,6 +5,9 @@ set(SRC
     ast/ast_builder.cpp
     ast/AstDebug.cpp
     ast/astdot.cpp
+    
+    parser/base_parser.cpp
+    parser/ErrorManager.cpp
 )
 
 set(LLVM_COMPILER_SRC

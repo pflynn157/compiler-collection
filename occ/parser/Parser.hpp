@@ -10,21 +10,15 @@
 #include <stack>
 #include <memory>
 
+#include <parser/base_parser.hpp>
 #include <parser/ErrorManager.hpp>
 #include <ast/ast.hpp>
 #include <lex/lex.hpp>
 
-struct ExprContext {
-    std::stack<std::shared_ptr<AstExpression>> output;
-    std::stack<std::shared_ptr<AstOp>> opStack;
-    std::shared_ptr<AstDataType> varType;
-    bool lastWasOp = true;
-};
-
 // The parser class
 // The parser is in charge of performing all parsing and AST-building tasks
 // It is also in charge of the error manager
-class Parser {
+class Parser : public BaseParser {
 public:
     explicit Parser(std::string input);
     ~Parser();
@@ -60,25 +54,16 @@ protected:
     std::shared_ptr<AstExpression> buildConstExpr(Token tk);
     bool buildOperator(Token tk, std::shared_ptr<ExprContext> ctx);
     bool buildIDExpr(std::shared_ptr<AstBlock> block, Token tk, std::shared_ptr<ExprContext> ctx);
-    bool applyHigherPred(std::shared_ptr<ExprContext> ctx);
-    bool applyAssoc(std::shared_ptr<ExprContext> ctx);
     std::shared_ptr<AstExpression> buildExpression(
                         std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
                         TokenType stopToken = t_semicolon,
                         bool isConst = false, bool buildList = false);
-    std::shared_ptr<AstExpression> checkExpression(std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> varType);
     
     // Parser.cpp
     bool buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent = nullptr);
     std::shared_ptr<AstExpression> checkCondExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstExpression> toCheck);
-    //int isConstant(std::string name);
-    //bool isVar(std::string name);
-    //bool isFunc(std::string name);
     std::shared_ptr<AstDataType> buildDataType(bool checkBrackets = true);
 private:
-    std::string input = "";
     std::unique_ptr<Scanner> scanner;
-    std::shared_ptr<AstTree> tree;
-    std::shared_ptr<ErrorManager> syntax;
 };
 

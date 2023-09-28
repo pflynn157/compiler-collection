@@ -31,12 +31,20 @@ std::shared_ptr<AstTree> get_ast(std::string input) {
     return tree;
 }
 
-void assemble(std::string) {
-
+void assemble(std::string name) {
+    std::string cmd = "as /tmp/" + name + ".asm -o /tmp/" + name + ".o";
+    system(cmd.c_str());
 }
 
 void link(std::string name) {
-
+    std::string cmd = "ld ";
+    cmd += "/usr/lib/x86_64-linux-gnu/crt1.o ";
+    cmd += "/usr/lib/x86_64-linux-gnu/crti.o ";
+    cmd += "/usr/lib/x86_64-linux-gnu/crtn.o ";
+    cmd += "/tmp/" + name + ".o -o " + name;
+    cmd += " -dynamic-linker /lib64/ld-linux-x86-64.so.2 ";
+    cmd += "-lc";
+    system(cmd.c_str());
 }
 
 void compile(std::shared_ptr<AstTree> tree, CFlags flags) {

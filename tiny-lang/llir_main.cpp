@@ -62,7 +62,7 @@ std::shared_ptr<AstTree> getAstTree(std::string input, bool testLex, bool printA
 void assemble(CFlags cflags, bool use_as) {
     if (use_as) {
         printf("Using built-in assembler...\n");
-        std::string cmd = std::string(AS_LOCATION) + "/asx86 ";
+        std::string cmd = std::string(AS_LOCATION) + "/x86/asx86 ";
         cmd += "/tmp/" + cflags.name + ".asm /tmp/" + cflags.name + ".o";
         system(cmd.c_str());
     } else {

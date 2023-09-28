@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ ! -f ./build/as/asx86 ]]; then
+if [[ ! -f ./build/as/x86/asx86 ]]; then
     echo "Error: No assembler built!"
     exit 1
 fi
@@ -12,7 +12,7 @@ echo ""
 
 total=0
 
-for d in ./as/*; do
+for d in ./as-x86/*; do
     for file in $d/*; do
         echo "`basename $d` `basename $file`"
         
@@ -22,7 +22,7 @@ for d in ./as/*; do
             OBJS="build/lib_test.o"
         fi
         
-        ../build/as/asx86 $file a.out
+        ../build/as/x86/asx86 $file a.out
         ld a.out $OBJS -o out
         
         as $file -o test.out

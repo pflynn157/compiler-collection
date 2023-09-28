@@ -32,5 +32,6 @@ add_subdirectory(compiler)
 
 # Build the core compiler
 add_subdirectory(tiny-lang)
+add_subdirectory(sal-lang)
 add_subdirectory(test)
 

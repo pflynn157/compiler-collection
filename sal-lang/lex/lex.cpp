@@ -31,7 +31,17 @@ token Lex::get_next() {
             value = "";
             c = reader.get();
             while (c != '\"') {
-                value += c;
+                if (c == '\\') {
+                    c = reader.get();
+                    if (c == 'n') {
+                        value += '\n';
+                    } else {
+                        value += '\\';
+                        value += c;
+                    }
+                } else {
+                    value += c;
+                }
                 c = reader.get();
             }
             
@@ -58,6 +68,7 @@ token Lex::get_next() {
             else if (buffer == "end") t = t_end;
             else if (buffer == "extern") t = t_extern;
             else if (buffer == "def") t = t_def;
+            else if (buffer == "any") t = t_any;
             else if (buffer == "string") t = t_string;
             else if (is_int()) {
                 t = t_int_literal;
@@ -86,7 +97,8 @@ bool Lex::is_symbol(char c) {
         case '{':
         case '}':
         case '#':
-        case ':': return true;
+        case ':':
+        case ',': return true;
         
         default: {}
     }
@@ -104,6 +116,7 @@ token Lex::get_symbol(char c) {
         case '}': return t_rcbrace;
         case '#': return t_numsym;
         case ':': return t_colon;
+        case ',': return t_comma;
         
         default: {}
     }
@@ -135,6 +148,7 @@ void Lex::print(token t) {
         case t_end: std::cout << "END" << std::endl; break;
         case t_def: std::cout << "DEF" << std::endl; break;
         case t_extern: std::cout << "EXTERN" << std::endl; break;
+        case t_any: std::cout << "ANY" << std::endl; break;
         
         case t_string: std::cout << "STRING" << std::endl; break;
 
@@ -144,6 +158,7 @@ void Lex::print(token t) {
         case t_rcbrace: std::cout << "}" << std::endl; break;
         case t_numsym: std::cout << "#" << std::endl; break;
         case t_colon: std::cout << ":" << std::endl; break;
+        case t_comma: std::cout << "," << std::endl; break;
 
         // Literals
         case t_id: std::cout << "ID(" << value << ")" << std::endl; break;

@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <ast/ast.hpp>
 #include <ast/ast_builder.hpp>
 
@@ -135,6 +137,7 @@ bool Parser::parse_function(std::shared_ptr<AstBlock> block, token start) {
     
     // Arguments
     std::vector<Var> args;
+    bool varargs = false;
     
     t = lex->get_next();
     if (t != t_lcbrace) {
@@ -145,6 +148,19 @@ bool Parser::parse_function(std::shared_ptr<AstBlock> block, token start) {
     
     t = lex->get_next();
     while (t != t_rcbrace) {
+        // Check variadiac arguments
+        if (t == t_any) {
+            varargs = true;
+            t = lex->get_next();
+            continue;
+        }
+        
+        // Check comma
+        if (t == t_comma) {
+            t = lex->get_next();
+            continue;
+        }
+    
         // ID
         std::string id_name = lex->value;
         if (t != t_id) {
@@ -183,6 +199,7 @@ bool Parser::parse_function(std::shared_ptr<AstBlock> block, token start) {
         std::shared_ptr<AstExternFunction> func = std::make_shared<AstExternFunction>(name);
         func->data_type = dtype;
         func->args = args;
+        func->varargs = varargs;
         block->addStatement(func);
     } else {
         std::shared_ptr<AstFunction> func = std::make_shared<AstFunction>(name);
@@ -243,6 +260,8 @@ std::shared_ptr<AstExpression> Parser::parse_expression(std::shared_ptr<AstBlock
                 context->output.push(s);
             } break;
             
+            case t_comma: break;
+            
             default: {
                 syntax->addError(0, "Unknown token in expression");
                 lex->print(t);
@@ -260,6 +279,7 @@ std::shared_ptr<AstExpression> Parser::parse_expression(std::shared_ptr<AstBlock
             context->output.pop();
             list->list.push_back(val);
         }
+        std::reverse(list->list.begin(), list->list.end());
         return list;
     }
     

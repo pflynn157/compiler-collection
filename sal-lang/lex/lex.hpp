@@ -18,6 +18,7 @@ enum token {
     t_end,
     t_def,
     t_extern,
+    t_any,
     
     // Datatype keywords
     t_string,
@@ -28,6 +29,7 @@ enum token {
     t_rcbrace,
     t_numsym,
     t_colon,
+    t_comma,
     
     // Literals
     t_id,

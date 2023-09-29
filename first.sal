@@ -1,12 +1,9 @@
 extern def puts{s:string}.
-
-def say_hello{}
-    puts "Hi!".
-end
+extern def printf{fmt:string, any}.
 
 func main{} of #32
-    puts "Hello!".
-    say_hello.
+    printf "Number: %d | %s\n", 20, "Hello!".
+    
     return 5.
 end
 

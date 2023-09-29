@@ -16,16 +16,23 @@ enum token {
     t_return,
     t_of,
     t_end,
+    t_def,
+    t_extern,
+    
+    // Datatype keywords
+    t_string,
     
     // Symbols
     t_dot,
     t_lcbrace,
     t_rcbrace,
     t_numsym,
+    t_colon,
     
     // Literals
     t_id,
     t_int_literal,
+    t_string_literal,
 };
 
 //

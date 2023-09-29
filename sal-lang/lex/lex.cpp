@@ -26,6 +26,19 @@ token Lex::get_next() {
     
     while (!reader.eof()) {
         char c = reader.get();
+        
+        if (c == '\"') {
+            value = "";
+            c = reader.get();
+            while (c != '\"') {
+                value += c;
+                c = reader.get();
+            }
+            
+            buffer = "";
+            return t_string_literal;
+        }
+        
         if (c == ' ' || c == '\n' || is_symbol(c)) {
             if (is_symbol(c)) {
                 token t = get_symbol(c);
@@ -43,6 +56,9 @@ token Lex::get_next() {
             else if (buffer == "return") t = t_return;
             else if (buffer == "of") t = t_of;
             else if (buffer == "end") t = t_end;
+            else if (buffer == "extern") t = t_extern;
+            else if (buffer == "def") t = t_def;
+            else if (buffer == "string") t = t_string;
             else if (is_int()) {
                 t = t_int_literal;
                 value = buffer;
@@ -69,7 +85,8 @@ bool Lex::is_symbol(char c) {
         case '.':
         case '{':
         case '}':
-        case '#': return true;
+        case '#':
+        case ':': return true;
         
         default: {}
     }
@@ -86,6 +103,7 @@ token Lex::get_symbol(char c) {
         case '{': return t_lcbrace;
         case '}': return t_rcbrace;
         case '#': return t_numsym;
+        case ':': return t_colon;
         
         default: {}
     }
@@ -115,16 +133,22 @@ void Lex::print(token t) {
         case t_return: std::cout << "RETURN" << std::endl; break;
         case t_of: std::cout << "OF" << std::endl; break;
         case t_end: std::cout << "END" << std::endl; break;
+        case t_def: std::cout << "DEF" << std::endl; break;
+        case t_extern: std::cout << "EXTERN" << std::endl; break;
+        
+        case t_string: std::cout << "STRING" << std::endl; break;
 
         // Symbols
         case t_dot: std::cout << "." << std::endl; break;
         case t_lcbrace: std::cout << "{" << std::endl; break;
         case t_rcbrace: std::cout << "}" << std::endl; break;
         case t_numsym: std::cout << "#" << std::endl; break;
+        case t_colon: std::cout << ":" << std::endl; break;
 
         // Literals
         case t_id: std::cout << "ID(" << value << ")" << std::endl; break;
         case t_int_literal: std::cout << "VAL(" << value << ")" << std::endl; break;
+        case t_string_literal: std::cout << "STR(" << value << ")" << std::endl; break;
         
         default: std::cout << "???" << std::endl;
     }

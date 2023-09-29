@@ -1,5 +1,7 @@
+extern def puts{s:string}.
 
 func main{} of #32
+    puts "Hello!".
     return 5.
 end
 

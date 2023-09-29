@@ -6,6 +6,7 @@
 #include <ast/ast.hpp>
 #include <llvm/Compiler.hpp>
 #include <lex/lex.hpp>
+#include <midend/midend.hpp>
 
 void test_scanner(std::string input) {
     Lex lex(input);
@@ -26,6 +27,14 @@ std::shared_ptr<AstTree> get_ast(std::string input) {
     }
     
     auto tree = parser->getTree();
+    tree->print();
+    
+    std::cout << "========================================" << std::endl;
+    
+    std::unique_ptr<Midend> midend = std::make_unique<Midend>(tree);
+    midend->run();
+    tree = midend->tree;
+    
     tree->print();
     
     return tree;

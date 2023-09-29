@@ -16,7 +16,6 @@ public:
     std::shared_ptr<AstDataType> parse_data_type();
     
     bool parse_function(std::shared_ptr<AstBlock> block, token start);
-    
     bool parse_call(std::shared_ptr<AstBlock> block, std::string name);
     bool parse_return(std::shared_ptr<AstBlock> block);
     

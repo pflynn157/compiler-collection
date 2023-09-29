@@ -1,6 +1,9 @@
 set(SRC
     lex/lex.cpp
     
+    midend/ast_processor.cpp
+    midend/midend.cpp
+    
     parser/parser.cpp
     
     main.cpp

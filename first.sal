@@ -2,7 +2,7 @@ extern def puts{s:string}.
 extern def printf{fmt:string, any}.
 
 func main{} of #32
-    printf "Number: %d | %s\n", 20, "Hello!".
+    print 20, 30, " ", "Hello!".
     
     return 5.
 end

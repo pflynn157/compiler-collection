@@ -168,12 +168,14 @@ bool Parser::parse_function(std::shared_ptr<AstBlock> block, token start) {
     
     // If we have a function, get the return
     std::shared_ptr<AstDataType> dtype;
+    bool is_def = false;
     if (start == t_func) {
         if (!consume_token(t_of, "Expected \"of\" in function declaration. Use \"def\" for void functions."))
             return false;
         dtype = parse_data_type();
     } else {
         dtype = std::make_shared<AstDataType>(V_AstType::Void);
+        is_def = true;
     }
 
     // Build the AST node
@@ -189,6 +191,11 @@ bool Parser::parse_function(std::shared_ptr<AstBlock> block, token start) {
         block->addStatement(func);
         
         parse_block(func->block);
+        
+        if (is_def) {
+            std::shared_ptr<AstReturnStmt> ret = std::make_shared<AstReturnStmt>();
+            func->block->addStatement(ret);
+        }
     }
     
     return true;
@@ -246,8 +253,6 @@ std::shared_ptr<AstExpression> Parser::parse_expression(std::shared_ptr<AstBlock
         t = lex->get_next();
     }
     
-    if (context->output.empty()) return nullptr;
-    
     if (is_list) {
         std::shared_ptr<AstExprList> list = std::make_shared<AstExprList>();
         while (!context->output.empty()) {
@@ -258,6 +263,7 @@ std::shared_ptr<AstExpression> Parser::parse_expression(std::shared_ptr<AstBlock
         return list;
     }
     
+    if (context->output.empty()) return nullptr;
     return context->output.top();
 }
 

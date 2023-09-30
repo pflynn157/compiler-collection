@@ -16,8 +16,6 @@ set(LLVM_COMPILER_SRC
     llvm/Flow.cpp
     llvm/Function.cpp
     llvm/Variable.cpp
-    
-    ${SRC}
 )
 
 set(LLIR_COMPILER_SRC
@@ -25,10 +23,9 @@ set(LLIR_COMPILER_SRC
     llir/Compiler.cpp
     llir/Flow.cpp
     llir/Function.cpp
-    
-    ${SRC}
 )
 
+add_library(compiler_base STATIC ${SRC})
 add_library(compiler_llvm STATIC ${LLVM_COMPILER_SRC})
 add_library(compiler_llir STATIC ${LLIR_COMPILER_SRC})
 
@@ -40,9 +37,10 @@ llvm_map_components_to_libnames(llvm_libs support core irreader target asmparser
 
 target_link_libraries(compiler_llvm
     ${llvm_libs}
+    compiler_base
 )
 
-target_link_libraries(compiler_llir llir)
+target_link_libraries(compiler_llir llir compiler_base)
 
 # Enable dev linking mode
 if (DEV_LINK_MODE)

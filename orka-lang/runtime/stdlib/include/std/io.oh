@@ -1,0 +1,7 @@
+
+extern printf(line:str, x1:int, x2:int, x3:int, x4:int, x5:int);
+
+extern printDouble(num:double);
+extern printFloat(num:float);
+extern setPrecision(p:int);
+

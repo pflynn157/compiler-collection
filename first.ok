@@ -1,0 +1,119 @@
+
+#OUTPUT
+#X: 10
+#Y: 10
+#Changed X: 25
+#END
+
+#RET 0
+
+import std.io;
+
+enum TokenType is
+    None,
+    Eof,
+    
+    Func,
+    Ret,
+    
+    Id,
+    Void,
+    Int
+end
+
+struct Token is
+    type : TokenType := TokenType::None;
+    id_val : str := "";
+end
+
+class Scanner is
+    var pos : int := 0;
+    var input : str := "";
+    var buffer : str := "";
+    
+    func Scanner is
+        this.pos := 0;
+    end
+    
+    func setInput(input:str) is
+        this.input := input;
+    end
+    
+    func getNext -> Token is
+        struct token : Token;
+        
+        if this.pos >= strlen(this.input) then
+            token.type := TokenType::Eof;
+            return token;
+        end
+    
+        var input2 : str := this.input;
+        var buffer2 : str := this.buffer;
+        
+        while this.pos < strlen(this.input) do
+            if input2[this.pos] = '\n' then
+                this.pos := this.pos + 1;
+                
+                
+                if token.type = TokenType::None then
+                    token.type := TokenType::Id;
+                    token.id_val := buffer2;
+                end
+                
+                buffer2 := "";
+                break;
+            else
+                var c : char := input2[this.pos];
+                buffer2 := buffer2 + c;
+            end
+            
+            this.pos := this.pos + 1;
+        end
+        
+        this.buffer := buffer2;
+        return token;
+    end
+    
+    func getKeyword -> TokenType is
+        var ret : TokenType := TokenType::None;
+        if this.buffer = "func" then ret := TokenType::Func;
+        elif this.buffer = "ret" then ret := TokenType::Ret;
+        elif this.buffer = "void" then ret := TokenType::Void;
+        elif this.buffer = "int" then ret := TokenType::Int;
+        end
+        return ret;
+    end
+end
+
+func printToken(token:Token) is
+    if token.type = TokenType::Eof then println("Eof");
+    elif token.type = TokenType::Func then println("Func");
+    elif token.type = TokenType::Ret then println("Ret");
+    elif token.type = TokenType::Void then println("Void");
+    elif token.type = TokenType::Int then println("Int");
+    elif token.type = TokenType::Id then
+        printf("ID: ");
+        println(token.id_val);
+    else println("IDK");
+    end
+end
+
+func main -> int is
+    class scanner : Scanner;
+    struct token : Token;
+    
+    var input : str := "func main\n";
+    input := input + "int x = 20;\n";
+    input := input + "return 0;\n";
+    input := input + "end\n";
+    scanner.setInput(input);
+    
+    token := scanner.getNext();
+    while token.type != TokenType::Eof do
+        printToken(token);
+        token := scanner.getNext();
+    end
+    
+    return 0;
+end
+

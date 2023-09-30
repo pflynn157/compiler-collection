@@ -3,17 +3,19 @@
 // This file is part of the Espresso compiler.
 // Espresso is licensed under the BSD-3 license. See the COPYING file for more information.
 //
+#include <memory>
+
 #include <Java/JavaIR.hpp>
 #include <Java/JavaBuilder.hpp>
 
 // Sets initial things up
 JavaClassBuilder::JavaClassBuilder(std::string className) {
-    java = new JavaClassFile;
+    java = std::make_shared<JavaClassFile>();
     this->className = className;
 
     // Sets the class name
     int pos = AddUTF8(className);
-    JavaClassRef *classRef = new JavaClassRef(pos);
+    auto classRef = std::make_shared<JavaClassRef>(pos);
     pos = java->AddConst(classRef);
     classMap[className] = pos;
     superPos = pos;
@@ -22,7 +24,7 @@ JavaClassBuilder::JavaClassBuilder(std::string className) {
 
     // Set the super class
     pos = AddUTF8("java/lang/Object");
-    JavaClassRef *superRef = new JavaClassRef(pos);
+    auto superRef = std::make_shared<JavaClassRef>(pos);
     pos = java->AddConst(superRef);
     classMap["java/lang/Object"] = pos;
 
@@ -36,7 +38,7 @@ JavaClassBuilder::JavaClassBuilder(std::string className) {
 
 // Adds a utf8 string to the constant pool
 int JavaClassBuilder::AddUTF8(std::string value) {
-    JavaUTF8Entry *entry = new JavaUTF8Entry(value);
+    auto entry = std::make_shared<JavaUTF8Entry>(value);
     java->const_pool.push_back(entry);
 
     int pos = java->const_pool.size();
@@ -52,7 +54,7 @@ int JavaClassBuilder::ImportClass(std::string baseClass) {
     if (classMap.find(baseClass) == classMap.end()) {
         classPos = AddUTF8(baseClass);
 
-        JavaClassRef *classRef = new JavaClassRef(classPos);
+        auto classRef = std::make_shared<JavaClassRef>(classPos);
         classPos = java->AddConst(classRef);
 
         classMap[baseClass] = classPos;
@@ -71,11 +73,11 @@ void JavaClassBuilder::ImportMethod(std::string baseClass, std::string name, std
     int namePos = AddUTF8(name);
     int sigPos = AddUTF8(signature);
 
-    JavaNameTypeEntry *nt = new JavaNameTypeEntry(namePos, sigPos);
+    auto nt = std::make_shared<JavaNameTypeEntry>(namePos, sigPos);
     int ntPos = java->AddConst(nt);
 
     // Create the method ref <class><name_type>
-    JavaMethodRefEntry *method = new JavaMethodRefEntry(classPos, ntPos);
+    auto method = std::make_shared<JavaMethodRefEntry>(classPos, ntPos);
     int methodPos = java->AddConst(method);
 
     //methodMap[name] = methodPos;
@@ -95,11 +97,11 @@ void JavaClassBuilder::ImportField(std::string baseClass, std::string typeClass,
     int namePos = AddUTF8(name);
 
     // NameAndType <name><sig>
-    JavaNameTypeEntry *nt = new JavaNameTypeEntry(namePos, sigPos);
+    auto nt = std::make_shared<JavaNameTypeEntry>(namePos, sigPos);
     int ntPos = java->AddConst(nt);
 
     // FieldRef <baseClass><name_type>
-    JavaFieldRefEntry *ref = new JavaFieldRefEntry(baseClassPos, ntPos);
+    auto ref = std::make_shared<JavaFieldRefEntry>(baseClassPos, ntPos);
     int refPos = java->AddConst(ref);
 
     fieldMap[name] = refPos;

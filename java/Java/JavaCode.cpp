@@ -7,19 +7,19 @@
 #include <Java/JavaIR.hpp>
 
 // Creates a static function
-JavaFunction *JavaClassBuilder::CreateMethod(std::string name, std::string signature, int flags) {
+std::shared_ptr<JavaFunction> JavaClassBuilder::CreateMethod(std::string name, std::string signature, int flags) {
     int nameIdx = AddUTF8(name);
     int sigIdx = AddUTF8(signature);
 
-    JavaFunction *func = new JavaFunction(flags, nameIdx, sigIdx, codeIdx);
+    auto func = std::make_shared<JavaFunction>(flags, nameIdx, sigIdx, codeIdx);
     java->methods.push_back(func);
 
     // Create a name and type entry
-    JavaNameTypeEntry *nt = new JavaNameTypeEntry(nameIdx, sigIdx);
+    auto JavaNameTypeEntry nt = std::make_shared<JavaNameTypeEntry>(nameIdx, sigIdx);
     int ntPos = java->AddConst(nt);
 
     // Create a method-ref entry
-    JavaMethodRefEntry *method = new JavaMethodRefEntry(superPos, ntPos);
+    auto method = std::make_shared<JavaMethodRefEntry>(superPos, ntPos);
     int methodPos = java->AddConst(method);
 
     //methodMap[name] = methodPos;
@@ -30,7 +30,7 @@ JavaFunction *JavaClassBuilder::CreateMethod(std::string name, std::string signa
 }
 
 // Creates an ALOAD instruction
-void JavaClassBuilder::CreateALoad(JavaFunction *func, int pos) {
+void JavaClassBuilder::CreateALoad(std::shared_ptr<JavaFunction> func, int pos) {
     switch (pos) {
         case 0: func->addCode(JavaCode(0x2A)); break;
         case 1: func->addCode(JavaCode(0x2B)); break;
@@ -44,7 +44,7 @@ void JavaClassBuilder::CreateALoad(JavaFunction *func, int pos) {
 }
 
 // Creates an ASTORE instruction
-void JavaClassBuilder::CreateAStore(JavaFunction *func, int pos) {
+void JavaClassBuilder::CreateAStore(std::shared_ptr<JavaFunction> func, int pos) {
     switch (pos) {
         case 0: func->addCode(JavaCode(0x4B)); break;
         case 1: func->addCode(JavaCode(0x4C)); break;
@@ -58,7 +58,7 @@ void JavaClassBuilder::CreateAStore(JavaFunction *func, int pos) {
 }
 
 // Creates a NEW instruction
-void JavaClassBuilder::CreateNew(JavaFunction *func, std::string name) {
+void JavaClassBuilder::CreateNew(std::shared_ptr<JavaFunction> func, std::string name) {
     int pos = classMap[name];
 
     JavaCode code(0xBB, (unsigned short)pos);
@@ -66,12 +66,12 @@ void JavaClassBuilder::CreateNew(JavaFunction *func, std::string name) {
 }
 
 // Creates a DUP instruction
-void JavaClassBuilder::CreateDup(JavaFunction *func) {
+void JavaClassBuilder::CreateDup(std::shared_ptr<JavaFunction> func) {
     func->addCode(JavaCode(0x59));
 }
 
 // Creates a getstatic instruction
-void JavaClassBuilder::CreateGetStatic(JavaFunction *func, std::string name) {
+void JavaClassBuilder::CreateGetStatic(std::shared_ptr<JavaFunction> func, std::string name) {
     int fieldPos = fieldMap[name];
 
     JavaCode code(0xB2, (unsigned short)fieldPos);
@@ -79,12 +79,12 @@ void JavaClassBuilder::CreateGetStatic(JavaFunction *func, std::string name) {
 }
 
 // Creates a LDC instruction (loads a string specifically)
-void JavaClassBuilder::CreateString(JavaFunction *func, std::string value) {
+void JavaClassBuilder::CreateString(std::shared_ptr<JavaFunction> func, std::string value) {
     int constPos = 0;
 
     if (constMap.find(value) == constMap.end()) {
         constPos = AddUTF8(value);
-        JavaStringEntry *entry = new JavaStringEntry(constPos);
+        auto entry = new JavaStringEntry(constPos);
         constPos = java->AddConst(entry);
 
         constMap[value] = constPos;
@@ -97,7 +97,7 @@ void JavaClassBuilder::CreateString(JavaFunction *func, std::string value) {
 }
 
 // Creates an InvokeSpecial instruction
-void JavaClassBuilder::CreateInvokeSpecial(JavaFunction *func, std::string name, std::string baseClass, std::string signature) {
+void JavaClassBuilder::CreateInvokeSpecial(std::shared_ptr<JavaFunction> func, std::string name, std::string baseClass, std::string signature) {
     int methodPos = FindMethod(name, baseClass, signature);
 
     JavaCode code(0xB7, (unsigned short)methodPos);
@@ -105,7 +105,7 @@ void JavaClassBuilder::CreateInvokeSpecial(JavaFunction *func, std::string name,
 }
 
 // Creates an InvokeVirtual instruction
-void JavaClassBuilder::CreateInvokeVirtual(JavaFunction *func, std::string name, std::string baseClass, std::string signature) {
+void JavaClassBuilder::CreateInvokeVirtual(std::shared_ptr<JavaFunction> func, std::string name, std::string baseClass, std::string signature) {
     int methodPos = FindMethod(name, baseClass, signature);
 
     JavaCode code(0xB6, (unsigned short)methodPos);
@@ -113,7 +113,7 @@ void JavaClassBuilder::CreateInvokeVirtual(JavaFunction *func, std::string name,
 }
 
 // Creates an InvokeStatic instruction
-void JavaClassBuilder::CreateInvokeStatic(JavaFunction *func, std::string name, std::string baseClass, std::string signature) {
+void JavaClassBuilder::CreateInvokeStatic(std::shared_ptr<JavaFunction> func, std::string name, std::string baseClass, std::string signature) {
     int methodPos = FindMethod(name, baseClass, signature);
 
     JavaCode code(0xB8, (unsigned short)methodPos);
@@ -121,18 +121,18 @@ void JavaClassBuilder::CreateInvokeStatic(JavaFunction *func, std::string name, 
 }
 
 // Creates a return-void call
-void JavaClassBuilder::CreateRetVoid(JavaFunction *func) {
+void JavaClassBuilder::CreateRetVoid(std::shared_ptr<JavaFunction> func) {
     func->addCode(JavaCode(0xB1));
 }
 
 // Creates a bipush call
-void JavaClassBuilder::CreateBIPush(JavaFunction *func, int value) {
+void JavaClassBuilder::CreateBIPush(std::shared_ptr<JavaFunction> func, int value) {
     JavaCode code(0x10, (unsigned char)value);
     func->addCode(code);
 }
 
 // Creates an i_load call
-void JavaClassBuilder::CreateILoad(JavaFunction *func, int value) {
+void JavaClassBuilder::CreateILoad(std::shared_ptr<JavaFunction> func, int value) {
     switch (value) {
         case 0: func->addCode(JavaCode(0x1A)); break;
         case 1: func->addCode(JavaCode(0x1B)); break;
@@ -146,7 +146,7 @@ void JavaClassBuilder::CreateILoad(JavaFunction *func, int value) {
 }
 
 // Creates an i_store call
-void JavaClassBuilder::CreateIStore(JavaFunction *func, int value) {
+void JavaClassBuilder::CreateIStore(std::shared_ptr<JavaFunction> func, int value) {
     switch (value) {
         case 0: func->addCode(JavaCode(0x3B)); break;
         case 1: func->addCode(JavaCode(0x3C)); break;
@@ -160,51 +160,51 @@ void JavaClassBuilder::CreateIStore(JavaFunction *func, int value) {
 }
 
 // Creates an i_add instruction
-void JavaClassBuilder::CreateIAdd(JavaFunction *func) {
+void JavaClassBuilder::CreateIAdd(std::shared_ptr<JavaFunction> func) {
     func->addCode(JavaCode(0x60));
 }
 
 // Creates an i_sub instruction
-void JavaClassBuilder::CreateISub(JavaFunction *func) {
+void JavaClassBuilder::CreateISub(std::shared_ptr<JavaFunction> func) {
     func->addCode(JavaCode(0x64));
 }
 
 // Creates an i_mul instruction
-void JavaClassBuilder::CreateIMul(JavaFunction *func) {
+void JavaClassBuilder::CreateIMul(std::shared_ptr<JavaFunction> func) {
     func->addCode(JavaCode(0x68));
 }
 
 // Creates an i_div instruction
-void JavaClassBuilder::CreateIDiv(JavaFunction *func) {
+void JavaClassBuilder::CreateIDiv(std::shared_ptr<JavaFunction> func) {
     func->addCode(JavaCode(0x6C));
 }
 
 // Creates an i_rem instruction
-void JavaClassBuilder::CreateIRem(JavaFunction *func) {
+void JavaClassBuilder::CreateIRem(std::shared_ptr<JavaFunction> func) {
     func->addCode(JavaCode(0x70));
 }
 
 // Creates an i_and instruction
-void JavaClassBuilder::CreateIAnd(JavaFunction *func) {
+void JavaClassBuilder::CreateIAnd(std::shared_ptr<JavaFunction> func) {
     func->addCode(JavaCode(0x7E));
 }
 
 // Creates an i_or instruction
-void JavaClassBuilder::CreateIOr(JavaFunction *func) {
+void JavaClassBuilder::CreateIOr(std::shared_ptr<JavaFunction> func) {
     func->addCode(JavaCode(0x80));
 }
 
 // Creates an i_xor instruction
-void JavaClassBuilder::CreateIXor(JavaFunction *func) {
+void JavaClassBuilder::CreateIXor(std::shared_ptr<JavaFunction> func) {
     func->addCode(JavaCode(0x82));
 }
 
 // Creates an i_shl instruction
-void JavaClassBuilder::CreateIShl(JavaFunction *func) {
+void JavaClassBuilder::CreateIShl(std::shared_ptr<JavaFunction> func) {
     func->addCode(JavaCode(0x78));
 }
 
 // Creates an i_shr instruction
-void JavaClassBuilder::CreateIShr(JavaFunction *func) {
+void JavaClassBuilder::CreateIShr(std::shared_ptr<JavaFunction> func) {
     func->addCode(JavaCode(0x7A));
 }

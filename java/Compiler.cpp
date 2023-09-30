@@ -5,41 +5,42 @@
 //
 #include <cstdio>
 #include <iostream>
+#include <memory>
 
 #include <Compiler.hpp>
 
 Compiler::Compiler(std::string className) {
     this->className = className;
-    builder = new JavaClassBuilder(className);
+    builder = std::make_shared<JavaClassBuilder>(className);
     
     builder->ImportField("java/lang/System", "java/io/PrintStream", "out");
     builder->ImportMethod("java/io/PrintStream", "println", "(Ljava/lang/String;)V");
     builder->ImportMethod("java/io/PrintStream", "println", "(I)V");
 }
 
-void Compiler::Build(AstTree *tree) {
+void Compiler::Build(std::shared_ptr<AstTree> tree) {
     // Generate the default constructor
     // TODO: We should check if there's a constructor before doing this
-    JavaFunction *construct = builder->CreateMethod("<init>", "()V");
+    std::shared_ptr<JavaFunction> construct = builder->CreateMethod("<init>", "()V");
 
     builder->CreateALoad(construct, 0);
     builder->CreateInvokeSpecial(construct, "<init>", "java/lang/Object");
     builder->CreateRetVoid(construct);
 
     // Build the functions (declarations only)
-    for (auto GS : tree->getGlobalStatements()) {
-        if (GS->getType() == AstType::Func) {
+    for (auto GS : tree->block->block) {
+        if (GS->type == V_AstType::Func) {
             BuildFunction(GS);
         }
     }
     
     // Now the code
-    for (auto GS : tree->getGlobalStatements()) {
-        if (GS->getType() == AstType::Func) {
-            AstFunction *funcAst = static_cast<AstFunction *>(GS);
-            JavaFunction *func = funcMap[funcAst->getName()];
+    for (auto GS : tree->block->block) {
+        if (GS->type == AstType::Func) {
+            auto funcAst = std::static_pointer_cast<AstFunction>(GS);
+            std::shared_ptr<JavaFunction> func = funcMap[funcAst->getName()];
             
-            for (AstStatement *stmt : funcAst->getBlock()->getBlock()) {
+            for (auto const &stmt : funcAst->block->block) {
                 BuildStatement(stmt, func);
             }
         }
@@ -55,8 +56,8 @@ void Compiler::Write() {
 }
 
 // Builds a function
-void Compiler::BuildFunction(AstGlobalStatement *GS) {
-    AstFunction *func = static_cast<AstFunction *>(GS);
+void Compiler::BuildFunction(std::shared_ptr<AstStatement> GS) {
+    a/*uto func = std::static_pointer_cast<AstFunction>(GS);
     
     int flags = 0;
     if (func->isRoutine()) flags |= F_STATIC;
@@ -68,25 +69,21 @@ void Compiler::BuildFunction(AstGlobalStatement *GS) {
     }
     
     std::string signature = "()V";
-    if (func->getName() == "main") signature = "([Ljava/lang/String;)V";
+    if (func->name == "main") signature = "([Ljava/lang/String;)V";
     
-    JavaFunction *function = builder->CreateMethod(func->getName(), signature, flags);
-    funcMap[func->getName()] = function;
-    
-    /*for (AstStatement *stmt : func->getBlock()->getBlock()) {
-        BuildStatement(stmt, function);
-    }*/
+    std::shared_ptr<JavaFunction> function = builder->CreateMethod(func->name, signature, flags);
+    funcMap[func->name] = function;*/
 }
 
 // Builds a statement
-void Compiler::BuildStatement(AstStatement *stmt, JavaFunction *function) {
-    switch (stmt->getType()) {
-        case AstType::VarDec: BuildVarDec(stmt, function); break;
-        case AstType::VarAssign: BuildVarAssign(stmt, function); break;
+void Compiler::BuildStatement(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function) {
+    /*switch (stmt->type) {
+        case V_AstType::VarDec: BuildVarDec(stmt, function); break;
+        case V_AstType::VarAssign: BuildVarAssign(stmt, function); break;
     
-        case AstType::FuncCallStmt: BuildFuncCallStatement(stmt, function); break;
+        case V_AstType::FuncCallStmt: BuildFuncCallStatement(stmt, function); break;
     
-        case AstType::Return: {
+        case V_AstType::Return: {
             if (stmt->getExpressionCount() == 0) {
                 builder->CreateRetVoid(function);
             } else {
@@ -95,12 +92,12 @@ void Compiler::BuildStatement(AstStatement *stmt, JavaFunction *function) {
         } break;
         
         default: {}
-    }
+    }*/
 }
 
 // Builds a variable declaration
-void Compiler::BuildVarDec(AstStatement *stmt, JavaFunction *function) {
-    AstVarDec *vd = static_cast<AstVarDec *>(stmt);
+void Compiler::BuildVarDec(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function) {
+    /*auto vd = std::static_pointer_cast<AstVarDec>(stmt);
     
     switch (vd->getDataType()) {
         case DataType::Int32: {
@@ -121,12 +118,12 @@ void Compiler::BuildVarDec(AstStatement *stmt, JavaFunction *function) {
         } break;
         
         default: {}
-    }
+    }*/
 }
 
 // Builds a variable assignment
-void Compiler::BuildVarAssign(AstStatement *stmt, JavaFunction *function) {
-    AstVarAssign *va = static_cast<AstVarAssign *>(stmt);
+void Compiler::BuildVarAssign(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function) {
+    /*AstVarAssign *va = static_cast<AstVarAssign *>(stmt);
     
     BuildExpr(va->getExpression(), function, va->getDataType());
     
@@ -137,14 +134,14 @@ void Compiler::BuildVarAssign(AstStatement *stmt, JavaFunction *function) {
         } break;
         
         default: {}
-    }
+    }*/
 }
 
 // Builds a function call statement
-void Compiler::BuildFuncCallStatement(AstStatement *stmt, JavaFunction *function) {
-    AstFuncCallStmt *fc = static_cast<AstFuncCallStmt *>(stmt);
+void Compiler::BuildFuncCallStatement(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function) {
+    /*auto fc = std::static_pointer_cast<AstFuncCallStmt>(stmt);
     
-    if (fc->getName() == "println") {
+    if (fc->name == "println") {
         builder->CreateGetStatic(function, "out");
     }
     
@@ -168,12 +165,12 @@ void Compiler::BuildFuncCallStatement(AstStatement *stmt, JavaFunction *function
     }
     
     signature = "(" + signature + ")V";
-    builder->CreateInvokeVirtual(function, fc->getName(), baseClass, signature);
+    builder->CreateInvokeVirtual(function, fc->getName(), baseClass, signature);*/
 }
 
 // Builds an expression
-void Compiler::BuildExpr(AstExpression *expr, JavaFunction *function, DataType dataType) {
-    switch (expr->getType()) {
+void Compiler::BuildExpr(std::shared_ptr<AstExpression> expr, std::shared_ptr<JavaFunction> function/*, DataType dataType*/) {
+    /*switch (expr->getType()) {
         case AstType::IntL: {
             AstInt *i = static_cast<AstInt *>(expr);
             builder->CreateBIPush(function, i->getValue());
@@ -241,12 +238,12 @@ void Compiler::BuildExpr(AstExpression *expr, JavaFunction *function, DataType d
         } break;
         
         default: {}
-    }
+    }*/
 }
 
 // Returns a type value for an expression
-std::string Compiler::GetTypeForExpr(AstExpression *expr) {
-    switch (expr->getType()) {
+std::string Compiler::GetTypeForExpr(std::shared_ptr<AstExpression> expr) {
+    /*switch (expr->getType()) {
         case AstType::IntL: return "I";
         case AstType::StringL: return "Ljava/lang/String;";
         
@@ -259,7 +256,7 @@ std::string Compiler::GetTypeForExpr(AstExpression *expr) {
         } break;
         
         default: {}
-    }
+    }*/
 
     return "V";
 }

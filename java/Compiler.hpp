@@ -27,13 +27,13 @@ protected:
     void BuildVarDec(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function);
     void BuildVarAssign(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function);
     void BuildFuncCallStatement(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function);
-    void BuildExpr(AstExpression *expr, JavaFunction *function, DataType dataType = DataType::Void);
+    void BuildExpr(std::shared_ptr<AstExpression> expr, std::shared_ptr<JavaFunction> function/*, DataType dataType = DataType::Void*/);
     
-    std::string GetTypeForExpr(AstExpression *expr);
+    std::string GetTypeForExpr(std::shared_ptr<AstExpression> expr);
 private:
     std::string className;
-    JavaClassBuilder *builder;
-    std::map<std::string, JavaFunction *> funcMap;
+    std::shared_ptr<JavaClassBuilder> builder;
+    std::map<std::string, std::shared_ptr<JavaFunction>> funcMap;
     
     int aCount = 1;
     std::map<std::string, int> objMap;

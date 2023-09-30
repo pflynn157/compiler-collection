@@ -9,6 +9,7 @@
 #include <arpa/inet.h>
 #include <map>
 #include <vector>
+#include <memory>
 
 #include <Java/JavaIR.hpp>
 
@@ -35,36 +36,36 @@ public:
     void ImportField(std::string baseClass, std::string typeClass, std::string name);
     int FindMethod(std::string name, std::string baseClass, std::string signature);
 
-    JavaFunction *CreateMethod(std::string name, std::string signature, int = F_PUBLIC);
-    void CreateALoad(JavaFunction *func, int pos);
-    void CreateAStore(JavaFunction *func, int pos);
-    void CreateNew(JavaFunction *func, std::string name);
-    void CreateDup(JavaFunction *func);
-    void CreateGetStatic(JavaFunction *func, std::string name);
-    void CreateString(JavaFunction *func, std::string value);
-    void CreateInvokeSpecial(JavaFunction *func, std::string name, std::string baseClass = "", std::string signature = "");
-    void CreateInvokeVirtual(JavaFunction *func, std::string name, std::string baseClass = "", std::string signature = "");
-    void CreateInvokeStatic(JavaFunction *func, std::string name, std::string baseClass = "", std::string signature = "");
-    void CreateRetVoid(JavaFunction *func);
+    std::shared_ptr<JavaFunction> CreateMethod(std::string name, std::string signature, int = F_PUBLIC);
+    void CreateALoad(std::shared_ptr<JavaFunction> func, int pos);
+    void CreateAStore(std::shared_ptr<JavaFunction> func, int pos);
+    void CreateNew(std::shared_ptr<JavaFunction> func, std::string name);
+    void CreateDup(std::shared_ptr<JavaFunction> func);
+    void CreateGetStatic(std::shared_ptr<JavaFunction> func, std::string name);
+    void CreateString(std::shared_ptr<JavaFunction> func, std::string value);
+    void CreateInvokeSpecial(std::shared_ptr<JavaFunction> func, std::string name, std::string baseClass = "", std::string signature = "");
+    void CreateInvokeVirtual(std::shared_ptr<JavaFunction> func, std::string name, std::string baseClass = "", std::string signature = "");
+    void CreateInvokeStatic(std::shared_ptr<JavaFunction> func, std::string name, std::string baseClass = "", std::string signature = "");
+    void CreateRetVoid(std::shared_ptr<JavaFunction> func);
     
     // Integer instructions
-    void CreateBIPush(JavaFunction *func, int value);
-    void CreateILoad(JavaFunction *func, int value);
-    void CreateIStore(JavaFunction *func, int value);
-    void CreateIAdd(JavaFunction *func);
-    void CreateISub(JavaFunction *func);
-    void CreateIMul(JavaFunction *func);
-    void CreateIDiv(JavaFunction *func);
-    void CreateIRem(JavaFunction *func);
-    void CreateIAnd(JavaFunction *func);
-    void CreateIOr(JavaFunction *func);
-    void CreateIXor(JavaFunction *func);
-    void CreateIShl(JavaFunction *func);
-    void CreateIShr(JavaFunction *func);
+    void CreateBIPush(std::shared_ptr<JavaFunction> func, int value);
+    void CreateILoad(std::shared_ptr<JavaFunction> func, int value);
+    void CreateIStore(std::shared_ptr<JavaFunction> func, int value);
+    void CreateIAdd(std::shared_ptr<JavaFunction> func);
+    void CreateISub(std::shared_ptr<JavaFunction> func);
+    void CreateIMul(std::shared_ptr<JavaFunction> func);
+    void CreateIDiv(std::shared_ptr<JavaFunction> func);
+    void CreateIRem(std::shared_ptr<JavaFunction> func);
+    void CreateIAnd(std::shared_ptr<JavaFunction> func);
+    void CreateIOr(std::shared_ptr<JavaFunction> func);
+    void CreateIXor(std::shared_ptr<JavaFunction> func);
+    void CreateIShl(std::shared_ptr<JavaFunction> func);
+    void CreateIShr(std::shared_ptr<JavaFunction> func);
 
     void Write(FILE *file);
 private:
-    JavaClassFile *java;
+    std::shared_ptr<JavaClassFile> java;
     std::string className;
     int codeIdx = 0;
     int superPos = 0;

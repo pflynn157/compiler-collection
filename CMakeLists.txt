@@ -38,3 +38,22 @@ add_subdirectory(sal-lang)
 #add_subdirectory(espresso-lang)
 add_subdirectory(test)
 
+##
+## These are temporary options until we get our new languages
+## fully integrated into the compiler collection
+##
+option(LIBJAVA "Build libjava" OFF)
+if (LIBJAVA)
+    add_subdirectory(java)
+endif()
+
+option(ESPRESSO "Build Espresso Language" OFF)
+if (ESPRESSO)
+    add_subdirectory(espresso-lang)
+endif()
+
+option(ORKA "Build Orka language" OFF)
+if (ORKA)
+    add_subdirectory(orka-lang)
+endif()
+

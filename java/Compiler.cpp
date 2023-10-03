@@ -36,9 +36,9 @@ void Compiler::Build(std::shared_ptr<AstTree> tree) {
     
     // Now the code
     for (auto GS : tree->block->block) {
-        if (GS->type == AstType::Func) {
+        if (GS->type == V_AstType::Func) {
             auto funcAst = std::static_pointer_cast<AstFunction>(GS);
-            std::shared_ptr<JavaFunction> func = funcMap[funcAst->getName()];
+            std::shared_ptr<JavaFunction> func = funcMap[funcAst->name];
             
             for (auto const &stmt : funcAst->block->block) {
                 BuildStatement(stmt, func);
@@ -57,7 +57,7 @@ void Compiler::Write() {
 
 // Builds a function
 void Compiler::BuildFunction(std::shared_ptr<AstStatement> GS) {
-    a/*uto func = std::static_pointer_cast<AstFunction>(GS);
+    /*auto func = std::static_pointer_cast<AstFunction>(GS);
     
     int flags = 0;
     if (func->isRoutine()) flags |= F_STATIC;

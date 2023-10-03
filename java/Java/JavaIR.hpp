@@ -10,6 +10,7 @@
 #include <iostream>
 #include <cstdio>
 #include <arpa/inet.h>
+#include <memory>
 
 enum JavaConstTag {
     UTF8 = 0x01,
@@ -195,7 +196,7 @@ struct JavaClassFile {
     unsigned short minor_version = 0;
     unsigned short major_version = htons(0x0034);
 
-    std::vector<JavaConstEntry *> const_pool;
+    std::vector<std::shared_ptr<JavaConstEntry>> const_pool;
 
     unsigned short modifiers = htons(0x0021);
     unsigned short this_idx = 0;
@@ -203,10 +204,10 @@ struct JavaClassFile {
 
     unsigned short interface_count = 0;
     unsigned short field_count = 0;
-    std::vector<JavaFunction *> methods;
+    std::vector<std::shared_ptr<JavaFunction>> methods;
     unsigned short attr_count = 0;
 
-    int AddConst(JavaConstEntry *entry) {
+    int AddConst(std::shared_ptr<JavaConstEntry> entry) {
         const_pool.push_back(entry);
         return const_pool.size();
     }
@@ -231,8 +232,9 @@ struct JavaClassFile {
 
         unsigned short func_count = htons(methods.size());
         fwrite(&func_count, sizeof(short), 1, file);
-        for (JavaFunction *func : methods) func->write(file);
+        for (auto const &func : methods) func->write(file);
 
         fwrite(&attr_count, sizeof(short), 1, file);
     }
 };
+

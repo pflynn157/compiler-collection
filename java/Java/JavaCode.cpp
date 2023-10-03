@@ -11,15 +11,15 @@ std::shared_ptr<JavaFunction> JavaClassBuilder::CreateMethod(std::string name, s
     int nameIdx = AddUTF8(name);
     int sigIdx = AddUTF8(signature);
 
-    auto func = std::make_shared<JavaFunction>(flags, nameIdx, sigIdx, codeIdx);
+    std::shared_ptr<JavaFunction> func = std::make_shared<JavaFunction>(flags, nameIdx, sigIdx, codeIdx);
     java->methods.push_back(func);
 
     // Create a name and type entry
-    auto JavaNameTypeEntry nt = std::make_shared<JavaNameTypeEntry>(nameIdx, sigIdx);
+    std::shared_ptr<JavaNameTypeEntry> nt = std::make_shared<JavaNameTypeEntry>(nameIdx, sigIdx);
     int ntPos = java->AddConst(nt);
 
     // Create a method-ref entry
-    auto method = std::make_shared<JavaMethodRefEntry>(superPos, ntPos);
+    std::shared_ptr<JavaMethodRefEntry> method = std::make_shared<JavaMethodRefEntry>(superPos, ntPos);
     int methodPos = java->AddConst(method);
 
     //methodMap[name] = methodPos;
@@ -84,7 +84,7 @@ void JavaClassBuilder::CreateString(std::shared_ptr<JavaFunction> func, std::str
 
     if (constMap.find(value) == constMap.end()) {
         constPos = AddUTF8(value);
-        auto entry = new JavaStringEntry(constPos);
+        auto entry = std::make_shared<JavaStringEntry>(constPos);
         constPos = java->AddConst(entry);
 
         constMap[value] = constPos;

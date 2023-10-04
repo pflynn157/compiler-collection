@@ -43,5 +43,6 @@ add_custom_target(test DEPENDS
     test_llir
     test_libllir
     test_toolchain
+    test_espresso
 )
 

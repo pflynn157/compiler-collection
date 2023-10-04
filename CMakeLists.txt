@@ -36,18 +36,13 @@ add_subdirectory(java)
 add_subdirectory(tiny-lang)
 add_subdirectory(sal-lang)
 #add_subdirectory(orka-lang)
-#add_subdirectory(espresso-lang)
+add_subdirectory(espresso-lang)
 add_subdirectory(test)
 
 ##
 ## These are temporary options until we get our new languages
 ## fully integrated into the compiler collection
 ##
-option(ESPRESSO "Build Espresso Language" OFF)
-if (ESPRESSO)
-    add_subdirectory(espresso-lang)
-endif()
-
 option(ORKA "Build Orka language" OFF)
 if (ORKA)
     add_subdirectory(orka-lang)

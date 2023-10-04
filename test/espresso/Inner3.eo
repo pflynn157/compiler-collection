@@ -22,6 +22,6 @@ private func sayHello3 is
 end
 
 routine main(args : str[]) is
-    var clazz : first;
+    var clazz : Inner3;
     clazz.sayHello();
 end

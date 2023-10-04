@@ -48,8 +48,8 @@ std::shared_ptr<AstStructType> buildStructType(std::string name) {
     return std::make_shared<AstStructType>(name);
 }
 
-std::shared_ptr<AstObjectType> buildObjectType() {
-    return std::make_shared<AstObjectType>();
+std::shared_ptr<AstObjectType> buildObjectType(std::string name) {
+    return std::make_shared<AstObjectType>(name);
 }
 
 } // End AstBuilder

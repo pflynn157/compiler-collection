@@ -146,8 +146,10 @@ struct AstStructType : AstDataType {
 
 // Represents an object type
 struct AstObjectType : AstDataType {
-    explicit AstObjectType();
+    explicit AstObjectType(std::string name);
     void print() override;
+    
+    std::string name = "";
 };
 
 // Var

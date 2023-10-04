@@ -7,12 +7,6 @@
 
 #RET 0
 
-public func sayHello is
-    println("Hello!");
-    this.sayHello2();
-    this.sayHello3();
-end
-
 protected func sayHello2 is
     println("Protected: Hello!!!");
 end
@@ -21,7 +15,13 @@ private func sayHello3 is
     println("Private: Hello!!!");
 end
 
+public func sayHello is
+    println("Hello!");
+    this.sayHello2();
+    this.sayHello3();
+end
+
 routine main(args : str[]) is
-    var clazz : first;
+    var clazz : Inner2;
     clazz.sayHello();
 end

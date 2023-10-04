@@ -20,7 +20,7 @@ std::shared_ptr<AstDataType> buildInt64Type(bool isUnsigned = false);
 std::shared_ptr<AstDataType> buildStringType();
 std::shared_ptr<AstPointerType> buildPointerType(std::shared_ptr<AstDataType> base);
 std::shared_ptr<AstStructType> buildStructType(std::string name);
-std::shared_ptr<AstObjectType> buildObjectType();
+std::shared_ptr<AstObjectType> buildObjectType(std::string name);
 
 }
 

@@ -173,6 +173,8 @@ void Compiler::BuildFuncCallStatement(std::shared_ptr<AstStatement> stmt, std::s
 
 // Builds an expression
 void Compiler::BuildExpr(std::shared_ptr<AstExpression> expr, std::shared_ptr<JavaFunction> function, std::shared_ptr<AstDataType> dataType) {
+    if (expr == nullptr) return;
+
     switch (expr->type) {
         case V_AstType::I32L: {
             std::shared_ptr<AstI32> i = std::static_pointer_cast<AstI32>(expr);
@@ -247,6 +249,8 @@ void Compiler::BuildExpr(std::shared_ptr<AstExpression> expr, std::shared_ptr<Ja
 
 // Returns a type value for an expression
 std::string Compiler::GetTypeForExpr(std::shared_ptr<AstExpression> expr) {
+    if (expr == nullptr) return "";
+
     switch (expr->type) {
         case V_AstType::I32L: return "I";
         case V_AstType::StringL: return "Ljava/lang/String;";

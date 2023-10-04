@@ -1,9 +1,8 @@
 set(EO_TEST_SRC
     test1
-)
-
-set(EO_CORE_TEST_SRC
-    test1
+    Inner
+    Inner2
+    Inner3
 )
 
 ## LLVM testing

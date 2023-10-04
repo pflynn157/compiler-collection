@@ -63,7 +63,7 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
         case Str: dataType = AstBuilder::buildStringType(); break;
         
         default: {
-            dataType = AstBuilder::buildObjectType();
+            dataType = AstBuilder::buildObjectType(token.id_val);
             className = token.id_val;
         }
     }

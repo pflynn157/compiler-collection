@@ -181,7 +181,8 @@ bool Parser::buildFunction(std::shared_ptr<AstBlock> block, Token startToken) {
         }
     } else {
         if (func->data_type->type == V_AstType::Void) {
-            func->addStatement(std::make_shared<AstReturnStmt>());
+            std::shared_ptr<AstReturnStmt> ret = std::make_shared<AstReturnStmt>();
+            func->addStatement(ret);
         } else {
             syntax->addError(scanner->getLine(), "Expected return statement.");
             return false;
@@ -201,8 +202,7 @@ bool Parser::buildFunctionCallStmt(std::shared_ptr<AstBlock> block, Token idToke
     }
     
     std::shared_ptr<AstExpression> expr = buildExpression(block, nullptr, RParen, Comma);
-    if (!expr) return false;
-    fc->expression = expr;
+    if (expr) fc->expression = expr;
     
     Token token = scanner->getNext();
     if (token.type != SemiColon) {

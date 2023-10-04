@@ -45,7 +45,7 @@ void AstStructType::print() {
 }
 
 void AstObjectType::print() {
-    std::cout << "object()";
+    std::cout << "object(" << name << ")";
 }
 
 //
@@ -139,8 +139,13 @@ void AstExprStatement::print() {
 }
 
 void AstFuncCallStmt::print() {
-    std::cout << "FC " << name;
-    expression->print();
+    std::cout << "FC ";
+    if (object_name != "") {
+        std::cout << object_name << ".";
+    }
+    std::cout << name;
+    if (expression) expression->print();
+    else std::cout << "()";
     std::cout << std::endl;
 }
 

@@ -1,0 +1,15 @@
+
+#OUTPUT
+#Hello!
+#END
+
+#RET 0
+
+public func sayHello is
+    println("Hello!");
+end
+
+routine main(args : str[]) is
+    var clazz : Inner;
+    clazz.sayHello();
+end

@@ -36,7 +36,9 @@ AstStructType::AstStructType(std::string name) : AstDataType(V_AstType::Struct) 
 //
 // AstObjectType
 //
-AstObjectType::AstObjectType() : AstDataType(V_AstType::Object) {}
+AstObjectType::AstObjectType(std::string name) : AstDataType(V_AstType::Object) {
+    this->name = name;
+}
 
 //
 // Var

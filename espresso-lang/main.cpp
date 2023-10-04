@@ -6,11 +6,12 @@
 #include <iostream>
 #include <string>
 #include <cstdio>
+#include <memory>
 
 #include <parser/Parser.hpp>
-#include <ast.hpp>
+#include <ast/ast.hpp>
 
-#include <Compiler.hpp>
+#include <JavaCompiler.hpp>
 
 int main(int argc, char **argv) {
     if (argc == 1) {
@@ -41,8 +42,8 @@ int main(int argc, char **argv) {
         }
     }
     
-    Parser *frontend = new Parser(input);
-    AstTree *tree;
+    std::unique_ptr<Parser> frontend = std::make_unique<Parser>(input);
+    std::shared_ptr<AstTree> tree;
     
     if (testLex) {
         frontend->debugScanner();
@@ -50,13 +51,10 @@ int main(int argc, char **argv) {
     }
     
     if (!frontend->parse()) {
-        delete frontend;
         return 1;
     }
     
     tree = frontend->getTree();
-    
-    delete frontend;
     
     if (printAst) {
         tree->print();
@@ -67,7 +65,7 @@ int main(int argc, char **argv) {
     std::string className = GetClassName(input);
     std::cout << "Output: " << className << ".class" << std::endl;
     
-    Compiler *compiler = new Compiler(className);
+    std::unique_ptr<Compiler> compiler = std::make_unique<Compiler>(className);
     compiler->Build(tree);
     compiler->Write();
     

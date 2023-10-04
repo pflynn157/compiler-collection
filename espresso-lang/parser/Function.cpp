@@ -4,12 +4,14 @@
 // Espresso is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <iostream>
+#include <memory>
 
 #include <parser/Parser.hpp>
-#include <ast.hpp>
+#include <ast/ast.hpp>
+#include <ast/ast_builder.cpp>
 
 // Returns the function arguments
-bool Parser::getFunctionArgs(std::vector<Var> &args) {
+bool Parser::getFunctionArgs(std::vector<Var> &args, std::shared_ptr<AstBlock> block) {
     Token token = scanner->getNext();
     if (token.type == LParen) {
         token = scanner->getNext();
@@ -18,7 +20,6 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
             Token t2 = scanner->getNext();
             Token t3 = scanner->getNext();
             Var v;
-            v.subType = DataType::Void;
             
             if (t1.type != Id) {
                 syntax->addError(scanner->getLine(), "Invalid function argument: Expected name.");
@@ -31,17 +32,17 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
             }
             
             switch (t3.type) {
-                case Bool: v.type = DataType::Bool; break;
-                case Char: v.type = DataType::Char; break;
-                case Byte: v.type = DataType::Byte; break;
-                case UByte: v.type = DataType::UByte; break;
-                case Short: v.type = DataType::Short; break;
-                case UShort: v.type = DataType::UShort; break;
-                case Int: v.type = DataType::Int32; break;
-                case UInt: v.type = DataType::UInt32; break;
-                case Int64: v.type = DataType::Int64; break;
-                case UInt64: v.type = DataType::UInt64; break;
-                case Str: v.type = DataType::String; break;
+                case Bool: v.type = AstBuilder::buildVoidType(); break;
+                case Char: v.type = AstBuilder::buildCharType(); break;
+                case Byte: v.type = AstBuilder::buildInt8Type(); break;
+                case UByte: v.type = AstBuilder::buildInt8Type(true); break;
+                case Short: v.type = AstBuilder::buildInt16Type(); break;
+                case UShort: v.type = AstBuilder::buildInt16Type(true); break;
+                case Int: v.type = AstBuilder::buildInt32Type(); break;
+                case UInt: v.type = AstBuilder::buildInt32Type(true); break;
+                case Int64: v.type = AstBuilder::buildInt64Type(); break;
+                case UInt64: v.type = AstBuilder::buildInt64Type(true); break;
+                case Str: v.type = AstBuilder::buildStringType(); break;
                 
                 default: {
                     syntax->addError(scanner->getLine(), "Invalid function argument: Unknown type.");
@@ -54,7 +55,7 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
             token = scanner->getNext();
             if (token.type == Comma) {
                 token = scanner->getNext();
-            } else if (token.type == LBracket) {
+            } /*else if (token.type == LBracket) {
                 Token token1 = scanner->getNext();
                 Token token2 = scanner->getNext();
                 
@@ -68,10 +69,11 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
                 
                 v.subType = v.type;
                 v.type = DataType::Array;
-            }
+            }*/
             
             args.push_back(v);
-            typeMap[v.name] = std::pair<DataType, DataType>(v.type, v.subType);
+            //typeMap[v.name] = std::pair<DataType, DataType>(v.type, v.subType);
+            block->symbolTable[v.name] = v.type;
         }
     } else {
         scanner->rewind(token);
@@ -81,10 +83,7 @@ bool Parser::getFunctionArgs(std::vector<Var> &args) {
 }
 
 // Builds a function
-bool Parser::buildFunction(Token startToken) {
-    typeMap.clear();
-    localConsts.clear();
-    
+bool Parser::buildFunction(std::shared_ptr<AstBlock> block, Token startToken) {
     bool isRoutine = false;
     Attr visible = Attr::Public;
     bool attrMod = false;
@@ -124,21 +123,20 @@ bool Parser::buildFunction(Token startToken) {
     
     // Get arguments
     std::vector<Var> args;
-    if (!getFunctionArgs(args)) return false;
+    if (!getFunctionArgs(args, block)) return false;
 
     // Check to see if there's any return type
     token = scanner->getNext();
-    DataType funcType = DataType::Void;
-    DataType ptrType = DataType::Void;
+    std::shared_ptr<AstDataType> data_type;
     
     if (token.type == Arrow) {
         token = scanner->getNext();
         switch (token.type) {
-            case Int: funcType = DataType::Int32; break;
+            case Int: data_type = AstBuilder::buildInt32Type(); break;
             default: {}
         }
     
-        token = scanner->getNext();
+        /*token = scanner->getNext();
         if (token.type == LBracket) {
             token = scanner->getNext();
             if (token.type != RBracket) {
@@ -150,7 +148,7 @@ bool Parser::buildFunction(Token startToken) {
             funcType = DataType::Array;
             
             token = scanner->getNext();
-        }
+        }*/
     }
     
     // Do syntax error check
@@ -160,28 +158,30 @@ bool Parser::buildFunction(Token startToken) {
     }
 
     // Create the function object
-    AstFunction *func = new AstFunction(funcName, isRoutine, visible);
-    func->setDataType(funcType, ptrType);
-    func->setArguments(args);
-    tree->addGlobalStatement(func);
+    std::shared_ptr<AstFunction> func = std::make_shared<AstFunction>(funcName);
+    func->data_type = data_type;
+    func->args = args;
+    func->routine = isRoutine;
+    func->attr = visible;
+    tree->block->addStatement(func);
     
     // Build the body
-    if (!buildBlock(func->getBlock())) return false;
+    if (!buildBlock(func->block)) return false;
     
     // Make sure we end with a return statement
-    AstType lastType = func->getBlock()->getBlock().back()->getType();
-    if (lastType == AstType::Return) {
-        AstStatement *ret = func->getBlock()->getBlock().back();
-        if (func->getDataType() == DataType::Void && ret->getExpressionCount() > 0) {
+    V_AstType lastType = func->block->block.back()->type;
+    if (lastType == V_AstType::Return) {
+        std::shared_ptr<AstStatement> ret = func->block->block.back();
+        if (func->data_type->type == V_AstType::Void && ret->hasExpression()) {
             syntax->addError(scanner->getLine(), "Cannot return from void function.");
             return false;
-        } else if (ret->getExpressionCount() == 0) {
+        } else if (!ret->hasExpression()) {
             syntax->addError(scanner->getLine(), "Expected return value.");
             return false;
         }
     } else {
-        if (func->getDataType() == DataType::Void) {
-            func->addStatement(new AstReturnStmt);
+        if (func->data_type->type == V_AstType::Void) {
+            func->addStatement(std::make_shared<AstReturnStmt>());
         } else {
             syntax->addError(scanner->getLine(), "Expected return statement.");
             return false;
@@ -192,15 +192,17 @@ bool Parser::buildFunction(Token startToken) {
 }
 
 // Builds a function call
-bool Parser::buildFunctionCallStmt(AstBlock *block, Token idToken, Token varToken) {
-    AstFuncCallStmt *fc = new AstFuncCallStmt(idToken.id_val);
+bool Parser::buildFunctionCallStmt(std::shared_ptr<AstBlock> block, Token idToken, Token varToken) {
+    std::shared_ptr<AstFuncCallStmt> fc = std::make_shared<AstFuncCallStmt>(idToken.id_val);
     block->addStatement(fc);
     
     if (varToken.type == Id) {
-        fc->setObjectName(varToken.id_val);
+        fc->object_name = varToken.id_val;
     }
     
-    if (!buildExpression(fc, DataType::Void, RParen, Comma)) return false;
+    std::shared_ptr<AstExpression> expr = buildExpression(block, nullptr, RParen, Comma);
+    if (!expr) return false;
+    fc->expression = expr;
     
     Token token = scanner->getNext();
     if (token.type != SemiColon) {
@@ -213,11 +215,12 @@ bool Parser::buildFunctionCallStmt(AstBlock *block, Token idToken, Token varToke
 }
 
 // Builds a return statement
-bool Parser::buildReturn(AstBlock *block) {
-    AstReturnStmt *stmt = new AstReturnStmt;
+bool Parser::buildReturn(std::shared_ptr<AstBlock> block) {
+    std::shared_ptr<AstReturnStmt> stmt = std::make_shared<AstReturnStmt>();
     block->addStatement(stmt);
     
-    if (!buildExpression(stmt, DataType::Void)) return false;
+    stmt->expression = buildExpression(block, nullptr);
+    if (!stmt->expression) return false;
     
     return true;
 }

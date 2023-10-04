@@ -7,6 +7,7 @@ add_compile_options(-std=c++17 -g)
 
 include_directories(compiler)
 include_directories(llir/src)
+include_directories(java)
 include_directories(.)
 
 include_directories(${LLVM_INCLUDE_DIRS})
@@ -29,7 +30,7 @@ add_subdirectory(libelf)
 add_subdirectory(as)
 add_subdirectory(llir)
 add_subdirectory(compiler)
-#add_subdirectory(java)
+add_subdirectory(java)
 
 # Build the core compiler
 add_subdirectory(tiny-lang)
@@ -42,11 +43,6 @@ add_subdirectory(test)
 ## These are temporary options until we get our new languages
 ## fully integrated into the compiler collection
 ##
-option(LIBJAVA "Build libjava" OFF)
-if (LIBJAVA)
-    add_subdirectory(java)
-endif()
-
 option(ESPRESSO "Build Espresso Language" OFF)
 if (ESPRESSO)
     add_subdirectory(espresso-lang)

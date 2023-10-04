@@ -7,8 +7,8 @@ set(SRC
     Java/JavaWriter.cpp
     Java/JavaCode.cpp
     
-    Compiler.cpp
-    Utils.cpp
+    JavaCompiler.cpp
+    JavaUtils.cpp
 )
 
 add_library(coffee-maker STATIC ${SRC})

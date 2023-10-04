@@ -89,6 +89,15 @@ enum class V_AstType {
     Struct
 };
 
+//
+// Attributes needed by some languages
+//
+enum class Attr {
+    Public,
+    Protected,
+    Private
+};
+
 // Forward declarations
 struct AstExpression;
 struct AstStatement;
@@ -652,6 +661,10 @@ struct AstFunction : AstStatement {
     std::shared_ptr<AstBlock> block;
     std::shared_ptr<AstDataType> data_type;
     std::string dtName = "";
+    
+    // These attributes are language specific
+    Attr attr = Attr::Public;
+    bool routine = false;
 };
 
 // Represents an AST expression statement
@@ -682,6 +695,9 @@ struct AstFuncCallStmt : AstStatement {
     std::string dot(std::string parent) override;
     
     std::string name = "";
+    
+    // Language-specific attributes
+    std::string object_name = "";
 };
 
 // Represents a return statement

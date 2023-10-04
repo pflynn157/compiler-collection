@@ -7,7 +7,7 @@
 #include <iostream>
 #include <memory>
 
-#include <Compiler.hpp>
+#include <JavaCompiler.hpp>
 
 Compiler::Compiler(std::string className) {
     this->className = className;

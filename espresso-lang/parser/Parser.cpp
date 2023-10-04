@@ -4,20 +4,12 @@
 // Espresso is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <iostream>
+#include <memory>
 
 #include <parser/Parser.hpp>
 
-Parser::Parser(std::string input) {
-    this->input = input;
-    scanner = new Scanner(input);
-    
-    tree = new AstTree(input);
-    syntax = new ErrorManager;
-}
-
-Parser::~Parser() {
-    delete scanner;
-    delete syntax;
+Parser::Parser(std::string input) : BaseParser(input) {
+    scanner = std::make_unique<Scanner>(input);
 }
 
 bool Parser::parse() {
@@ -462,57 +454,3 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
     return true;
 }
 
-// This is meant mainly for literals; it checks to make sure all the types in
-// the expression agree in type. LLVM will have a problem if not
-AstExpression *Parser::checkExpression(AstExpression *expr, DataType varType) {
-    switch (expr->getType()) {
-        case AstType::IntL: {
-            // Change to byte literals
-            if (varType == DataType::Byte || varType == DataType::UByte) {
-                AstInt *i32 = static_cast<AstInt *>(expr);
-                AstByte *byte = new AstByte(i32->getValue());
-                expr = byte;
-                
-            // Change to word literals
-            } else if (varType == DataType::Short || varType == DataType::UShort) {
-                AstInt *i32 = static_cast<AstInt *>(expr);
-                AstWord *i16 = new AstWord(i32->getValue());
-                expr = i16;
-                
-            // Change to qword literals
-            } else if (varType == DataType::Int64 || varType == DataType::UInt64) {
-                AstInt *i32 = static_cast<AstInt *>(expr);
-                AstQWord *i64 = new AstQWord(i32->getValue());
-                expr = i64;
-            }
-        } break;
-            
-        default: {}
-    }
-    
-    return expr;
-}
-
-// The debug function for the scanner
-void Parser::debugScanner() {
-    std::cout << "Debugging scanner..." << std::endl;
-    
-    Token t;
-    do {
-        t = scanner->getNext();
-        t.print();
-    } while (t.type != Eof);
-}
-
-// Checks to see if a string is a constant
-int Parser::isConstant(std::string name) {
-    if (globalConsts.find(name) != globalConsts.end()) {
-        return 1;
-    }
-    
-    if (localConsts.find(name) != localConsts.end()) {
-        return 2;
-    }
-    
-    return 0;
-}

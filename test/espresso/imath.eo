@@ -1,0 +1,28 @@
+
+#OUTPUT
+#20
+#30
+#10
+#200
+#2
+#0
+#END
+
+#RET 0
+
+routine main(args : str[]) is
+    var x : int := 20;
+    var y1 : int := x + 10;
+    var y2 : int := x - 10;
+    var y3 : int := x * 10;
+    var y4 : int := x / 10;
+    var y5 : int := x % 10;
+    
+    println(x);
+    println(y1);
+    println(y2);
+    println(y3);
+    println(y4);
+    println(y5);
+end
+

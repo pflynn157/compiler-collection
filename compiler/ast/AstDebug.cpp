@@ -131,6 +131,7 @@ void AstStruct::print() {
 
 void AstExprStatement::print() {
     std::cout << "EXPR ";
+    if (name != "") std::cout << "N:" << name << " ";
     if (dataType) dataType->print();
     
     std::cout << " ";

@@ -45,7 +45,7 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
     }
     
     token = scanner->getNext();
-    std::shared_ptr<AstDataType> dataType;
+    std::shared_ptr<AstDataType> dataType = AstBuilder::buildVoidType();
     bool isString = false;
     std::string className = "";
     
@@ -145,6 +145,7 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
             block->symbolTable[name] = dataType;
     
             std::shared_ptr<AstExprStatement> va = std::make_shared<AstExprStatement>();
+            va->name = name;
             va->dataType = dataType;
             va->expression = empty->expression;
             block->addStatement(va);
@@ -158,6 +159,7 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
 bool Parser::buildVariableAssign(std::shared_ptr<AstBlock> block, Token idToken) {
     std::shared_ptr<AstDataType> dataType = block->symbolTable[idToken.id_val];
     std::shared_ptr<AstExprStatement> va = std::make_shared<AstExprStatement>();
+    va->name = idToken.id_val;
     va->dataType = dataType;
     block->addStatement(va);
     

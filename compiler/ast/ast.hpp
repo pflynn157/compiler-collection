@@ -693,6 +693,7 @@ struct AstExprStatement : AstStatement {
     std::shared_ptr<AstDataType> dataType;
     
     // Language-specific attributes
+    // TODO: I would like to eventually get rid of this
     std::string name = "";
 };
 

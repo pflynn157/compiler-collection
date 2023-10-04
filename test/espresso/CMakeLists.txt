@@ -3,6 +3,7 @@ set(EO_TEST_SRC
     Inner
     Inner2
     Inner3
+    imath
 )
 
 ## LLVM testing

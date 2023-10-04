@@ -210,7 +210,7 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
                 }
             
                 std::string name = token.id_val;
-                if (varType->type == V_AstType::Void) {
+                if (varType == nullptr || varType->type == V_AstType::Void) {
                     varType = block->symbolTable[name];
                 }
                 

@@ -188,7 +188,9 @@ void Compiler::BuildExpr(std::shared_ptr<AstExpression> expr, std::shared_ptr<Ja
         
         case V_AstType::ID: {
             std::shared_ptr<AstID> id = std::static_pointer_cast<AstID>(expr);
-            switch (dataType->type) {
+            int pos = intMap[id->value];
+            builder->CreateILoad(function, pos);
+            /*switch (dataType->type) {
                 case V_AstType::Int32: {
                     int pos = intMap[id->value];
                     builder->CreateILoad(function, pos);
@@ -200,7 +202,7 @@ void Compiler::BuildExpr(std::shared_ptr<AstExpression> expr, std::shared_ptr<Ja
                         builder->CreateILoad(function, pos);
                     }
                 }
-            }
+            }*/
         } break;
         
         case V_AstType::Add: 

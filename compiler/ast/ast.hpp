@@ -689,6 +689,9 @@ struct AstExprStatement : AstStatement {
     std::string dot(std::string parent) override;
     
     std::shared_ptr<AstDataType> dataType;
+    
+    // Language-specific attributes
+    std::string name = "";
 };
 
 // Represents a function call statement

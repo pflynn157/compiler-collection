@@ -57,12 +57,12 @@ void Compiler::Write() {
 
 // Builds a function
 void Compiler::BuildFunction(std::shared_ptr<AstStatement> GS) {
-    /*auto func = std::static_pointer_cast<AstFunction>(GS);
+    auto func = std::static_pointer_cast<AstFunction>(GS);
     
     int flags = 0;
-    if (func->isRoutine()) flags |= F_STATIC;
+    if (func->routine) flags |= F_STATIC;
     
-    switch (func->getAttribute()) {
+    switch (func->attr) {
         case Attr::Public: flags |= F_PUBLIC; break;
         case Attr::Protected: flags |= F_PROTECTED; break;
         case Attr::Private: flags |= F_PRIVATE; break;
@@ -72,19 +72,19 @@ void Compiler::BuildFunction(std::shared_ptr<AstStatement> GS) {
     if (func->name == "main") signature = "([Ljava/lang/String;)V";
     
     std::shared_ptr<JavaFunction> function = builder->CreateMethod(func->name, signature, flags);
-    funcMap[func->name] = function;*/
+    funcMap[func->name] = function;
 }
 
 // Builds a statement
 void Compiler::BuildStatement(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function) {
-    /*switch (stmt->type) {
+    switch (stmt->type) {
         case V_AstType::VarDec: BuildVarDec(stmt, function); break;
-        case V_AstType::VarAssign: BuildVarAssign(stmt, function); break;
+        case V_AstType::ExprStmt: BuildVarAssign(stmt, function); break;
     
         case V_AstType::FuncCallStmt: BuildFuncCallStatement(stmt, function); break;
     
         case V_AstType::Return: {
-            if (stmt->getExpressionCount() == 0) {
+            if (!stmt->hasExpression()) {
                 builder->CreateRetVoid(function);
             } else {
                 // TODO
@@ -92,54 +92,54 @@ void Compiler::BuildStatement(std::shared_ptr<AstStatement> stmt, std::shared_pt
         } break;
         
         default: {}
-    }*/
+    }
 }
 
 // Builds a variable declaration
 void Compiler::BuildVarDec(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function) {
-    /*auto vd = std::static_pointer_cast<AstVarDec>(stmt);
+    auto vd = std::static_pointer_cast<AstVarDec>(stmt);
     
-    switch (vd->getDataType()) {
-        case DataType::Int32: {
-            intMap[vd->getName()] = iCount;
+    switch (vd->data_type->type) {
+        case V_AstType::Int32: {
+            intMap[vd->name] = iCount;
             ++iCount;
         } break;
     
-        case DataType::Object: {
-            objMap[vd->getName()] = aCount;
+        case V_AstType::Object: {
+            objMap[vd->name] = aCount;
             ++aCount;
             
-            objTypeMap[vd->getName()] = vd->getClassName();
+            objTypeMap[vd->name] = vd->class_name;
             
-            builder->CreateNew(function, vd->getClassName());
+            builder->CreateNew(function, vd->class_name);
             builder->CreateDup(function);
-            builder->CreateInvokeSpecial(function, "<init>", vd->getClassName());
+            builder->CreateInvokeSpecial(function, "<init>", vd->class_name);
             builder->CreateAStore(function, aCount - 1);
         } break;
         
         default: {}
-    }*/
+    }
 }
 
 // Builds a variable assignment
 void Compiler::BuildVarAssign(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function) {
-    /*AstVarAssign *va = static_cast<AstVarAssign *>(stmt);
+    std::shared_ptr<AstExprStatement> va = std::static_pointer_cast<AstExprStatement>(stmt);
     
-    BuildExpr(va->getExpression(), function, va->getDataType());
+    BuildExpr(va->expression, function, va->dataType);
     
-    switch (va->getDataType()) {
-        case DataType::Int32: {
-            int iPos = intMap[va->getName()];
+    switch (va->dataType->type) {
+        case V_AstType::Int32: {
+            int iPos = intMap[va->name];
             builder->CreateIStore(function, iPos);
         } break;
         
         default: {}
-    }*/
+    }
 }
 
 // Builds a function call statement
 void Compiler::BuildFuncCallStatement(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function) {
-    /*auto fc = std::static_pointer_cast<AstFuncCallStmt>(stmt);
+    auto fc = std::static_pointer_cast<AstFuncCallStmt>(stmt);
     
     if (fc->name == "println") {
         builder->CreateGetStatic(function, "out");
@@ -148,115 +148,119 @@ void Compiler::BuildFuncCallStatement(std::shared_ptr<AstStatement> stmt, std::s
     std::string signature = "";
     std::string baseClass = "";
     
-    if (fc->getObjectName() == "this") {
+    if (fc->object_name == "this") {
         baseClass = "this";
         builder->CreateALoad(function, 0);
-    } else if (fc->getObjectName() != "") {
-        baseClass = objTypeMap[fc->getObjectName()];
+    } else if (fc->object_name != "") {
+        baseClass = objTypeMap[fc->object_name];
         //if (baseClass == className) baseClass = "";
         
-        int pos = objMap[fc->getObjectName()];
+        int pos = objMap[fc->object_name];
         builder->CreateALoad(function, pos);
     }
     
-    for (AstExpression *expr : fc->getExpressions()) {
+    /*auto list = std::static_pointer_cast<AstExprList>(fc->expression);
+    for (auto const &expr : list->list) {
         signature = GetTypeForExpr(expr);
         BuildExpr(expr, function);
-    }
+    }*/
+    signature = GetTypeForExpr(fc->expression);
+    BuildExpr(fc->expression, function);
     
     signature = "(" + signature + ")V";
-    builder->CreateInvokeVirtual(function, fc->getName(), baseClass, signature);*/
+    builder->CreateInvokeVirtual(function, fc->name, baseClass, signature);
 }
 
 // Builds an expression
-void Compiler::BuildExpr(std::shared_ptr<AstExpression> expr, std::shared_ptr<JavaFunction> function/*, DataType dataType*/) {
-    /*switch (expr->getType()) {
-        case AstType::IntL: {
-            AstInt *i = static_cast<AstInt *>(expr);
-            builder->CreateBIPush(function, i->getValue());
+void Compiler::BuildExpr(std::shared_ptr<AstExpression> expr, std::shared_ptr<JavaFunction> function, std::shared_ptr<AstDataType> dataType) {
+    switch (expr->type) {
+        case V_AstType::I32L: {
+            std::shared_ptr<AstI32> i = std::static_pointer_cast<AstI32>(expr);
+            builder->CreateBIPush(function, i->value);
         } break;
     
-        case AstType::StringL: {
-            AstString *str = static_cast<AstString *>(expr);
-            builder->CreateString(function, str->getValue());
+        case V_AstType::StringL: {
+            std::shared_ptr<AstString> str = std::static_pointer_cast<AstString>(expr);
+            builder->CreateString(function, str->value);
         } break;
         
-        case AstType::ID: {
-            AstID *id = static_cast<AstID *>(expr);
-            switch (dataType) {
-                case DataType::Int32: {
-                    int pos = intMap[id->getValue()];
+        case V_AstType::ID: {
+            std::shared_ptr<AstID> id = std::static_pointer_cast<AstID>(expr);
+            switch (dataType->type) {
+                case V_AstType::Int32: {
+                    int pos = intMap[id->value];
                     builder->CreateILoad(function, pos);
                 } break;
                 
                 default: {
-                    if (intMap.find(id->getValue()) != intMap.end()) {
-                        int pos = intMap[id->getValue()];
+                    if (intMap.find(id->value) != intMap.end()) {
+                        int pos = intMap[id->value];
                         builder->CreateILoad(function, pos);
                     }
                 }
             }
         } break;
         
-        case AstType::Add: 
-        case AstType::Sub:
-        case AstType::Mul:
-        case AstType::Div:
-        case AstType::Rem:
-        case AstType::And:
-        case AstType::Or:
-        case AstType::Xor:
-        case AstType::Lsh:
-        case AstType::Rsh: {
-            AstBinaryOp *op = static_cast<AstBinaryOp *>(expr);
-            BuildExpr(op->getLVal(), function, dataType);
-            BuildExpr(op->getRVal(), function, dataType);
+        case V_AstType::Add: 
+        case V_AstType::Sub:
+        case V_AstType::Mul:
+        case V_AstType::Div:
+        case V_AstType::Mod:
+        case V_AstType::And:
+        case V_AstType::Or:
+        case V_AstType::Xor:
+        //case V_AstType::Lsh:
+        //case V_AstType::Rsh:
+        {
+            std::shared_ptr<AstBinaryOp> op = std::static_pointer_cast<AstBinaryOp>(expr);
+            BuildExpr(op->lval, function, dataType);
+            BuildExpr(op->rval, function, dataType);
             
             // Math
-            if (expr->getType() == AstType::Add)
+            if (expr->type == V_AstType::Add)
                 builder->CreateIAdd(function);
-            else if (expr->getType() == AstType::Sub)
+            else if (expr->type == V_AstType::Sub)
                 builder->CreateISub(function);
-            else if (expr->getType() == AstType::Mul)
+            else if (expr->type == V_AstType::Mul)
                 builder->CreateIMul(function);
-            else if (expr->getType() == AstType::Div)
+            else if (expr->type == V_AstType::Div)
                 builder->CreateIDiv(function);
-            else if (expr->getType() == AstType::Rem)
+            else if (expr->type == V_AstType::Mod)
                 builder->CreateIRem(function);
             
             // Logical
-            else if (expr->getType() == AstType::And)
+            else if (expr->type == V_AstType::And)
                 builder->CreateIAnd(function);
-            else if (expr->getType() == AstType::Or)
+            else if (expr->type == V_AstType::Or)
                 builder->CreateIOr(function);
-            else if (expr->getType() == AstType::Xor)
+            else if (expr->type == V_AstType::Xor)
                 builder->CreateIXor(function);
-            else if (expr->getType() == AstType::Lsh)
-                builder->CreateIShl(function);
-            else if (expr->getType() == AstType::Rsh)
-                builder->CreateIShr(function);
+            //else if (expr->type == V_AstType::Lsh)
+            //    builder->CreateIShl(function);
+            //else if (expr->type == V_AstType::Rsh)
+            //    builder->CreateIShr(function);
         } break;
         
         default: {}
-    }*/
+    }
 }
 
 // Returns a type value for an expression
 std::string Compiler::GetTypeForExpr(std::shared_ptr<AstExpression> expr) {
-    /*switch (expr->getType()) {
-        case AstType::IntL: return "I";
-        case AstType::StringL: return "Ljava/lang/String;";
+    switch (expr->type) {
+        case V_AstType::I32L: return "I";
+        case V_AstType::StringL: return "Ljava/lang/String;";
         
-        case AstType::ID: {
-            AstID *id = static_cast<AstID *>(expr);
+        case V_AstType::ID: {
+            std::shared_ptr<AstID> id = std::static_pointer_cast<AstID>(expr);
             
-            if (intMap.find(id->getValue()) != intMap.end()) {
+            if (intMap.find(id->value) != intMap.end()) {
                 return "I";
             }
         } break;
         
         default: {}
-    }*/
+    }
 
     return "V";
 }

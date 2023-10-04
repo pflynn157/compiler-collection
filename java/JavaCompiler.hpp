@@ -27,7 +27,7 @@ protected:
     void BuildVarDec(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function);
     void BuildVarAssign(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function);
     void BuildFuncCallStatement(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function);
-    void BuildExpr(std::shared_ptr<AstExpression> expr, std::shared_ptr<JavaFunction> function/*, DataType dataType = DataType::Void*/);
+    void BuildExpr(std::shared_ptr<AstExpression> expr, std::shared_ptr<JavaFunction> function, std::shared_ptr<AstDataType> dataType = nullptr);
     
     std::string GetTypeForExpr(std::shared_ptr<AstExpression> expr);
 private:

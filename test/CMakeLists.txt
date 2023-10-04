@@ -4,6 +4,8 @@ add_subdirectory(tiny-lang/core)
 add_subdirectory(tiny-lang/output)
 add_subdirectory(tiny-lang/lex)
 
+add_subdirectory(espresso)
+
 if (DISABLE_OUTPUT_TEST)
     add_custom_target(test_llvm DEPENDS
         test_core

@@ -24,7 +24,7 @@ bool Parser::parse() {
             case Private:
             case Routine:
             case Func: {
-                code = buildFunction(token);
+                code = buildFunction(tree->block, token);
             } break;
             
             case Const: code = buildConst(true); break;
@@ -54,7 +54,7 @@ bool Parser::parse() {
 }
 
 // Builds a statement block
-bool Parser::buildBlock(AstBlock *block, int stopLayer, AstIfStmt *parentBlock, bool inElif) {
+bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent) {
     Token token = scanner->getNext();
     while (token.type != Eof) {
         bool code = true;
@@ -101,21 +101,14 @@ bool Parser::buildBlock(AstBlock *block, int stopLayer, AstIfStmt *parentBlock, 
             // difference (one very much needed)
             case If: code = buildConditional(block); break;
             case Elif: {
-                if (inElif) {
-                    scanner->rewind(token);
-                    end = true;
-                } else {
-                    code = buildElif(parentBlock);
-                }
+                std::shared_ptr<AstIfStmt> condParent = std::static_pointer_cast<AstIfStmt>(parent);
+                code = buildConditional(condParent->false_block);
+                end = true;
             } break;
             case Else: {
-                if (inElif) {
-                    scanner->rewind(token);
-                    end = true;
-                } else {
-                    code = buildElse(parentBlock);
-                    end = true;
-                }
+                std::shared_ptr<AstIfStmt> condParent = std::static_pointer_cast<AstIfStmt>(parent);
+                buildBlock(condParent->false_block);
+                end = true;
             } break;
             
             // Handle loops
@@ -128,17 +121,8 @@ bool Parser::buildBlock(AstBlock *block, int stopLayer, AstIfStmt *parentBlock, 
             case Continue: code = buildLoopCtrl(block, false); break;
             
             // Handle the END keyword
-            // This is kind of tricky in conditionals
             case End: {
-                if (inElif) {
-                    scanner->rewind(token);
-                    end = true;
-                    break;
-                }
-                if (layer == stopLayer) {
-                    end = true;
-                }
-                if (layer > 0) --layer;
+                end = true;
             } break;
             
             case Nl: break;
@@ -159,22 +143,23 @@ bool Parser::buildBlock(AstBlock *block, int stopLayer, AstIfStmt *parentBlock, 
 }
 
 // Builds an expression
-bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType stopToken, TokenType separateToken,
-                             AstExpression **dest, bool isConst) {
-    std::stack<AstExpression *> output;
-    std::stack<AstExpression *> opStack;
+std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
+                        TokenType stopToken, TokenType separateToken,
+                        bool isConst) {
+    std::stack<std::shared_ptr<AstExpression>> output;
+    std::stack<std::shared_ptr<AstExpression>> opStack;
     
-    DataType varType = currentType;
-    
+    auto varType = currentType;
     bool lastWasOp = true;
 
     Token token = scanner->getNext();
     while (token.type != Eof && token.type != stopToken) {
         if (token.type == separateToken && output.size() > 0) {
-            AstExpression *expr = output.top();
+            std::shared_ptr<AstExpression> expr = output.top();
             output.pop();
+            return expr;
             
-            if (stmt == nullptr) {
+            /*if (stmt == nullptr) {
                 if ((*dest)->getType() == AstType::FuncCallExpr) {
                     AstFuncCallExpr *fc = static_cast<AstFuncCallExpr *>(*dest);
                     fc->addArgument(expr);
@@ -184,35 +169,35 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             } else {
                 stmt->addExpression(expr);
             }
-            continue;
+            continue;*/
         }
     
         switch (token.type) {
             case True: {
                 lastWasOp = false;
-                output.push(new AstBool(1));
+                output.push(std::make_shared<AstI32>(1));
             } break;
             
             case False: {
                 lastWasOp = false;
-                output.push(new AstBool(0));
+                output.push(std::make_shared<AstI32>(0));
             } break;
             
             case CharL: {
                 lastWasOp = false;
-                AstChar *c = new AstChar(token.i8_val);
+                std::shared_ptr<AstChar> c = std::make_shared<AstChar>(token.i8_val);
                 output.push(c);
             } break;
             
             case Int32: {
                 lastWasOp = false;
-                AstInt *i32 = new AstInt(token.i32_val);
+                std::shared_ptr<AstI32> i32 = std::make_shared<AstI32>(token.i32_val);
                 output.push(i32);
             } break;
             
             case String: {
                 lastWasOp = false;
-                AstString *str = new AstString(token.id_val);
+                std::shared_ptr<AstString> str = std::make_shared<AstString>(token.id_val);
                 output.push(str);
             } break;
             
@@ -221,31 +206,30 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                 
                 if (isConst) {
                     syntax->addError(scanner->getLine(), "Invalid constant value.");
-                    return false;
+                    return nullptr;
                 }
             
                 std::string name = token.id_val;
-                if (varType == DataType::Void) {
-                    varType = typeMap[name].first;
-                    if (varType == DataType::Array) varType = typeMap[name].second;
+                if (varType->type == V_AstType::Void) {
+                    varType = block->symbolTable[name];
                 }
                 
                 token = scanner->getNext();
                 if (token.type == LBracket) {
-                    AstExpression *index = nullptr;
+                    /*AstExpression *index = nullptr;
                     buildExpression(nullptr, DataType::Int32, RBracket, EmptyToken, &index);
                     
                     AstArrayAccess *acc = new AstArrayAccess(name);
                     acc->setIndex(index);
-                    output.push(acc);
+                    output.push(acc);*/
                 } else if (token.type == LParen) {
-                    AstFuncCallExpr *fc = new AstFuncCallExpr(name);
+                    /*AstFuncCallExpr *fc = new AstFuncCallExpr(name);
                     AstExpression *fcExpr = fc;
                     buildExpression(nullptr, varType, RParen, Comma, &fcExpr);
                     
-                    output.push(fc);
+                    output.push(fc);*/
                 } else if (token.type == Scope) {
-                    if (enums.find(name) == enums.end()) {
+                    /*if (enums.find(name) == enums.end()) {
                         syntax->addError(scanner->getLine(), "Unknown enum.");
                         return false;
                     }
@@ -258,19 +242,19 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                     
                     EnumDec dec = enums[name];
                     AstExpression *val = dec.values[token.id_val];
-                    output.push(val);
+                    output.push(val);*/
                 } else {
-                    int constVal = isConstant(name);
+                    int constVal = block->isConstant(name);
                     if (constVal > 0) {
                         if (constVal == 1) {
-                            AstExpression *expr = globalConsts[name].second;
+                            std::shared_ptr<AstExpression> expr = block->globalConsts[name].second;
                             output.push(expr);
                         } else if (constVal == 2) {
-                            AstExpression *expr = localConsts[name].second;
+                            std::shared_ptr<AstExpression> expr = block->localConsts[name].second;
                             output.push(expr);
                         }
                     } else {
-                        AstID *id = new AstID(name);
+                        std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
                         output.push(id);
                     }
                     
@@ -279,7 +263,7 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             } break;
             
             case Sizeof: {
-                lastWasOp = false;
+                /*lastWasOp = false;
                 
                 if (isConst) {
                     syntax->addError(scanner->getLine(), "Invalid constant value.");
@@ -300,7 +284,7 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                 
                 AstID *id = new AstID(token2.id_val);
                 AstSizeof *size = new AstSizeof(id);
-                output.push(size);
+                output.push(size);*/
             } break;
             
             case Plus: 
@@ -311,41 +295,41 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             case Lsh:
             case Rsh: {
                 if (opStack.size() > 0) {
-                    AstType type = opStack.top()->getType();
-                    if (type == AstType::Mul || type == AstType::Div) {
-                        AstExpression *rval = checkExpression(output.top(), varType);
+                    V_AstType type = opStack.top()->type;
+                    if (type == V_AstType::Mul || type == V_AstType::Div) {
+                        std::shared_ptr<AstExpression> rval = checkExpression(output.top(), varType);
                         output.pop();
                         
-                        AstExpression *lval = checkExpression(output.top(), varType);
+                        std::shared_ptr<AstExpression> lval = checkExpression(output.top(), varType);
                         output.pop();
                         
-                        AstBinaryOp *op = static_cast<AstBinaryOp *>(opStack.top());
+                        std::shared_ptr<AstBinaryOp> op = std::static_pointer_cast<AstBinaryOp>(opStack.top());
                         opStack.pop();
                         
-                        op->setLVal(lval);
-                        op->setRVal(rval);
+                        op->lval = lval;
+                        op->rval = rval;
                         output.push(op);
                     }
                 }
                 
                 if (token.type == Plus) {
-                    AstAddOp *add = new AstAddOp;
+                    std::shared_ptr<AstAddOp> add = std::make_shared<AstAddOp>();
                     opStack.push(add);
                 } else if (token.type == And) {
-                    opStack.push(new AstAndOp);
+                    opStack.push(std::make_shared<AstAndOp>());
                 } else if (token.type == Or) {
-                    opStack.push(new AstOrOp);
+                    opStack.push(std::make_shared<AstOrOp>());
                 } else if (token.type == Xor) {
-                    opStack.push(new AstXorOp);
-                } else if (token.type == Lsh) {
-                    opStack.push(new AstLshOp);
+                    opStack.push(std::make_shared<AstXorOp>());
+                /*} else if (token.type == Lsh) {
+                    opStack.push(std::make_shared<AstLshOp>());
                 } else if (token.type == Rsh) {
-                    opStack.push(new AstRshOp);
+                    opStack.push(std::make_shared<AstRshOp>());*/
                 } else {
                     if (lastWasOp) {
-                        opStack.push(new AstNegOp);
+                        opStack.push(std::make_shared<AstNegOp>());
                     } else {
-                        AstSubOp *sub = new AstSubOp;
+                        std::shared_ptr<AstSubOp> sub = std::make_shared<AstSubOp>();
                         opStack.push(sub);
                     }
                 }
@@ -355,31 +339,31 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
             
             case Mul: {
                 lastWasOp = true;
-                AstMulOp *mul = new AstMulOp;
+                std::shared_ptr<AstMulOp> mul = std::make_shared<AstMulOp>();
                 opStack.push(mul);
             } break;
             
             case Div: {
                 lastWasOp = true;
-                AstDivOp *div = new AstDivOp;
+                std::shared_ptr<AstDivOp> div = std::make_shared<AstDivOp>();
                 opStack.push(div);
             } break;
             
             case Mod: {
                 lastWasOp = true;
-                AstRemOp *rem = new AstRemOp;
+                std::shared_ptr<AstModOp> rem = std::make_shared<AstModOp>();
                 opStack.push(rem);
             } break;
             
-            case EQ: opStack.push(new AstEQOp); lastWasOp = true; break;
-            case NEQ: opStack.push(new AstNEQOp); lastWasOp = true; break;
-            case GT: opStack.push(new AstGTOp); lastWasOp = true; break;
-            case LT: opStack.push(new AstLTOp); lastWasOp = true; break;
-            case GTE: opStack.push(new AstGTEOp); lastWasOp = true; break;
-            case LTE: opStack.push(new AstLTEOp); lastWasOp = true; break;
+            case EQ: opStack.push(std::make_shared<AstEQOp>()); lastWasOp = true; break;
+            case NEQ: opStack.push(std::make_shared<AstNEQOp>()); lastWasOp = true; break;
+            case GT: opStack.push(std::make_shared<AstGTOp>()); lastWasOp = true; break;
+            case LT: opStack.push(std::make_shared<AstLTOp>()); lastWasOp = true; break;
+            case GTE: opStack.push(std::make_shared<AstGTEOp>()); lastWasOp = true; break;
+            case LTE: opStack.push(std::make_shared<AstLTEOp>()); lastWasOp = true; break;
             
             case Step: {
-                lastWasOp = false;       
+                /*lastWasOp = false;       
                 
                 if (stmt->getType() != AstType::For) {
                     syntax->addError(scanner->getLine(), "Step is only valid with for loops");
@@ -393,20 +377,20 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
                 }
                 
                 AstForStmt *forStmt = static_cast<AstForStmt *>(stmt);
-                forStmt->setStep(token.i32_val);
+                forStmt->setStep(token.i32_val);*/
             } break;
             
             default: {}
         }
         
         if (!lastWasOp && opStack.size() > 0) {
-            if (opStack.top()->getType() == AstType::Neg) {
-                AstExpression *val = checkExpression(output.top(), varType);
+            if (opStack.top()->type == V_AstType::Neg) {
+                std::shared_ptr<AstExpression> val = checkExpression(output.top(), varType);
                 output.pop();
                 
-                AstNegOp *op = static_cast<AstNegOp *>(opStack.top());
+                std::shared_ptr<AstNegOp> op = std::static_pointer_cast<AstNegOp>(opStack.top());
                 opStack.pop();
-                op->setVal(val);
+                op->value = val;
                 output.push(op);
             }
         }
@@ -416,29 +400,30 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
     
     // Build the expression
     while (opStack.size() > 0) {
-        AstExpression *rval = checkExpression(output.top(), varType);
+        std::shared_ptr<AstExpression> rval = checkExpression(output.top(), varType);
         output.pop();
         
-        AstExpression *lval = checkExpression(output.top(), varType);
+        std::shared_ptr<AstExpression> lval = checkExpression(output.top(), varType);
         output.pop();
         
-        AstBinaryOp *op = static_cast<AstBinaryOp *>(opStack.top());
+        std::shared_ptr<AstBinaryOp> op = std::static_pointer_cast<AstBinaryOp>(opStack.top());
         opStack.pop();
         
-        op->setLVal(lval);
-        op->setRVal(rval);
+        op->lval = lval;
+        op->rval = rval;
         output.push(op);
     }
     
     // Add the expressions back
-    if (output.size() == 0) {
-        return true;
-    }
+    //if (output.size() == 0) {
+    //    return nullptr;
+    //}
     
     // Type check the top
-    AstExpression *expr = checkExpression(output.top(), varType);
+    std::shared_ptr<AstExpression> expr = checkExpression(output.top(), varType);
+    return expr;
     
-    if (stmt == nullptr) {
+    /*if (stmt == nullptr) {
         if ((*dest) == nullptr) {
             *dest = expr;
         } else if ((*dest)->getType() == AstType::FuncCallExpr) {
@@ -451,6 +436,6 @@ bool Parser::buildExpression(AstStatement *stmt, DataType currentType, TokenType
         stmt->addExpression(expr);
     }
     
-    return true;
+    return true;*/
 }
 

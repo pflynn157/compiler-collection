@@ -18,11 +18,13 @@
 // The parser is in charge of performing all parsing and AST-building tasks
 // It is also in charge of the error manager
 
-class Parser : BaseParser {
+class Parser : public BaseParser {
 public:
     explicit Parser(std::string input);
     
     bool parse();
+    
+    void debugScanner();
 protected:
     // Function.cpp
     bool getFunctionArgs(std::vector<Var> &args, std::shared_ptr<AstBlock> block);
@@ -34,17 +36,17 @@ protected:
     bool buildVariableDec(std::shared_ptr<AstBlock> block);
     bool buildVariableAssign(std::shared_ptr<AstBlock> block, Token idToken);
     bool buildArrayAssign(std::shared_ptr<AstBlock> block, Token idToken);
-    bool buildConst(bool isGlobal);
+    bool buildConst(std::shared_ptr<AstBlock> block, bool isGlobal);
     
     // Flow.cpp
     std::shared_ptr<AstExpression> checkCondExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstExpression> toCheck);
     bool buildConditional(std::shared_ptr<AstBlock> block);
-    bool buildElif(AstIfStmt *block);
-    bool buildElse(AstIfStmt *block);
+    //bool buildElif(AstIfStmt *block);
+    //bool buildElse(AstIfStmt *block);
     bool buildWhile(std::shared_ptr<AstBlock> block);
-    bool buildRepeat(std::shared_ptr<AstBlock> block);
-    bool buildFor(std::shared_ptr<AstBlock> block);
-    bool buildForAll(std::shared_ptr<AstBlock> block);
+    //bool buildRepeat(std::shared_ptr<AstBlock> block);
+    //bool buildFor(std::shared_ptr<AstBlock> block);
+    //bool buildForAll(std::shared_ptr<AstBlock> block);
     bool buildLoopCtrl(std::shared_ptr<AstBlock> block, bool isBreak);
     
     // Structure.cpp

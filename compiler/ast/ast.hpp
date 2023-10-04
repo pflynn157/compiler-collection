@@ -86,7 +86,8 @@ enum class V_AstType {
     Int64,
     String,
     Ptr,
-    Struct
+    Struct,
+    Object
 };
 
 //
@@ -141,6 +142,12 @@ struct AstStructType : AstDataType {
     void print() override;
     
     std::string name = "";
+};
+
+// Represents an object type
+struct AstObjectType : AstDataType {
+    explicit AstObjectType();
+    void print() override;
 };
 
 // Var
@@ -721,6 +728,9 @@ struct AstVarDec : AstStatement {
     std::string name = "";
     std::shared_ptr<AstExpression> size = nullptr;
     std::shared_ptr<AstDataType> data_type;
+    
+    // Language-specific attributes
+    std::string class_name = "";
 };
 
 // Represents a structure declaration

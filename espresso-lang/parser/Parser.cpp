@@ -27,7 +27,7 @@ bool Parser::parse() {
                 code = buildFunction(tree->block, token);
             } break;
             
-            case Const: code = buildConst(true); break;
+            case Const: code = buildConst(tree->block, true); break;
             case Enum: code = buildEnum(); break;
             
             case Eof:
@@ -62,7 +62,7 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
         
         switch (token.type) {
             case VarD: code = buildVariableDec(block); break;
-            case Const: code = buildConst(false); break;
+            case Const: code = buildConst(block, false); break;
             
             case Id: {
                 Token idToken = token;
@@ -113,9 +113,9 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
             
             // Handle loops
             case While: code = buildWhile(block); break;
-            case Repeat: code = buildRepeat(block); break;
-            case For: code = buildFor(block); break;
-            case ForAll: code = buildForAll(block); break;
+            //case Repeat: code = buildRepeat(block); break;
+            //case For: code = buildFor(block); break;
+            //case ForAll: code = buildForAll(block); break;
             
             case Break: code = buildLoopCtrl(block, true); break;
             case Continue: code = buildLoopCtrl(block, false); break;
@@ -437,5 +437,16 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
     }
     
     return true;*/
+}
+
+// The debug function for the scanner
+void Parser::debugScanner() {
+    std::cout << "Debugging scanner..." << std::endl;
+    
+    Token t;
+    do {
+        t = scanner->getNext();
+        t.print();
+    } while (t.type != Eof);
 }
 

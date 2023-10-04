@@ -6,13 +6,15 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <parser/Parser.hpp>
-#include <ast.hpp>
+#include <ast/ast.hpp>
+#include <ast/ast_builder.hpp>
 
 // Builds a variable declaration
 // A variable declaration is composed of an Alloca and optionally, an assignment
-bool Parser::buildVariableDec(AstBlock *block) {
+bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
     Token token = scanner->getNext();
     std::vector<std::string> toDeclare;
     toDeclare.push_back(token.id_val);
@@ -43,25 +45,25 @@ bool Parser::buildVariableDec(AstBlock *block) {
     }
     
     token = scanner->getNext();
-    DataType dataType = DataType::Void;
+    std::shared_ptr<AstDataType> dataType;
     bool isString = false;
     std::string className = "";
     
     switch (token.type) {
-        case Bool: dataType = DataType::Bool; break;
-        case Char: dataType = DataType::Char; break;
-        case Byte: dataType = DataType::Byte; break;
-        case UByte: dataType = DataType::UByte; break;
-        case Short: dataType = DataType::Short; break;
-        case UShort: dataType = DataType::UShort; break;
-        case Int: dataType = DataType::Int32; break;
-        case UInt: dataType = DataType::UInt32; break;
-        case Int64: dataType = DataType::Int64; break;
-        case UInt64: dataType = DataType::UInt64; break;
-        case Str: dataType = DataType::String; break;
+        case Bool: dataType = AstBuilder::buildBoolType(); break;
+        case Char: dataType = AstBuilder::buildCharType(); break;
+        case Byte: dataType = AstBuilder::buildInt8Type(); break;
+        case UByte: dataType = AstBuilder::buildInt8Type(true); break;
+        case Short: dataType = AstBuilder::buildInt16Type(); break;
+        case UShort: dataType = AstBuilder::buildInt16Type(true); break;
+        case Int: dataType = AstBuilder::buildInt32Type(); break;
+        case UInt: dataType = AstBuilder::buildInt32Type(true); break;
+        case Int64: dataType = AstBuilder::buildInt64Type(); break;
+        case UInt64: dataType = AstBuilder::buildInt64Type(true); break;
+        case Str: dataType = AstBuilder::buildStringType(); break;
         
         default: {
-            dataType = DataType::Object;
+            dataType = AstBuilder::buildObjectType();
             className = token.id_val;
         }
     }
@@ -70,23 +72,22 @@ bool Parser::buildVariableDec(AstBlock *block) {
     
     // We have a class
     if (token.type == SemiColon ) {
-        if (dataType != DataType::Object) {
+        if (dataType->type != V_AstType::Object) {
             syntax->addError(scanner->getLine(), "Non-objects must have an init expression.");
             return false;
         }
         
         for (std::string name : toDeclare) {
-            AstVarDec *vd = new AstVarDec(name, dataType);
-            vd->setClassName(className);
+            std::shared_ptr<AstVarDec> vd = std::make_shared<AstVarDec>(name, dataType);
+            vd->class_name = className;
             block->addStatement(vd);
             
-            auto typePair = std::pair<DataType, DataType>(dataType, DataType::Void);
-            typeMap[name] = typePair;
+            block->symbolTable[name] = dataType;
         }
     
     // We have an array
     } else if (token.type == LBracket) {
-        AstVarDec *empty = new AstVarDec("", DataType::Array);
+        /*AstVarDec *empty = new AstVarDec("", DataType::Array);
         if (!buildExpression(empty, DataType::Int32, RBracket)) return false;   
         
         token = scanner->getNext();
@@ -130,23 +131,22 @@ bool Parser::buildVariableDec(AstBlock *block) {
             vd->setPtrSize(arg);
             
             typeMap[name] = std::pair<DataType, DataType>(DataType::Array, dataType);
-        }
+        }*/
         
     // Otherwise, we have a regular variable
     } else {
-        AstVarAssign *empty = new AstVarAssign("");
-        if (!buildExpression(empty, dataType)) return false;
+        std::shared_ptr<AstExprStatement> empty = std::make_shared<AstExprStatement>();
+        empty->expression = buildExpression(block, dataType);
+        if (!empty->expression) return false;
     
         for (std::string name : toDeclare) {
-            AstVarDec *vd = new AstVarDec(name, dataType);
+            std::shared_ptr<AstVarDec> vd = std::make_shared<AstVarDec>(name, dataType);
             block->addStatement(vd);
-            
-            auto typePair = std::pair<DataType, DataType>(dataType, DataType::Void);
-            typeMap[name] = typePair;
+            block->symbolTable[name] = dataType;
     
-            AstVarAssign *va = new AstVarAssign(name);
-            va->setDataType(dataType);
-            va->addExpression(empty->getExpression());
+            std::shared_ptr<AstExprStatement> va = std::make_shared<AstExprStatement>();
+            va->dataType = dataType;
+            va->expression = empty->expression;
             block->addStatement(va);
         }
     }
@@ -155,15 +155,16 @@ bool Parser::buildVariableDec(AstBlock *block) {
 }
 
 // Builds a variable assignment
-bool Parser::buildVariableAssign(AstBlock *block, Token idToken) {
-    DataType dataType = typeMap[idToken.id_val].first;
-    AstVarAssign *va = new AstVarAssign(idToken.id_val);
-    va->setDataType(dataType);
+bool Parser::buildVariableAssign(std::shared_ptr<AstBlock> block, Token idToken) {
+    std::shared_ptr<AstDataType> dataType = block->symbolTable[idToken.id_val];
+    std::shared_ptr<AstExprStatement> va = std::make_shared<AstExprStatement>();
+    va->dataType = dataType;
     block->addStatement(va);
     
-    if (!buildExpression(va, dataType)) return false;
+    va->expression = buildExpression(block, dataType);
+    if (!va->expression) return false;
     
-    if (va->getExpressionCount() == 0) {
+    if (!va->hasExpression()) {
         syntax->addError(scanner->getLine(), "Invalid variable assignment.");
         return false;
     }
@@ -172,8 +173,8 @@ bool Parser::buildVariableAssign(AstBlock *block, Token idToken) {
 }
 
 // Builds an array assignment
-bool Parser::buildArrayAssign(AstBlock *block, Token idToken) {
-    DataType dataType = typeMap[idToken.id_val].second;
+bool Parser::buildArrayAssign(std::shared_ptr<AstBlock> block, Token idToken) {
+    /*DataType dataType = typeMap[idToken.id_val].second;
     AstArrayAssign *pa = new AstArrayAssign(idToken.id_val);
     pa->setDataType(typeMap[idToken.id_val].first);
     pa->setPtrType(dataType);
@@ -188,12 +189,12 @@ bool Parser::buildArrayAssign(AstBlock *block, Token idToken) {
     }
     
     if (!buildExpression(pa, dataType)) return false;
-
+*/
     return true;
 }
 
 // Builds a constant variable
-bool Parser::buildConst(bool isGlobal) {
+bool Parser::buildConst(std::shared_ptr<AstBlock> block, bool isGlobal) {
     Token token = scanner->getNext();
     std::string name = token.id_val;
     
@@ -212,20 +213,20 @@ bool Parser::buildConst(bool isGlobal) {
     
     // Get the data type
     token = scanner->getNext();
-    DataType dataType = DataType::Void;
+    std::shared_ptr<AstDataType> dataType;
     
     switch (token.type) {
-        case Bool: dataType = DataType::Bool; break;
-        case Char: dataType = DataType::Char; break;
-        case Byte: dataType = DataType::Byte; break;
-        case UByte: dataType = DataType::UByte; break;
-        case Short: dataType = DataType::Short; break;
-        case UShort: dataType = DataType::UShort; break;
-        case Int: dataType = DataType::Int32; break;
-        case UInt: dataType = DataType::UInt32; break;
-        case Int64: dataType = DataType::Int64; break;
-        case UInt64: dataType = DataType::UInt64; break;
-        case Str: dataType = DataType::String; break;
+        case Bool: dataType = AstBuilder::buildBoolType(); break;
+        case Char: dataType = AstBuilder::buildCharType(); break;
+        case Byte: dataType = AstBuilder::buildInt8Type(); break;
+        case UByte: dataType = AstBuilder::buildInt8Type(true); break;
+        case Short: dataType = AstBuilder::buildInt16Type(); break;
+        case UShort: dataType = AstBuilder::buildInt16Type(true); break;
+        case Int: dataType = AstBuilder::buildInt32Type(); break;
+        case UInt: dataType = AstBuilder::buildInt32Type(true); break;
+        case Int64: dataType = AstBuilder::buildInt64Type(); break;
+        case UInt64: dataType = AstBuilder::buildInt64Type(true); break;
+        case Str: dataType = AstBuilder::buildStringType(); break;
         
         default: {
             syntax->addError(scanner->getLine(), "Unknown data type.");
@@ -241,14 +242,14 @@ bool Parser::buildConst(bool isGlobal) {
     }
     
     // Build the expression. We create a dummy statement for this
-    AstExpression *expr = nullptr;
-    if (!buildExpression(nullptr, dataType, SemiColon, EmptyToken, &expr, true)) return false;
+    std::shared_ptr<AstExpression> expr = buildExpression(block, dataType, SemiColon, EmptyToken, true);
+    if (expr == nullptr) return false;
     
     // Put it all together
     if (isGlobal) {
-        globalConsts[name] = std::pair<DataType, AstExpression*>(dataType, expr);
+        block->globalConsts[name] = std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>(dataType, expr);
     } else {
-        localConsts[name] = std::pair<DataType, AstExpression*>(dataType, expr);
+        block->localConsts[name] = std::pair<std::shared_ptr<AstDataType>, std::shared_ptr<AstExpression>>(dataType, expr);
     }
     
     return true;

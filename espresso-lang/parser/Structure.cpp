@@ -8,11 +8,11 @@
 #include <map>
 
 #include <parser/Parser.hpp>
-#include <ast.hpp>
+#include <ast/ast.hpp>
 
 // Parses and builds an enumeration
 bool Parser::buildEnum() {
-    Token token = scanner->getNext();
+    /*Token token = scanner->getNext();
     std::string name = token.id_val;
     
     if (token.type != Id) {
@@ -94,6 +94,6 @@ bool Parser::buildEnum() {
     theEnum.type = dataType;
     theEnum.values = values;
     enums[name] = theEnum;
-    
+    */
     return true;
 }

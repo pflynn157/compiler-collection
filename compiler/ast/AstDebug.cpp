@@ -44,6 +44,10 @@ void AstStructType::print() {
     std::cout << "struct(" << name << ")";
 }
 
+void AstObjectType::print() {
+    std::cout << "object()";
+}
+
 //
 // Global types
 //

@@ -313,6 +313,28 @@ std::string AstXorOp::dot(std::string parent) {
     return output;
 }
 
+std::string AstLshOp::dot(std::string parent) {
+    std::string name = "lsh" + std::to_string(idx);
+    ++idx;
+    
+    std::string output = name + "[label=\"<<\"];\n";
+    output += parent + " -> " + name + ";\n";
+    output += lval->dot(name);
+    output += rval->dot(name);
+    return output;
+}
+
+std::string AstRshOp::dot(std::string parent) {
+    std::string name = "rsh" + std::to_string(idx);
+    ++idx;
+    
+    std::string output = name + "[label=\">>\"];\n";
+    output += parent + " -> " + name + ";\n";
+    output += lval->dot(name);
+    output += rval->dot(name);
+    return output;
+}
+
 std::string AstEQOp::dot(std::string parent) {
     std::string name = "eq" + std::to_string(idx);
     ++idx;

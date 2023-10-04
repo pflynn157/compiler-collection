@@ -51,6 +51,8 @@ enum class V_AstType {
     And,
     Or,
     Xor,
+    Lsh,
+    Rsh,
     
     EQ,
     NEQ,
@@ -385,6 +387,30 @@ struct AstXorOp : AstBinaryOp {
     AstXorOp() {
         this->type = V_AstType::Xor;
         this->precedence = 9;
+    }
+    
+    void print();
+    std::string dot(std::string parent) override;
+};
+
+// Represents an LSH operation
+class AstLshOp : public AstBinaryOp {
+public:
+    AstLshOp() {
+        this->type = V_AstType::Lsh;
+        this->precedence = 10;
+    }
+    
+    void print();
+    std::string dot(std::string parent) override;
+};
+
+// Represents an RSH operation
+class AstRshOp : public AstBinaryOp {
+public:
+    AstRshOp() {
+        this->type = V_AstType::Rsh;
+        this->precedence = 10;
     }
     
     void print();

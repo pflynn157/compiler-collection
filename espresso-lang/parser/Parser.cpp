@@ -321,10 +321,10 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
                     opStack.push(std::make_shared<AstOrOp>());
                 } else if (token.type == Xor) {
                     opStack.push(std::make_shared<AstXorOp>());
-                /*} else if (token.type == Lsh) {
+                } else if (token.type == Lsh) {
                     opStack.push(std::make_shared<AstLshOp>());
                 } else if (token.type == Rsh) {
-                    opStack.push(std::make_shared<AstRshOp>());*/
+                    opStack.push(std::make_shared<AstRshOp>());
                 } else {
                     if (lastWasOp) {
                         opStack.push(std::make_shared<AstNegOp>());

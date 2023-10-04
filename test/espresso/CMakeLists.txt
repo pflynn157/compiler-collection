@@ -4,6 +4,7 @@ set(EO_TEST_SRC
     Inner2
     Inner3
     imath
+    ilogic
 )
 
 ## LLVM testing

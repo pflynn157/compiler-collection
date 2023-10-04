@@ -213,8 +213,8 @@ void Compiler::BuildExpr(std::shared_ptr<AstExpression> expr, std::shared_ptr<Ja
         case V_AstType::And:
         case V_AstType::Or:
         case V_AstType::Xor:
-        //case V_AstType::Lsh:
-        //case V_AstType::Rsh:
+        case V_AstType::Lsh:
+        case V_AstType::Rsh:
         {
             std::shared_ptr<AstBinaryOp> op = std::static_pointer_cast<AstBinaryOp>(expr);
             BuildExpr(op->lval, function, dataType);
@@ -239,10 +239,10 @@ void Compiler::BuildExpr(std::shared_ptr<AstExpression> expr, std::shared_ptr<Ja
                 builder->CreateIOr(function);
             else if (expr->type == V_AstType::Xor)
                 builder->CreateIXor(function);
-            //else if (expr->type == V_AstType::Lsh)
-            //    builder->CreateIShl(function);
-            //else if (expr->type == V_AstType::Rsh)
-            //    builder->CreateIShr(function);
+            else if (expr->type == V_AstType::Lsh)
+                builder->CreateIShl(function);
+            else if (expr->type == V_AstType::Rsh)
+                builder->CreateIShr(function);
         } break;
         
         default: {}

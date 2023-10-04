@@ -284,6 +284,22 @@ void AstXorOp::print() {
     std::cout << ")";
 }
 
+void AstLshOp::print() {
+    std::cout << "(";
+    lval->print();
+    std::cout << ") << (";
+    rval->print();
+    std::cout << ")";
+}
+
+void AstRshOp::print() {
+    std::cout << "(";
+    lval->print();
+    std::cout << ") >> (";
+    rval->print();
+    std::cout << ")";
+}
+
 void AstEQOp::print() {
     std::cout << "(";
     lval->print();

@@ -23,6 +23,7 @@ bool Parser::getFunctionArgs(std::vector<Var> &args, std::shared_ptr<AstBlock> b
             
             if (t1.type != Id) {
                 syntax->addError(scanner->getLine(), "Invalid function argument: Expected name.");
+                t1.print();
                 return false;
             }
             
@@ -55,7 +56,7 @@ bool Parser::getFunctionArgs(std::vector<Var> &args, std::shared_ptr<AstBlock> b
             token = scanner->getNext();
             if (token.type == Comma) {
                 token = scanner->getNext();
-            } /*else if (token.type == LBracket) {
+            } else if (token.type == LBracket) {
                 Token token1 = scanner->getNext();
                 Token token2 = scanner->getNext();
                 
@@ -67,9 +68,8 @@ bool Parser::getFunctionArgs(std::vector<Var> &args, std::shared_ptr<AstBlock> b
                 if (token2.type == Comma) token = scanner->getNext();
                 else token = token2;
                 
-                v.subType = v.type;
-                v.type = DataType::Array;
-            }*/
+                v.type = AstBuilder::buildPointerType(v.type);
+            }
             
             args.push_back(v);
             //typeMap[v.name] = std::pair<DataType, DataType>(v.type, v.subType);
@@ -127,7 +127,7 @@ bool Parser::buildFunction(std::shared_ptr<AstBlock> block, Token startToken) {
 
     // Check to see if there's any return type
     token = scanner->getNext();
-    std::shared_ptr<AstDataType> data_type;
+    std::shared_ptr<AstDataType> data_type = AstBuilder::buildVoidType();
     
     if (token.type == Arrow) {
         token = scanner->getNext();

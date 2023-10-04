@@ -415,9 +415,9 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
     }
     
     // Add the expressions back
-    //if (output.size() == 0) {
-    //    return nullptr;
-    //}
+    if (output.size() == 0) {
+        return nullptr;
+    }
     
     // Type check the top
     std::shared_ptr<AstExpression> expr = checkExpression(output.top(), varType);

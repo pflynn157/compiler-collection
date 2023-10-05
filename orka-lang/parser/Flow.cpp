@@ -9,31 +9,33 @@
 // Called if a conditional statement has only one operand. If it does,
 // we have to expand to have two operands before we get down to the
 // compiler layer
-AstExpression *Parser::checkCondExpression(AstExpression *toCheck) {
-    AstExpression *expr = toCheck;
+std::shared_ptr<AstExpression> Parser::checkCondExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstExpression> toCheck) {
+    std::shared_ptr<AstExpression> expr = toCheck;
     
-    switch (toCheck->getType()) {
-        case AstType::ID: {
-            AstID *id = static_cast<AstID *>(toCheck);
-            DataType dataType = typeMap[id->getValue()].first;
+    switch (toCheck->type) {
+        case V_AstType::ID: {
+            std::shared_ptr<AstID> id = std::static_pointer_cast<AstID>(toCheck);
+            std::shared_ptr<AstDataType> dataType = block->getDataType(id->value);            
+            std::shared_ptr<AstEQOp> eq = std::make_shared<AstEQOp>();
+            eq->lval = id;
             
-            AstEQOp *eq = new AstEQOp;
-            eq->setLVal(id);
-            
-            switch (dataType) {
-                case DataType::Bool: eq->setRVal(new AstBool(1)); break;
-                case DataType::Byte:
-                case DataType::UByte: eq->setRVal(new AstByte(1)); break;
-                case DataType::Short:
-                case DataType::UShort: eq->setRVal(new AstWord(1)); break;
-                case DataType::Int32:
-                case DataType::UInt32: eq->setRVal(new AstInt(1)); break;
-                case DataType::Int64:
-                case DataType::UInt64: eq->setRVal(new AstQWord(1)); break;
+            switch (dataType->type) {
+                case V_AstType::Bool: eq->rval = std::make_shared<AstI32>(1); break;
+                case V_AstType::Int8: eq->rval = std::make_shared<AstI8>(1); break;
+                case V_AstType::Int16: eq->rval = std::make_shared<AstI16>(1); break;
+                case V_AstType::Int32: eq->rval = std::make_shared<AstI32>(1); break;
+                case V_AstType::Int64: eq->rval = std::make_shared<AstI64>(1); break;
                 
                 default: {}
             }
             
+            expr = eq;
+        } break;
+        
+        case V_AstType::I32L: {
+            std::shared_ptr<AstEQOp> eq = std::make_shared<AstEQOp>();
+            eq->lval = expr;
+            eq->rval = std::make_shared<AstI32>(1);
             expr = eq;
         } break;
         
@@ -44,74 +46,63 @@ AstExpression *Parser::checkCondExpression(AstExpression *toCheck) {
 }
 
 // Builds a conditional statement
-bool Parser::buildConditional(AstBlock *block) {
-    AstIfStmt *cond = new AstIfStmt;
-    if (!buildExpression(cond, DataType::Void, Then)) return false;
+bool Parser::buildConditional(std::shared_ptr<AstBlock> block) {
+    std::shared_ptr<AstIfStmt> cond = std::make_shared<AstIfStmt>();
+    std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr, Then);
+    if (!arg) return false;
+    cond->expression = arg;
     block->addStatement(cond);
     
-    AstExpression *expr = checkCondExpression(cond->getExpressions().at(0));
-    cond->clearExpressions();
-    cond->addExpression(expr);
-
-    ++layer;
-    buildBlock(cond->getBlockStmt(), layer, cond);
+    std::shared_ptr<AstExpression> expr = checkCondExpression(block, cond->expression);
+    cond->expression = expr;
     
-    return true;
-}
-
-// Builds an ELIF statement
-bool Parser::buildElif(AstIfStmt *block) {
-    AstElifStmt *elif = new AstElifStmt;
-    if (!buildExpression(elif, DataType::Void, Then)) return false;
-    block->addBranch(elif);
+    std::shared_ptr<AstBlock> true_block = std::make_shared<AstBlock>();
+    true_block->mergeSymbols(block);
+    cond->true_block = true_block;
     
-    AstExpression *expr = checkCondExpression(elif->getExpressions().at(0));
-    elif->clearExpressions();
-    elif->addExpression(expr);
+    std::shared_ptr<AstBlock> false_block = std::make_shared<AstBlock>();
+    false_block->mergeSymbols(block);
+    cond->false_block = false_block;
+    buildBlock(true_block, cond);
     
-    buildBlock(elif->getBlockStmt(), layer, block, true);
-    return true;
-}
-
-// Builds an ELSE statement
-bool Parser::buildElse(AstIfStmt *block) {
-    AstElseStmt *elsee = new AstElseStmt;
-    block->addBranch(elsee);
-    
-    buildBlock(elsee->getBlockStmt(), layer);
     return true;
 }
 
 // Builds a while statement
-bool Parser::buildWhile(AstBlock *block) {
-    AstWhileStmt *loop = new AstWhileStmt;
-    if (!buildExpression(loop, DataType::Void, Do)) return false;
+bool Parser::buildWhile(std::shared_ptr<AstBlock> block) {
+    std::shared_ptr<AstWhileStmt> loop = std::make_shared<AstWhileStmt>();
+    std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr, Do);
+    if (!arg) return false;
+    loop->expression = arg;
     block->addStatement(loop);
     
-    AstExpression *expr = checkCondExpression(loop->getExpressions().at(0));
-    loop->clearExpressions();
-    loop->addExpression(expr);
+    std::shared_ptr<AstExpression> expr = checkCondExpression(block, loop->expression);
+    loop->expression = expr;
     
-    ++layer;
-    buildBlock(loop->getBlockStmt(), layer);
+    std::shared_ptr<AstBlock> block2 = std::make_shared<AstBlock>();
+    block2->mergeSymbols(block);
+    buildBlock(block2);
+    loop->block = block2;
     
     return true;
 }
 
 // Builds an infinite loop statement
-bool Parser::buildRepeat(AstBlock *block) {
-    AstRepeatStmt *loop = new AstRepeatStmt;
+bool Parser::buildRepeat(std::shared_ptr<AstBlock> block) {
+    std::shared_ptr<AstRepeatStmt> loop = std::make_shared<AstRepeatStmt>();
     block->addStatement(loop);
     
-    ++layer;
-    buildBlock(loop->getBlockStmt(), layer);
+    std::shared_ptr<AstBlock> block2 = std::make_shared<AstBlock>();
+    block2->mergeSymbols(block);
+    buildBlock(block2);
+    loop->block = block2;
 
     return true;
 }
 
 // Builds a for loop
-bool Parser::buildFor(AstBlock *block) {
-    AstForStmt *loop = new AstForStmt;
+bool Parser::buildFor(std::shared_ptr<AstBlock> block) {
+    std::shared_ptr<AstForStmt> loop = std::make_shared<AstForStmt>();
     block->addStatement(loop);
     
     // Get the index
@@ -121,7 +112,7 @@ bool Parser::buildFor(AstBlock *block) {
         return false;
     }
     
-    loop->setIndex(new AstID(token.id_val));
+    loop->indexVar = std::make_shared<AstID>(token.id_val);
     
     token = scanner->getNext();
     if (token.type != In) {
@@ -130,7 +121,10 @@ bool Parser::buildFor(AstBlock *block) {
     }
     
     // Build the starting and ending expression
-    if (!buildExpression(loop, DataType::Void, Do, Range)) return false;
+    // TODO: This will need to be fixed
+    /*auto bounds_expr = buildExpression(block, nullptr, Do, Range);
+    if (bounds_expr == nullptr) return false;
+    loop->expression = bounds_expr;
     
     if (loop->getExpressionCount() == 2) {
         AstExpression *end = loop->getExpressions().back();
@@ -143,17 +137,19 @@ bool Parser::buildFor(AstBlock *block) {
     } else {
         syntax->addError(scanner->getLine(), "Invalid expression in for loop.");
         return false;
-    }
+    }*/
     
-    ++layer;
-    buildBlock(loop->getBlockStmt(), layer);
+    std::shared_ptr<AstBlock> block2 = std::make_shared<AstBlock>();
+    block2->mergeSymbols(block);
+    buildBlock(block2);
+    loop->block = block2;
     
     return true;
 }
 
 // Builds a forall loop
-bool Parser::buildForAll(AstBlock *block) {
-    AstForAllStmt *loop = new AstForAllStmt;
+bool Parser::buildForAll(std::shared_ptr<AstBlock> block) {
+    std::shared_ptr<AstForAllStmt> loop = std::make_shared<AstForAllStmt>();
     block->addStatement(loop);
     
     // Get the index
@@ -163,7 +159,7 @@ bool Parser::buildForAll(AstBlock *block) {
         return false;
     }
     
-    loop->setIndex(new AstID(token.id_val));
+    loop->indexVar = std::make_shared<AstID>(token.id_val);
     
     token = scanner->getNext();
     if (token.type != In) {
@@ -178,7 +174,8 @@ bool Parser::buildForAll(AstBlock *block) {
         return false;
     }
     
-    loop->setArray(new AstID(token.id_val));
+    auto array_id = std::make_shared<AstID>(token.id_val);
+    loop->arrayVar = array_id;
     
     // Make sure we end with the "do" keyword
     token = scanner->getNext();
@@ -187,20 +184,22 @@ bool Parser::buildForAll(AstBlock *block) {
         return false;
     }
     
-    ++layer;
-    buildBlock(loop->getBlockStmt(), layer);
+    std::shared_ptr<AstBlock> block2 = std::make_shared<AstBlock>();
+    block2->mergeSymbols(block);
+    buildBlock(block2);
+    loop->block = block2;
     
     return true;
 }
 
 // Builds a loop keyword
-bool Parser::buildLoopCtrl(AstBlock *block, bool isBreak) {
-    if (isBreak) block->addStatement(new AstBreak);
-    else block->addStatement(new AstContinue);
+bool Parser::buildLoopCtrl(std::shared_ptr<AstBlock> block, bool isBreak) {
+    if (isBreak) block->addStatement(std::make_shared<AstBreak>());
+    else block->addStatement(std::make_shared<AstContinue>());
     
-    Token token = scanner->getNext();
-    if (token.type != SemiColon) {
-        syntax->addError(scanner->getLine(), "Expected \';\' after break or continue.");
+    Token tk = scanner->getNext();
+    if (tk.type != SemiColon) {
+        syntax->addError(0, "Expected \';\' after break or continue.");
         return false;
     }
     

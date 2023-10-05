@@ -7,76 +7,67 @@
 
 #include <string>
 #include <map>
+#include <memory>
 
 #include <lex/Lex.hpp>
 #include <parser/ErrorManager.hpp>
 #include <ast/ast.hpp>
+#include <parser/base_parser.hpp>
 
 // The parser class
 // The parser is in charge of performing all parsing and AST-building tasks
 // It is also in charge of the error manager
 
-class Parser {
+class Parser : public BaseParser {
 public:
     explicit Parser(std::string input);
-    ~Parser();
     
     bool parse();
-    
-    AstTree *getTree() { return tree; }
     
     void debugScanner();
 protected:
     // Function.cpp
     bool getFunctionArgs(std::vector<Var> &args);
     bool buildFunction(Token startToken, std::string className = "");
-    bool buildFunctionCallStmt(AstBlock *block, Token idToken);
-    bool buildReturn(AstBlock *block);
+    bool buildFunctionCallStmt(std::shared_ptr<AstBlock> block, Token idToken);
+    bool buildReturn(std::shared_ptr<AstBlock> block);
     
     // Variable.cpp
-    bool buildVariableDec(AstBlock *block);
-    bool buildVariableAssign(AstBlock *block, Token idToken);
-    bool buildArrayAssign(AstBlock *block, Token idToken);
+    bool buildVariableDec(std::shared_ptr<AstBlock> block);
+    bool buildVariableAssign(std::shared_ptr<AstBlock> block, Token idToken);
+    bool buildArrayAssign(std::shared_ptr<AstBlock> block, Token idToken);
     bool buildConst(bool isGlobal);
     
     // Flow.cpp
-    bool buildConditional(AstBlock *block);
-    bool buildElif(AstIfStmt *block);
-    bool buildElse(AstIfStmt *block);
-    bool buildWhile(AstBlock *block);
-    bool buildRepeat(AstBlock *block);
-    bool buildFor(AstBlock *block);
-    bool buildForAll(AstBlock *block);
-    bool buildLoopCtrl(AstBlock *block, bool isBreak);
+    bool buildConditional(std::shared_ptr<AstBlock> block);
+    bool buildWhile(std::shared_ptr<AstBlock> block);
+    bool buildRepeat(std::shared_ptr<AstBlock> block);
+    bool buildFor(std::shared_ptr<AstBlock> block);
+    bool buildForAll(std::shared_ptr<AstBlock> block);
+    bool buildLoopCtrl(std::shared_ptr<AstBlock> block, bool isBreak);
     
     // Structure.cpp
     bool buildEnum();
     bool buildStruct();
-    bool buildStructMember(AstStruct *str, Token token);
-    bool buildStructDec(AstBlock *block);
-    bool buildStructAssign(AstBlock *block, Token idToken);
+    bool buildStructMember(std::shared_ptr<AstStruct> str, Token token);
+    bool buildStructDec(std::shared_ptr<AstBlock> block);
+    bool buildStructAssign(std::shared_ptr<AstBlock> block, Token idToken);
     bool buildClass();
-    bool buildClassDec(AstBlock *block);
+    bool buildClassDec(std::shared_ptr<AstBlock> block);
     
-    bool buildBlock(AstBlock *block, int stopLayer = 0, AstIfStmt *parentBlock = nullptr, bool inElif = false);
-    bool buildExpression(AstStatement *stmt, DataType currentType,
-                        TokenType stopToken = SemiColon, TokenType separateToken = EmptyToken,
-                        AstExpression **dest = nullptr, bool isConst = false);
-    AstExpression *checkExpression(AstExpression *expr, DataType varType);
-    AstExpression *checkCondExpression(AstExpression *toCheck);
+    bool buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent = nullptr);
+    std::shared_ptr<AstExpression> buildExpression(
+                        std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
+                        TokenType stopToken = SemiColon,
+                        bool isConst = false, bool buildList = false);
+    std::shared_ptr<AstExpression> checkExpression(std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> varType);
+    std::shared_ptr<AstExpression> checkCondExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstExpression> toCheck);
     int isConstant(std::string name);
 private:
-    std::string input = "";
-    Scanner *scanner;
-    AstTree *tree;
-    ErrorManager *syntax;
-    int layer = 0;
-    AstClass *currentClass = nullptr;
+    std::unique_ptr<Scanner> scanner;
+    std::shared_ptr<AstClass> currentClass = nullptr;
     
-    std::map<std::string, std::pair<DataType,DataType>> typeMap;
     std::map<std::string, std::string> classMap;
-    std::map<std::string, std::pair<DataType, AstExpression*>> globalConsts;
-    std::map<std::string, std::pair<DataType, AstExpression*>> localConsts;
-    std::map<std::string, EnumDec> enums;
+    std::map<std::string, AstEnum> enums;
 };
 

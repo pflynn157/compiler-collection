@@ -206,6 +206,16 @@ struct AstClass {
 };
 
 //
+// AstEnum
+// Represents an enumeration
+//
+struct AstEnum {
+    std::string name;
+    std::shared_ptr<AstDataType> type;
+    std::map<std::string, std::shared_ptr<AstExpression>> values;
+};
+
+//
 // Represents an AstBlock
 // Blocks hold tables and symbol information
 //

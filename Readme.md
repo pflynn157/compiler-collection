@@ -8,9 +8,11 @@ Here is our current project list:
 * as -> Assemblers for various architectures (current x86 and RISC-V).
 * compiler -> A library for generalizing our frontends to various backends
 * libelf -> Utilities for the ELF binary file format.
+* libjava -> A library for generating Java class files (no external libraries needed)
 * llir -> A homebrew compiler backend modeled after LLVM.
 * test -> The test system
 * tiny-lang -> The first language, a mini educational language
 * sal-lang -> Set Algorithmic Language- A language based on formal set theory with heavy emphasis on math.
+* espresso-lang -> An experimental language to test and demonstrate the libjava library
 
 

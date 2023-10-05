@@ -35,25 +35,13 @@ protected:
     // Variable.cpp
     bool buildVariableDec(std::shared_ptr<AstBlock> block);
     bool buildVariableAssign(std::shared_ptr<AstBlock> block, Token idToken);
-    //bool buildArrayAssign(std::shared_ptr<AstBlock> block, Token idToken);
     bool buildConst(std::shared_ptr<AstBlock> block, bool isGlobal);
     
     // Flow.cpp
     std::shared_ptr<AstExpression> checkCondExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstExpression> toCheck);
     bool buildConditional(std::shared_ptr<AstBlock> block);
-    //bool buildElif(AstIfStmt *block);
-    //bool buildElse(AstIfStmt *block);
     bool buildWhile(std::shared_ptr<AstBlock> block);
-    //bool buildRepeat(std::shared_ptr<AstBlock> block);
-    //bool buildFor(std::shared_ptr<AstBlock> block);
-    //bool buildForAll(std::shared_ptr<AstBlock> block);
     bool buildLoopCtrl(std::shared_ptr<AstBlock> block, bool isBreak);
-    
-    // Structure.cpp
-    //bool buildEnum();
-    //bool buildStruct();
-    //bool buildStructDec(std::shared_ptr<AstBlock> block);
-    //bool buildStructAssign(std::shared_ptr<AstBlock> block, Token idToken);
     
     bool buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent = nullptr);
     std::shared_ptr<AstExpression> buildExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
@@ -61,6 +49,5 @@ protected:
                         bool isConst = false);
 private:
     std::unique_ptr<Scanner> scanner;
-    //std::map<std::string, EnumDec> enums;
 };
 

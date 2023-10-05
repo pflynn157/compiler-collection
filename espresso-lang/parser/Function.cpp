@@ -72,7 +72,6 @@ bool Parser::getFunctionArgs(std::vector<Var> &args, std::shared_ptr<AstBlock> b
             }
             
             args.push_back(v);
-            //typeMap[v.name] = std::pair<DataType, DataType>(v.type, v.subType);
             block->symbolTable[v.name] = v.type;
         }
     } else {
@@ -135,20 +134,6 @@ bool Parser::buildFunction(std::shared_ptr<AstBlock> block, Token startToken) {
             case Int: data_type = AstBuilder::buildInt32Type(); break;
             default: {}
         }
-    
-        /*token = scanner->getNext();
-        if (token.type == LBracket) {
-            token = scanner->getNext();
-            if (token.type != RBracket) {
-                syntax->addError(scanner->getLine(), "Invalid function type.");
-                return false;
-            }
-            
-            ptrType = funcType;
-            funcType = DataType::Array;
-            
-            token = scanner->getNext();
-        }*/
     }
     
     // Do syntax error check

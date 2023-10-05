@@ -28,7 +28,6 @@ bool Parser::parse() {
             } break;
             
             case Const: code = buildConst(tree->block, true); break;
-            //case Enum: code = buildEnum(); break;
             
             case Eof:
             case Nl: break;
@@ -70,8 +69,6 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
                 
                 if (token.type == Assign) {
                     code = buildVariableAssign(block, idToken);
-                //} else if (token.type == LBracket) {
-                //    code = buildArrayAssign(block, idToken);
                 } else if (token.type == LParen) {
                     Token varToken;
                     varToken.type = EmptyToken;
@@ -96,9 +93,6 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
             
             case Return: code = buildReturn(block); break;
             
-            // Handle conditionals
-            // Yes, ELIF and ElSE are similar, but if you look closely, there is a subtle
-            // difference (one very much needed)
             case If: code = buildConditional(block); break;
             case Elif: {
                 std::shared_ptr<AstIfStmt> condParent = std::static_pointer_cast<AstIfStmt>(parent);
@@ -113,17 +107,11 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
             
             // Handle loops
             case While: code = buildWhile(block); break;
-            //case Repeat: code = buildRepeat(block); break;
-            //case For: code = buildFor(block); break;
-            //case ForAll: code = buildForAll(block); break;
             
             case Break: code = buildLoopCtrl(block, true); break;
             case Continue: code = buildLoopCtrl(block, false); break;
             
-            // Handle the END keyword
-            case End: {
-                end = true;
-            } break;
+            case End: end = true; break;
             
             case Nl: break;
             
@@ -158,18 +146,6 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
             std::shared_ptr<AstExpression> expr = output.top();
             output.pop();
             return expr;
-            
-            /*if (stmt == nullptr) {
-                if ((*dest)->getType() == AstType::FuncCallExpr) {
-                    AstFuncCallExpr *fc = static_cast<AstFuncCallExpr *>(*dest);
-                    fc->addArgument(expr);
-                } else {
-                    *dest = expr;
-                }
-            } else {
-                stmt->addExpression(expr);
-            }
-            continue;*/
         }
     
         switch (token.type) {
@@ -215,77 +191,23 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
                 }
                 
                 token = scanner->getNext();
-                /*if (token.type == LBracket) {
-                    AstExpression *index = nullptr;
-                    buildExpression(nullptr, DataType::Int32, RBracket, EmptyToken, &index);
-                    
-                    AstArrayAccess *acc = new AstArrayAccess(name);
-                    acc->setIndex(index);
-                    output.push(acc);
-                } else if (token.type == LParen) {
-                    AstFuncCallExpr *fc = new AstFuncCallExpr(name);
-                    AstExpression *fcExpr = fc;
-                    buildExpression(nullptr, varType, RParen, Comma, &fcExpr);
-                    
-                    output.push(fc);
-                } else if (token.type == Scope) {
-                    if (enums.find(name) == enums.end()) {
-                        syntax->addError(scanner->getLine(), "Unknown enum.");
-                        return false;
+
+                int constVal = block->isConstant(name);
+                if (constVal > 0) {
+                    if (constVal == 1) {
+                        std::shared_ptr<AstExpression> expr = block->globalConsts[name].second;
+                        output.push(expr);
+                    } else if (constVal == 2) {
+                        std::shared_ptr<AstExpression> expr = block->localConsts[name].second;
+                        output.push(expr);
                     }
-                    
-                    token = scanner->getNext();
-                    if (token.type != Id) {
-                        syntax->addError(scanner->getLine(), "Expected identifier.");
-                        return false;
-                    }
-                    
-                    EnumDec dec = enums[name];
-                    AstExpression *val = dec.values[token.id_val];
-                    output.push(val);
-                } else {*/
-                    int constVal = block->isConstant(name);
-                    if (constVal > 0) {
-                        if (constVal == 1) {
-                            std::shared_ptr<AstExpression> expr = block->globalConsts[name].second;
-                            output.push(expr);
-                        } else if (constVal == 2) {
-                            std::shared_ptr<AstExpression> expr = block->localConsts[name].second;
-                            output.push(expr);
-                        }
-                    } else {
-                        std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
-                        output.push(id);
-                    }
-                    
-                    scanner->rewind(token);
-                //}
+                } else {
+                    std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
+                    output.push(id);
+                }
+                
+                scanner->rewind(token);
             } break;
-            
-            /*case Sizeof: {
-                lastWasOp = false;
-                
-                if (isConst) {
-                    syntax->addError(scanner->getLine(), "Invalid constant value.");
-                    return false;
-                }
-                
-                std::string name = token.id_val;
-                
-                Token token1 = scanner->getNext();
-                Token token2 = scanner->getNext();
-                Token token3 = scanner->getNext();
-                
-                if (token1.type != LParen || token2.type != Id || token3.type != RParen) {
-                    syntax->addError(scanner->getLine(), "Invalid token in sizeof.");
-                    token.print();
-                    return false;
-                }
-                
-                AstID *id = new AstID(token2.id_val);
-                AstSizeof *size = new AstSizeof(id);
-                output.push(size);
-            } break;*/
             
             case Plus: 
             case Minus:
@@ -362,24 +284,6 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
             case GTE: opStack.push(std::make_shared<AstGTEOp>()); lastWasOp = true; break;
             case LTE: opStack.push(std::make_shared<AstLTEOp>()); lastWasOp = true; break;
             
-            /*case Step: {
-                lastWasOp = false;       
-                
-                if (stmt->getType() != AstType::For) {
-                    syntax->addError(scanner->getLine(), "Step is only valid with for loops");
-                    return false;
-                }
-                
-                token = scanner->getNext();
-                if (token.type != Int32) {
-                    syntax->addError(scanner->getLine(), "Expected integer literal with \"step\"");
-                    return false;
-                }
-                
-                AstForStmt *forStmt = static_cast<AstForStmt *>(stmt);
-                forStmt->setStep(token.i32_val);
-            } break;*/
-            
             default: {}
         }
         
@@ -422,21 +326,6 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
     // Type check the top
     std::shared_ptr<AstExpression> expr = checkExpression(output.top(), varType);
     return expr;
-    
-    /*if (stmt == nullptr) {
-        if ((*dest) == nullptr) {
-            *dest = expr;
-        } else if ((*dest)->getType() == AstType::FuncCallExpr) {
-            AstFuncCallExpr *fc = static_cast<AstFuncCallExpr *>(*dest);
-            fc->addArgument(expr);
-        } else {
-            *dest = expr;
-        }
-    } else {
-        stmt->addExpression(expr);
-    }
-    
-    return true;*/
 }
 
 // The debug function for the scanner

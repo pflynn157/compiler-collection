@@ -63,7 +63,6 @@ Token Scanner::getNext() {
             ++currentLine;
         }
         
-        // TODO: This needs some kind of error handleing
         if (next == '\'') {
             char c = reader.get();
             rawBuffer += c;
@@ -198,7 +197,6 @@ TokenType Scanner::getKeyword() {
     else if (buffer == "public") return Public;
     else if (buffer == "protected") return Protected;
     else if (buffer == "private") return Private;
-    //else if (buffer == "enum") return Enum;
     else if (buffer == "end") return End;
     else if (buffer == "return") return Return;
     else if (buffer == "var") return VarD;
@@ -218,20 +216,13 @@ TokenType Scanner::getKeyword() {
     else if (buffer == "elif") return Elif;
     else if (buffer == "else") return Else;
     else if (buffer == "while") return While;
-    //else if (buffer == "repeat") return Repeat;
-    //else if (buffer == "for") return For;
-    //else if (buffer == "forall") return ForAll;
     else if (buffer == "is") return Is;
     else if (buffer == "then") return Then;
     else if (buffer == "do") return Do;
     else if (buffer == "break") return Break;
     else if (buffer == "continue") return Continue;
-    //else if (buffer == "in") return In;
-    //else if (buffer == "sizeof") return Sizeof;
-    //else if (buffer == "import") return Import;
     else if (buffer == "true") return True;
     else if (buffer == "false") return False;
-    //else if (buffer == "step") return Step;
     return EmptyToken;
 }
 
@@ -251,15 +242,13 @@ TokenType Scanner::getSymbol(char c) {
         case '&': return And;
         case '|': return Or;
         case '^': return Xor;
+        case '.': return Dot;
         
         case ':': {
             char c2 = reader.get();
             if (c2 == '=') {
                 rawBuffer += c2;
                 return Assign;
-            //} else if (c2 == ':') {
-            //    rawBuffer += c2;
-            //    return Scope;
             } else {
                 reader.unget();
                 return Colon;
@@ -304,17 +293,6 @@ TokenType Scanner::getSymbol(char c) {
             }
         } break;
         
-        case '.': {
-            /*char c2 = reader.get();
-            if (c2 == '.') {
-                rawBuffer += c2;
-                return Range;
-            } else {
-                reader.unget();*/
-                return Dot;
-            //}
-        } break;
-        
         case '-': {
             char c2 = reader.get();
             if (c2 == '>') {
@@ -355,7 +333,6 @@ void Token::print() {
         case Eof: std::cout << "EOF "; break;
         
         case Func: std::cout << "FUNC "; break;
-        //case Enum: std::cout << "ENUM "; break;
         case End: std::cout << "END "; break;
         case Return: std::cout << "RETURN "; break;
         case VarD: std::cout << "VAR "; break;
@@ -364,18 +341,11 @@ void Token::print() {
         case Elif: std::cout << "ELIF"; break;
         case Else: std::cout << "ELSE"; break;
         case While: std::cout << "WHILE"; break;
-        //case For: std::cout << "FOR"; break;
-        //case ForAll: std::cout << "FORALL"; break;
-        //case Repeat: std::cout << "REPEAT"; break;
         case Is: std::cout << "IS"; break;
         case Then: std::cout << "THEN"; break;
         case Do: std::cout << "DO"; break;
         case Break: std::cout << "BREAK"; break;
         case Continue: std::cout << "CONTINUE"; break;
-        //case In: std::cout << "IN"; break;
-        //case Sizeof: std::cout << "SIZEOF"; break;
-        //case Import: std::cout << "IMPORT"; break;
-        //case Step: std::cout << "STEP"; break;
         
         case Bool: std::cout << "BOOL"; break;
         case Char: std::cout << "CHAR"; break;
@@ -404,9 +374,7 @@ void Token::print() {
         case RBracket: std::cout << "]"; break;
         case Comma: std::cout << ", "; break;
         case Dot: std::cout << ". "; break;
-        //case Range: std::cout << ".. "; break;
         case Arrow: std::cout << "-> "; break;
-        //case Scope: std::cout << ":: "; break;
         
         case Plus: std::cout << "+ "; break;
         case Minus: std::cout << "- "; break;

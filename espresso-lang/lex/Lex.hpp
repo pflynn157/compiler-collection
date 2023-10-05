@@ -29,18 +29,11 @@ enum TokenType {
     Elif,
     Else,
     While,
-    //Repeat,
-    //For,
-    //ForAll,
     Is,
     Then,
     Do,
     Break,
     Continue,
-    //In,
-    //Sizeof,
-    //Import,
-    //Step,
     
     // Datatype Keywords
     Bool,
@@ -74,9 +67,7 @@ enum TokenType {
     RBracket,
     Comma,
     Dot,
-    //Range,
     Arrow,
-    //Scope,
     
     Plus,
     Minus,

@@ -85,55 +85,6 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
             block->symbolTable[name] = dataType;
         }
     
-    // We have an array
-    } else if (token.type == LBracket) {
-        /*AstVarDec *empty = new AstVarDec("", DataType::Array);
-        if (!buildExpression(empty, DataType::Int32, RBracket)) return false;   
-        
-        token = scanner->getNext();
-        if (token.type != SemiColon) {
-            syntax->addError(scanner->getLine(), "Error: Expected \';\'.");
-            return false;
-        }
-        
-        for (std::string name : toDeclare) {
-            AstVarDec *vd = new AstVarDec(name, DataType::Array);
-            block->addStatement(vd);
-            vd->addExpression(empty->getExpression());
-            vd->setPtrType(dataType);
-            
-            // Create an assignment to a malloc call
-            AstVarAssign *va = new AstVarAssign(name);
-            va->setDataType(DataType::Array);
-            va->setPtrType(dataType);
-            block->addStatement(va);
-            
-            AstFuncCallExpr *callMalloc = new AstFuncCallExpr("malloc");
-            callMalloc->setArguments(vd->getExpressions());
-            va->addExpression(callMalloc);
-            
-            // In order to get a proper malloc, we need to multiply the argument by
-            // the size of the type. Get the arguments, and do that
-            AstExpression *arg = callMalloc->getArguments().at(0);
-            callMalloc->clearArguments();
-            
-            AstInt *size;
-            if (dataType == DataType::Int32) size = new AstInt(4);
-            else if (dataType == DataType::String) size = new AstInt(8);
-            else size = new AstInt(1);
-            
-            AstMulOp *op = new AstMulOp;
-            op->setLVal(size);
-            op->setRVal(arg);
-            callMalloc->addArgument(op);
-            
-            // Finally, set the size of the declaration
-            vd->setPtrSize(arg);
-            
-            typeMap[name] = std::pair<DataType, DataType>(DataType::Array, dataType);
-        }*/
-        
-    // Otherwise, we have a regular variable
     } else {
         std::shared_ptr<AstExprStatement> empty = std::make_shared<AstExprStatement>();
         empty->expression = buildExpression(block, dataType);
@@ -173,26 +124,6 @@ bool Parser::buildVariableAssign(std::shared_ptr<AstBlock> block, Token idToken)
     
     return true;
 }
-
-// Builds an array assignment
-/*bool Parser::buildArrayAssign(std::shared_ptr<AstBlock> block, Token idToken) {
-    DataType dataType = typeMap[idToken.id_val].second;
-    AstArrayAssign *pa = new AstArrayAssign(idToken.id_val);
-    pa->setDataType(typeMap[idToken.id_val].first);
-    pa->setPtrType(dataType);
-    block->addStatement(pa);
-    
-    if (!buildExpression(pa, DataType::Int32, RBracket)) return false;
-    
-    Token token = scanner->getNext();
-    if (token.type != Assign) {
-        syntax->addError(scanner->getLine(), "Expected \'=\' after array assignment.");
-        return false;
-    }
-    
-    if (!buildExpression(pa, dataType)) return false;
-    return true;
-}*/
 
 // Builds a constant variable
 bool Parser::buildConst(std::shared_ptr<AstBlock> block, bool isGlobal) {

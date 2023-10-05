@@ -6,7 +6,6 @@ set(SRC
     parser/Flow.cpp
     parser/Function.cpp
     parser/Parser.cpp
-    parser/Structure.cpp
     parser/Variable.cpp
     
     main.cpp

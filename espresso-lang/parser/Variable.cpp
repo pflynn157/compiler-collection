@@ -175,8 +175,8 @@ bool Parser::buildVariableAssign(std::shared_ptr<AstBlock> block, Token idToken)
 }
 
 // Builds an array assignment
-bool Parser::buildArrayAssign(std::shared_ptr<AstBlock> block, Token idToken) {
-    /*DataType dataType = typeMap[idToken.id_val].second;
+/*bool Parser::buildArrayAssign(std::shared_ptr<AstBlock> block, Token idToken) {
+    DataType dataType = typeMap[idToken.id_val].second;
     AstArrayAssign *pa = new AstArrayAssign(idToken.id_val);
     pa->setDataType(typeMap[idToken.id_val].first);
     pa->setPtrType(dataType);
@@ -191,9 +191,8 @@ bool Parser::buildArrayAssign(std::shared_ptr<AstBlock> block, Token idToken) {
     }
     
     if (!buildExpression(pa, dataType)) return false;
-*/
     return true;
-}
+}*/
 
 // Builds a constant variable
 bool Parser::buildConst(std::shared_ptr<AstBlock> block, bool isGlobal) {

@@ -11,7 +11,7 @@
 #include <ast/ast.hpp>
 
 // Parses and builds an enumeration
-bool Parser::buildEnum() {
+//bool Parser::buildEnum() {
     /*Token token = scanner->getNext();
     std::string name = token.id_val;
     
@@ -95,5 +95,5 @@ bool Parser::buildEnum() {
     theEnum.values = values;
     enums[name] = theEnum;
     */
-    return true;
-}
+//    return true;
+//}

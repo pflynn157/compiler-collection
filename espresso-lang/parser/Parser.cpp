@@ -28,7 +28,7 @@ bool Parser::parse() {
             } break;
             
             case Const: code = buildConst(tree->block, true); break;
-            case Enum: code = buildEnum(); break;
+            //case Enum: code = buildEnum(); break;
             
             case Eof:
             case Nl: break;
@@ -70,8 +70,8 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
                 
                 if (token.type == Assign) {
                     code = buildVariableAssign(block, idToken);
-                } else if (token.type == LBracket) {
-                    code = buildArrayAssign(block, idToken);
+                //} else if (token.type == LBracket) {
+                //    code = buildArrayAssign(block, idToken);
                 } else if (token.type == LParen) {
                     Token varToken;
                     varToken.type = EmptyToken;
@@ -215,21 +215,21 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
                 }
                 
                 token = scanner->getNext();
-                if (token.type == LBracket) {
-                    /*AstExpression *index = nullptr;
+                /*if (token.type == LBracket) {
+                    AstExpression *index = nullptr;
                     buildExpression(nullptr, DataType::Int32, RBracket, EmptyToken, &index);
                     
                     AstArrayAccess *acc = new AstArrayAccess(name);
                     acc->setIndex(index);
-                    output.push(acc);*/
+                    output.push(acc);
                 } else if (token.type == LParen) {
-                    /*AstFuncCallExpr *fc = new AstFuncCallExpr(name);
+                    AstFuncCallExpr *fc = new AstFuncCallExpr(name);
                     AstExpression *fcExpr = fc;
                     buildExpression(nullptr, varType, RParen, Comma, &fcExpr);
                     
-                    output.push(fc);*/
+                    output.push(fc);
                 } else if (token.type == Scope) {
-                    /*if (enums.find(name) == enums.end()) {
+                    if (enums.find(name) == enums.end()) {
                         syntax->addError(scanner->getLine(), "Unknown enum.");
                         return false;
                     }
@@ -242,8 +242,8 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
                     
                     EnumDec dec = enums[name];
                     AstExpression *val = dec.values[token.id_val];
-                    output.push(val);*/
-                } else {
+                    output.push(val);
+                } else {*/
                     int constVal = block->isConstant(name);
                     if (constVal > 0) {
                         if (constVal == 1) {
@@ -259,11 +259,11 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
                     }
                     
                     scanner->rewind(token);
-                }
+                //}
             } break;
             
-            case Sizeof: {
-                /*lastWasOp = false;
+            /*case Sizeof: {
+                lastWasOp = false;
                 
                 if (isConst) {
                     syntax->addError(scanner->getLine(), "Invalid constant value.");
@@ -284,8 +284,8 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
                 
                 AstID *id = new AstID(token2.id_val);
                 AstSizeof *size = new AstSizeof(id);
-                output.push(size);*/
-            } break;
+                output.push(size);
+            } break;*/
             
             case Plus: 
             case Minus:
@@ -362,8 +362,8 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
             case GTE: opStack.push(std::make_shared<AstGTEOp>()); lastWasOp = true; break;
             case LTE: opStack.push(std::make_shared<AstLTEOp>()); lastWasOp = true; break;
             
-            case Step: {
-                /*lastWasOp = false;       
+            /*case Step: {
+                lastWasOp = false;       
                 
                 if (stmt->getType() != AstType::For) {
                     syntax->addError(scanner->getLine(), "Step is only valid with for loops");
@@ -377,8 +377,8 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
                 }
                 
                 AstForStmt *forStmt = static_cast<AstForStmt *>(stmt);
-                forStmt->setStep(token.i32_val);*/
-            } break;
+                forStmt->setStep(token.i32_val);
+            } break;*/
             
             default: {}
         }

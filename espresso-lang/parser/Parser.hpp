@@ -35,7 +35,7 @@ protected:
     // Variable.cpp
     bool buildVariableDec(std::shared_ptr<AstBlock> block);
     bool buildVariableAssign(std::shared_ptr<AstBlock> block, Token idToken);
-    bool buildArrayAssign(std::shared_ptr<AstBlock> block, Token idToken);
+    //bool buildArrayAssign(std::shared_ptr<AstBlock> block, Token idToken);
     bool buildConst(std::shared_ptr<AstBlock> block, bool isGlobal);
     
     // Flow.cpp
@@ -50,10 +50,10 @@ protected:
     bool buildLoopCtrl(std::shared_ptr<AstBlock> block, bool isBreak);
     
     // Structure.cpp
-    bool buildEnum();
-    bool buildStruct();
-    bool buildStructDec(std::shared_ptr<AstBlock> block);
-    bool buildStructAssign(std::shared_ptr<AstBlock> block, Token idToken);
+    //bool buildEnum();
+    //bool buildStruct();
+    //bool buildStructDec(std::shared_ptr<AstBlock> block);
+    //bool buildStructAssign(std::shared_ptr<AstBlock> block, Token idToken);
     
     bool buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent = nullptr);
     std::shared_ptr<AstExpression> buildExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,

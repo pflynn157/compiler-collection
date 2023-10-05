@@ -129,6 +129,16 @@ void AstStruct::print() {
     std::cout << std::endl;
 }
 
+void AstClass::print() {
+    std::cout << "CLASS " << name << std::endl;
+    
+    for (auto const &stmt : functions) {
+        std::cout << "  ";
+        stmt->print();
+    }
+    std::cout << std::endl;
+}
+
 void AstExprStatement::print() {
     std::cout << "EXPR ";
     if (name != "") std::cout << "N:" << name << " ";
@@ -188,6 +198,39 @@ void AstWhileStmt::print(int indent) {
     
     block->print(indent+4);
 }
+
+void AstRepeatStmt::print(int indent) {
+    std::cout << "    ";
+    std::cout << "REPEAT" << std::endl;
+    block->print(indent+4);
+}
+
+void AstForStmt::print(int indent) {
+    std::cout << "    ";
+    std::cout << "FOR ";
+    indexVar->print();
+    std::cout << " IN ";
+    startBound->print();
+    std::cout << " .. ";
+    endBound->print();
+    std::cout << " STEP ";
+    step->print();
+    std::cout << std::endl;
+    
+    block->print(indent+4);
+}
+
+void AstForAllStmt::print(int indent) {
+    std::cout << "    ";
+    std::cout << "FORALL ";
+    indexVar->print();
+    std::cout << " IN ";
+    arrayVar->print();
+    std::cout << std::endl;
+    
+    block->print(indent+4);
+}
+
 
 void AstBreak::print() {
     std::cout << "BREAK" << std::endl;

@@ -34,6 +34,9 @@ enum class V_AstType {
     
     If,
     While,
+    Repeat,
+    For,
+    ForAll,
     
     Break,
     Continue,
@@ -104,6 +107,7 @@ enum class Attr {
 // Forward declarations
 struct AstExpression;
 struct AstStatement;
+struct AstFunction;
 
 //
 // The base of all AST nodes
@@ -180,6 +184,25 @@ struct AstStruct : AstNode {
     std::vector<Var> items;
     std::map<std::string, std::shared_ptr<AstExpression>> default_expressions;
     int size = 0;
+};
+
+//
+// AstClass
+// Represents a class
+//
+struct AstClass {
+    explicit AstClass(std::string name) {
+        this->name = name;
+    }
+    
+    void addFunction(std::shared_ptr<AstFunction> func) {
+        functions.push_back(func);
+    }
+    
+    void print();
+    
+    std::string name = "";
+    std::vector<std::shared_ptr<AstFunction>> functions;
 };
 
 //
@@ -798,6 +821,41 @@ struct AstWhileStmt : AstStatement {
     void print(int indent = 0);
     std::string dot(std::string parent) override;
 
+    std::shared_ptr<AstBlock> block = nullptr;
+};
+
+// Represents an infinite loop statement
+struct AstRepeatStmt : public AstStatement {
+    explicit AstRepeatStmt() : AstStatement(V_AstType::Repeat) {}
+    
+    void print(int indent = 0);
+    
+    std::shared_ptr<AstBlock> block = nullptr;
+};
+
+// Represents a for loop
+struct AstForStmt : public AstStatement {
+    explicit AstForStmt() : AstStatement(V_AstType::For) {
+        step = std::make_shared<AstI32>(1);
+    }
+    
+    void print(int indent = 0);
+    
+    std::shared_ptr<AstID> indexVar;
+    std::shared_ptr<AstExpression> startBound;
+    std::shared_ptr<AstExpression> endBound;
+    std::shared_ptr<AstI32> step;
+    std::shared_ptr<AstBlock> block = nullptr;
+};
+
+// Represents a for-all loop
+struct AstForAllStmt : public AstStatement {
+    explicit AstForAllStmt() : AstStatement(V_AstType::ForAll) {}
+    
+    void print(int indent = 0);
+    
+    std::shared_ptr<AstID> indexVar;
+    std::shared_ptr<AstID> arrayVar;
     std::shared_ptr<AstBlock> block = nullptr;
 };
 

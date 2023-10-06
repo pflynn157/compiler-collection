@@ -54,7 +54,7 @@ void AstObjectType::print() {
 void AstExternFunction::print() {
     std::cout << "EXTERN FUNC " << name << "(";
     for (auto var : args) {
-        var.type->print();
+        if (var.type) var.type->print();
         std::cout << ", ";
     }
     std::cout << ") ";

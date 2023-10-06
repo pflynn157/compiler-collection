@@ -1,11 +1,14 @@
 //
-// Copyright 2021-2022 Patrick Flynn
-// This file is part of the Tiny Lang compiler.
-// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2021 Patrick Flynn
+// This file is part of the Orka compiler.
+// Orka is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <fstream>
 #include <iostream>
 #include <cstdio>
+#include <memory>
+
+#include <lex/lex.hpp>
 
 std::string getInputPath(std::string input) {
     std::string name = "";
@@ -16,44 +19,37 @@ std::string getInputPath(std::string input) {
         else name += c;
     }
     
-    name += "_pre.tl";
+    name += "_pre.ok";
     return name;
 }
 
 std::string preprocessFile(std::string input, bool print) {
-    return input;
-    /*std::string newPath = "/tmp/" + getInputPath(input);
-    
-    FILE *file = fopen(input.c_str(), "r");
-    std::string input_str = "";
-    while (!feof(file)) {
-        input_str += fgetc(file);
+    std::string newPath = "/tmp/" + getInputPath(input);
+    std::unique_ptr<Scanner> scanner = std::make_unique<Scanner>(input);
+    if (scanner->isError()) {
+        return "";
     }
-    Scanner *scanner = lex_init_string((char *)input_str.c_str());
     
-    std::string content = "";
+    std::ofstream writer(newPath);
     
     // Read until the end of the file
-    token tk;
-    while (tk != t_eof) {
-        tk = lex_get_next(scanner);
+    Token token;
+    while (!scanner->isEof() && token.type != t_eof) {
+        token = scanner->getNext();
         
-        if (token.type != Import) {
-            content += scanner->getRawBuffer();
+        if (token.type != t_import) {
+            writer << scanner->getRawBuffer();
             continue;
         }
-        
-        // Indicate we have an import line
-        content += "#pragma count\n";
         
         // Build the include path
         token = scanner->getNext();
         std::string path = "";
         
-        while (token.type != SemiColon) {
+        while (token.type != t_semicolon) {
             switch (token.type) {
-                case Id: path += token.id_val; break;
-                case Dot: path += "/"; break;
+                case t_id: path += token.id_val; break;
+                case t_dot: path += "/"; break;
                 
                 default: {
                     // TODO: Blow up
@@ -65,10 +61,14 @@ std::string preprocessFile(std::string input, bool print) {
         
         // Load the include path
         // TODO: We need better path support
-        path = "/usr/local/include/tinylang/" + path + ".th";
-        std::string preprocInclude = preprocessFile(path, false);
+#ifdef DEV_LINK_MODE
+        path = std::string(ORKA_HEADER_LOCATION) + "/" + path + ".oh";
+#else
+        path = "/usr/local/include/orka/" + path + ".oh";
+#endif
+        std::string preprocInclude = preprocessFile(path, print);
         
-        std::ifstream reader(preprocInclude.c_str());
+        std::ifstream reader(preprocInclude);
         if (!reader.is_open()) {
             std::cerr << "Fatal: Unable to open preprocessed include" << std::endl;
             return "";
@@ -76,12 +76,8 @@ std::string preprocessFile(std::string input, bool print) {
         
         std::string line = "";
         while (std::getline(reader, line)) {
-            if (line == "" || line.length() == 0) continue;
-            content += "#pragma nocount\n";
-            content += line + "\n";
+            writer << line;
         }
-        int last = content.length() - 1;
-        if (content[last] == '\n') content[last] = ' ';
         
         reader.close();
         remove(preprocInclude.c_str());
@@ -90,17 +86,6 @@ std::string preprocessFile(std::string input, bool print) {
         scanner->getRawBuffer();
     }
     
-    if (print) std::cout << content << std::endl;
-    
-    std::ofstream writer(newPath, std::ios_base::out | std::ios_base::trunc);
-    if (writer.is_open()) {
-        writer << content;
-        writer.close();
-    } else {
-        std::cerr << "Unable to open new file in preproc" << std::endl;
-    }
-    
-    delete scanner;
-    return newPath;*/
+    return newPath;
 }
 

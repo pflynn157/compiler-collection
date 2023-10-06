@@ -5,6 +5,7 @@ add_subdirectory(tiny-lang/output)
 add_subdirectory(tiny-lang/lex)
 
 add_subdirectory(espresso)
+add_subdirectory(orka)
 
 if (DISABLE_OUTPUT_TEST)
     add_custom_target(test_llvm DEPENDS

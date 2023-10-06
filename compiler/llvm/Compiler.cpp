@@ -371,6 +371,7 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
 }
 
 Type *Compiler::translateType(std::shared_ptr<AstDataType> dataType) {
+    if (dataType == nullptr) return Type::getVoidTy(*context);
     Type *type;
     
     switch (dataType->type) {

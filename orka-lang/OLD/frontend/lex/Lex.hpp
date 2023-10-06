@@ -15,36 +15,36 @@ enum TokenType {
     Eof,
     
     // Keywords
-    Extern,
-    Func,
+    Extern,     //in
+    Func,       //in
     Enum,
-    Struct,
+    Struct,     //in
     Class,
-    End,
-    Return,
-    VarD,
-    Const,
-    If,
-    Elif,
-    Else,
-    While,
+    End,        //in
+    Return,     //in
+    VarD,       //in
+    Const,      //in
+    If,         //in
+    Elif,       //in
+    Else,       //in
+    While,      //in
     Repeat,
     For,
     ForAll,
-    Is,
-    Then,
-    Do,
-    Break,
-    Continue,
+    Is,     //in
+    Then,   //in
+    Do,     //in
+    Break,      //in
+    Continue,   //in
     In,
     Sizeof,
-    Import,
+    Import,     //in
     Step,
     Extends,
     
     // Datatype Keywords
-    Bool,
-    Char,
+    Bool,   //in
+    Char,   //in
     Byte,
     UByte,
     Short,

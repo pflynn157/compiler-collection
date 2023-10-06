@@ -54,15 +54,19 @@ void assemble(CFlags cflags) {
 
 #ifdef DEV_LINK_MODE
 
-#ifndef LINK_LOCATION
-#define LINK_LOCATION = "."
+#ifndef LINK_CORELIB_LOCATION
+#define LINK_CORELIB_LOCATION = "."
+#endif
+
+#ifndef LINK_STDLIB_LOCATION
+#define LINK_STDLIB_LOCATION = "."
 #endif
 
 void link(CFlags cflags) {
     std::string cmd = "ld ";
-    cmd += std::string(LINK_LOCATION) + "/amd64_start.o ";
     cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
-    cmd += " -L" + std::string(LINK_LOCATION) + "/corelib -lcorelib ";
+    cmd += " -L" + std::string(LINK_CORELIB_LOCATION) + " -lcorelib ";
+    cmd += " -L" + std::string(LINK_STDLIB_LOCATION) + " -lstdlib ";
     system(cmd.c_str());
     //printf("LINK: %s\n", cmd.c_str());
 }

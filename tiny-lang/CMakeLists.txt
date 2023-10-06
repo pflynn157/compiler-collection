@@ -29,3 +29,15 @@ target_link_libraries(tlc compiler_llvm)
 add_executable(tlcllir ${SRC} llir_main.cpp)
 target_link_libraries(tlcllir compiler_llir)
 
+# Enable dev linking mode
+if (DEV_LINK_MODE)
+    target_compile_options(tlc PUBLIC
+        -DLINK_LOCATION="${CMAKE_BINARY_DIR}/tiny-lang/stdlib"
+    )
+    
+    target_compile_options(tlcllir PUBLIC
+        -DLINK_LOCATION="${CMAKE_BINARY_DIR}/tiny-lang/stdlib"
+        -DAS_LOCATION="${CMAKE_BINARY_DIR}/as"
+    )
+endif()
+

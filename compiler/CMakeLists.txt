@@ -42,15 +42,3 @@ target_link_libraries(compiler_llvm
 
 target_link_libraries(compiler_llir llir compiler_base)
 
-# Enable dev linking mode
-if (DEV_LINK_MODE)
-    target_compile_options(compiler_llvm PUBLIC
-        -DLINK_LOCATION="${CMAKE_BINARY_DIR}/tiny-lang/stdlib"
-    )
-    
-    target_compile_options(compiler_llir PUBLIC
-        -DLINK_LOCATION="${CMAKE_BINARY_DIR}/tiny-lang/stdlib"
-        -DAS_LOCATION="${CMAKE_BINARY_DIR}/as"
-    )
-endif()
-

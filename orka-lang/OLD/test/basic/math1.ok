@@ -1,0 +1,27 @@
+
+#OUTPUT
+#X1: 30
+#X2: 10
+#X3: 200
+#X4: 2
+#END
+
+#RET 0
+
+extern printf(ln : str, x : int);
+
+func main -> int is
+    var y : int := 20;
+    var x1 : int := y + 10;
+    var x2 : int := y - 10;
+    var x3 : int := y * 10;
+    var x4 : int := y / 10;
+    
+    printf("X1: %d\n", x1);
+    printf("X2: %d\n", x2);
+    printf("X3: %d\n", x3);
+    printf("X4: %d\n", x4);
+    
+    return 0;
+end
+

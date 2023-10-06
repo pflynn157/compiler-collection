@@ -1,0 +1,18 @@
+
+#OUTPUT
+#CONST: 20, 30
+#END
+
+#RET 0
+
+extern printf(ln:str, x:int);
+
+const Top : int := 30;
+
+func main -> int is
+    const x : int := 20;
+    
+    printf("CONST: %d, %d\n", x, Top);
+    
+    return 0;
+end

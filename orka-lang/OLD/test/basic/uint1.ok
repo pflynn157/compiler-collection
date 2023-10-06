@@ -1,0 +1,20 @@
+
+#OUTPUT
+#1234
+#4660
+#END
+
+#RET 0
+
+extern println(line:str);
+extern printf(line:str, x:int);
+
+func main -> int is
+    var x : uint := 0x1234;
+    
+    printf("%x\n", x);
+    printf("%d\n", x);
+    
+    return 0;
+end
+

@@ -1,0 +1,20 @@
+
+#OUTPUT
+#True
+#END
+
+#RET 0
+
+import std.io;
+
+extern println(ln:str);
+
+func main -> int is
+    var x : bool := true;
+    
+    if x then println("True");
+    else println("False");
+    end
+    
+    return 0;
+end

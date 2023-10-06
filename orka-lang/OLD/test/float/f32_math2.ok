@@ -1,0 +1,35 @@
+
+#OUTPUT
+#99.123001
+#2.398099
+#---------------
+#101.521102
+#96.724899
+#237.706863
+#41.333976
+#END
+
+#RET 0
+
+import std.io;
+
+func main(args:str[]) -> int is
+    var x : float := 99.12300;
+    var y : float := 2.398100;
+    
+    printFloat(x);
+    printFloat(y);
+    println("---------------");
+    
+    var a1 : float := x + y;
+    var a2 : float := x - y;
+    var a3 : float := x * y;
+    var a4 : float := x / y;
+    
+    printFloat(a1);
+    printFloat(a2);
+    printFloat(a3);
+    printFloat(a4);
+    
+    return 0;
+end

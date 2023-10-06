@@ -1,0 +1,25 @@
+
+#OUTPUT
+#Hi!
+#How are you?
+#Good!
+#END
+
+#RET 0
+
+import std.io;
+
+extern println(s:str);
+
+func main -> int is
+    var args : str[3];
+    args[0] := "Hi!";
+    args[1] := "How are you?";
+    args[2] := "Good!";
+    
+    forall a in args do
+        println(a);
+    end
+    
+    return 0;
+end

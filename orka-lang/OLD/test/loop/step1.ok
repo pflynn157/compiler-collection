@@ -1,0 +1,35 @@
+
+#OUTPUT
+#100
+#0
+#100
+#0
+#100
+#0
+#100
+#0
+#100
+#0
+#END
+
+#RET 0
+
+extern printf(ln:str, x:int);
+
+func main -> int is
+    var numbers : int[10];
+    
+    for i in 0 .. 10 do
+        numbers[i] := 0;
+    end
+    
+    for i in 0 .. 10 step 2 do
+        numbers[i] := 100;
+    end
+    
+    forall i in numbers do
+        printf("%d\n", i);
+    end
+    
+    return 0;
+end

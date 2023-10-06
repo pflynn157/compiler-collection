@@ -1,0 +1,56 @@
+
+#OUTPUT
+#Main!
+#Func1
+#Func2
+#Func3: 20
+#Func4: 20, 30
+#Func5: 20
+#Func6: 20, 30
+#END
+
+#RET 0
+
+import std.io;
+
+extern println(ln:str);
+
+func func1 is
+    println("Func1");
+end
+
+func func2 -> int is
+    println("Func2");
+    return 0;
+end
+
+func func3(x:int) is
+    printf("Func3: %d\n", x);
+end
+
+func func4(x:int, y:int) is
+    printf("Func4: %d, %d\n", x, y);
+end
+
+func func5(x:int) -> int is
+    printf("Func5: %d\n", x);
+    return 0;
+end
+
+func func6(x:int, y:int) -> int is
+    printf("Func6: %d, %d\n", x, y);
+    return 0;
+end
+
+func main -> int is
+    println("Main!");
+    
+    func1();
+    func2();
+    func3(20);
+    func4(20, 30);
+    func5(20);
+    func6(20, 30);
+    
+    return 0;
+end

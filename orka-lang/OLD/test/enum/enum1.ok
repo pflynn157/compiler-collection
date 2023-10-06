@@ -1,0 +1,26 @@
+
+#OUTPUT
+#A: 0
+#B: 1
+#C: 2
+#END
+
+#RET 0
+
+import std.io;
+
+enum Vals is
+    A,
+    B,
+    C
+end
+
+func main -> int is
+    var x : int = Vals::B;
+    
+    printf("A: %d\n", Vals::A);
+    printf("B: %d\n", x);
+    printf("C: %d\n", Vals::C);
+    
+    return 0;
+end

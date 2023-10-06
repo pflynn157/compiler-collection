@@ -1,0 +1,18 @@
+
+#OUTPUT
+#21
+#END
+
+#RET 0
+
+extern println(line:str);
+extern printf(line:str, x:int);
+
+func main -> int is
+    var x : ushort := 0x21;
+    
+    printf("%x\n", x);
+    
+    return 0;
+end
+

@@ -1,33 +1,36 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Orka compiler.
-// Orka is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2021-2022 Patrick Flynn
+// This file is part of the Tiny Lang compiler.
+// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #pragma once
 
 #include <string>
 #include <map>
+#include <stack>
 #include <memory>
 
-#include <lex/Lex.hpp>
+#include <parser/base_parser.hpp>
 #include <parser/ErrorManager.hpp>
 #include <ast/ast.hpp>
-#include <parser/base_parser.hpp>
+#include <lex/lex.hpp>
 
 // The parser class
 // The parser is in charge of performing all parsing and AST-building tasks
 // It is also in charge of the error manager
-
 class Parser : public BaseParser {
 public:
     explicit Parser(std::string input);
+    ~Parser();
     
     bool parse();
+    
+    std::shared_ptr<AstTree> getTree() { return tree; }
     
     void debugScanner();
 protected:
     // Function.cpp
-    bool getFunctionArgs(std::vector<Var> &args, std::shared_ptr<AstBlock> block);
+    bool getFunctionArgs(std::shared_ptr<AstBlock> block, std::vector<Var> &args);
     bool buildFunction(Token startToken, std::string className = "");
     bool buildFunctionCallStmt(std::shared_ptr<AstBlock> block, Token idToken);
     bool buildReturn(std::shared_ptr<AstBlock> block);
@@ -35,39 +38,32 @@ protected:
     // Variable.cpp
     bool buildVariableDec(std::shared_ptr<AstBlock> block);
     bool buildVariableAssign(std::shared_ptr<AstBlock> block, Token idToken);
-    bool buildArrayAssign(std::shared_ptr<AstBlock> block, Token idToken);
-    bool buildConst(bool isGlobal);
+    bool buildConst(std::shared_ptr<AstBlock> block, bool isGlobal);
     
     // Flow.cpp
     bool buildConditional(std::shared_ptr<AstBlock> block);
     bool buildWhile(std::shared_ptr<AstBlock> block);
-    bool buildRepeat(std::shared_ptr<AstBlock> block);
-    bool buildFor(std::shared_ptr<AstBlock> block);
-    bool buildForAll(std::shared_ptr<AstBlock> block);
     bool buildLoopCtrl(std::shared_ptr<AstBlock> block, bool isBreak);
     
     // Structure.cpp
-    bool buildEnum();
     bool buildStruct();
-    bool buildStructMember(std::shared_ptr<AstStruct> str, Token token);
+    bool buildStructMember(std::shared_ptr<AstStruct> str, Token tk);
     bool buildStructDec(std::shared_ptr<AstBlock> block);
-    bool buildStructAssign(std::shared_ptr<AstBlock> block, Token idToken);
-    bool buildClass();
-    bool buildClassDec(std::shared_ptr<AstBlock> block);
     
-    bool buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent = nullptr);
+    // Expression.cpp
+    std::shared_ptr<AstExpression> buildConstExpr(Token tk);
+    bool buildOperator(Token tk, std::shared_ptr<ExprContext> ctx);
+    bool buildIDExpr(std::shared_ptr<AstBlock> block, Token tk, std::shared_ptr<ExprContext> ctx);
     std::shared_ptr<AstExpression> buildExpression(
                         std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
-                        TokenType stopToken = SemiColon,
+                        TokenType stopToken = t_semicolon,
                         bool isConst = false, bool buildList = false);
-    std::shared_ptr<AstExpression> checkExpression(std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> varType);
+    
+    // Parser.cpp
+    bool buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent = nullptr);
     std::shared_ptr<AstExpression> checkCondExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstExpression> toCheck);
-    int isConstant(std::string name);
+    std::shared_ptr<AstDataType> buildDataType(bool checkBrackets = true);
 private:
     std::unique_ptr<Scanner> scanner;
-    std::shared_ptr<AstClass> currentClass = nullptr;
-    
-    std::map<std::string, std::string> classMap;
-    std::map<std::string, AstEnum> enums;
 };
 

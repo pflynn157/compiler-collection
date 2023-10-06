@@ -1,0 +1,33 @@
+
+#OUTPUT
+#X: 0
+#X: 1
+#X: 2
+#X: 3
+#X: 4
+#X: 5
+#^ X: 6
+#^ X: 7
+#^ X: 8
+#^ X: 9
+#END
+
+#RET 0
+
+extern printf(ln:str, x:int);
+
+func main -> int is
+    var x : int := 0;
+    
+    while x < 10 do
+        if x > 5 then
+            printf("^ ");
+        end
+        
+        printf("X: %d\n", x);
+        x := x + 1;
+    end
+
+    return 0;
+end
+

@@ -1,0 +1,37 @@
+
+#OUTPUT
+#Before:
+#X: 10
+#Y: 20
+#After:
+#X: 25
+#Y: 20
+#END
+
+#RET 0
+
+import std.io;
+
+struct S1 is
+    x : int := 10;
+    y : int := 20;
+end
+
+func printStruct(s:S1) is
+    printf("X: %d\n", s.x);
+    printf("Y: %d\n", s.y);
+end
+
+func main -> int is
+    struct s : S1;
+    
+    println("Before:");
+    printStruct(s);
+    
+    s.x := 25;
+    
+    println("After:");
+    printStruct(s);
+    
+    return 0;
+end

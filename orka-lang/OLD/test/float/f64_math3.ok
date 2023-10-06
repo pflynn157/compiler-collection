@@ -1,0 +1,25 @@
+
+#OUTPUT
+#2.398099
+#99.123001
+#---------------
+#390.087986
+#END
+
+#RET 0
+
+import std.io;
+
+func main(args:str[]) -> int is
+    var x : double := 2.3981;
+    var y : double := 99.123;
+    
+    printDouble(x);
+    printDouble(y);
+    println("---------------");
+    
+    var answer : double := x + y * 3.9112;
+    printDouble(answer);
+    
+    return 0;
+end

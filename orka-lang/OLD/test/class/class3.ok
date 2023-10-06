@@ -1,0 +1,43 @@
+
+#OUTPUT
+#hi
+#Hello!
+#X (before): 20
+#X (After): 40
+#END
+
+#RET 0
+
+import std.io;
+
+class C1 is
+    func C1 is
+        println("hi");
+    end
+    
+    func sayHello is
+        println("Hello!");    
+    end
+    
+    func getX -> int is
+        return this.x;
+    end
+    
+    func setX(x:int) is
+        this.x := x;
+    end
+    
+    var x : int := 20;
+end
+
+func main -> int is
+    class var1 : C1;
+    var1.sayHello();
+    
+    var x : int := var1.getX();
+    printf("X (before): %d\n", x);
+    
+    var1.setX(40);
+    printf("X (After): %d\n", var1.getX());
+    return 0;
+end

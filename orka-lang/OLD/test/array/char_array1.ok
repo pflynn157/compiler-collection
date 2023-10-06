@@ -1,0 +1,37 @@
+
+#OUTPUT
+#ABCDEFG??
+#ABCDEFG??
+#END
+
+#RET 0
+
+extern printf(line:str, x:int);
+extern printCharArray(array:char[]);
+
+func main -> int is
+    var c : char := 'A';
+    var string : char[10];
+    
+    for i in 0 .. 10 do
+        if i = 0 then string[0] := 'A';
+        elif i = 1 then string[1] := 'B';
+        elif i = 2 then string[2] := 'C';
+        elif i = 3 then string[3] := 'D';
+        elif i = 4 then string[4] := 'E';
+        elif i = 5 then string[5] := 'F';
+        elif i = 6 then string[6] := 'G';
+        elif i = 9 then string[9] := '\n';
+        else string[i] := '?';
+        end
+    end
+    
+    for i in 0 .. 10 do
+        printf("%c", string[i]);
+    end
+    
+    printCharArray(string);
+    
+    return 0;
+end
+

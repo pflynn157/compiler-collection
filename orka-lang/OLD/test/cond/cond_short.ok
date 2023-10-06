@@ -1,0 +1,38 @@
+
+#OUTPUT
+#True
+#20
+#False
+#31
+#END
+
+#RET 0
+
+import std.io;
+
+extern println(ln:str);
+
+func test1(x:short) is
+    if x = 20 then println("True");
+    else println("False");
+    end
+    
+    printf("%d\n", x);
+end
+
+func test2(x:short) is
+    if x = 20 then println("True");
+    else println("False");
+    end
+    
+    printf("%d\n", x);
+end
+
+func main -> int is
+    var x1 : short := 20;
+    var x2 : short := 31;
+    
+    test1(x1);
+    test2(x2);
+    return 0;
+end

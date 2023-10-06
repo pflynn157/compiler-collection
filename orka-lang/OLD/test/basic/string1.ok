@@ -1,0 +1,21 @@
+
+#OUTPUT
+#Hello!
+#l
+#END
+
+#RET 0
+
+extern println(line:str);
+extern printf(line:str, x:int);
+
+func main -> int is
+    var string : str := "Hello!";
+    var c : char := string[3];
+    
+    println(string);
+    printf("%c\n", c);
+    
+    return 0;
+end
+

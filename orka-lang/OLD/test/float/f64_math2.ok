@@ -1,0 +1,35 @@
+
+#OUTPUT
+#99.123001
+#2.398099
+#---------------
+#101.521100
+#96.724901
+#237.706858
+#41.333974
+#END
+
+#RET 0
+
+import std.io;
+
+func main(args:str[]) -> int is
+    var x : double := 99.12300;
+    var y : double := 2.398100;
+    
+    printDouble(x);
+    printDouble(y);
+    println("---------------");
+    
+    var a1 : double := x + y;
+    var a2 : double := x - y;
+    var a3 : double := x * y;
+    var a4 : double := x / y;
+    
+    printDouble(a1);
+    printDouble(a2);
+    printDouble(a3);
+    printDouble(a4);
+    
+    return 0;
+end

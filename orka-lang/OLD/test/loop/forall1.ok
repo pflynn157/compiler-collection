@@ -1,0 +1,33 @@
+
+#OUTPUT
+#0
+#2
+#4
+#6
+#8
+#10
+#12
+#14
+#16
+#18
+#END
+
+#RET 0
+
+extern printf(ln:str, x:int);
+
+func main -> int is
+    var numbers : int[10];
+    var x : int := 0;
+    
+    for i in 0 .. 10 do
+        numbers[i] := i * 2;
+    end
+    
+    forall i in numbers do
+        printf("%d\n", i);
+    end
+    
+    return 0;
+end
+

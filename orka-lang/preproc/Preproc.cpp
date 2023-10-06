@@ -1,13 +1,11 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Orka compiler.
-// Orka is licensed under the BSD-3 license. See the COPYING file for more information.
+// Copyright 2021-2022 Patrick Flynn
+// This file is part of the Tiny Lang compiler.
+// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <fstream>
 #include <iostream>
 #include <cstdio>
-
-#include <lex/Lex.hpp>
 
 std::string getInputPath(std::string input) {
     std::string name = "";
@@ -18,28 +16,35 @@ std::string getInputPath(std::string input) {
         else name += c;
     }
     
-    name += "_pre.ok";
+    name += "_pre.tl";
     return name;
 }
 
-std::string preprocessFile(std::string input) {
-    std::string newPath = "/tmp/" + getInputPath(input);
-    Scanner *scanner = new Scanner(input);
-    if (scanner->isError()) {
-        return "";
-    }
+std::string preprocessFile(std::string input, bool print) {
+    return input;
+    /*std::string newPath = "/tmp/" + getInputPath(input);
     
-    std::ofstream writer(newPath);
+    FILE *file = fopen(input.c_str(), "r");
+    std::string input_str = "";
+    while (!feof(file)) {
+        input_str += fgetc(file);
+    }
+    Scanner *scanner = lex_init_string((char *)input_str.c_str());
+    
+    std::string content = "";
     
     // Read until the end of the file
-    Token token;
-    while (!scanner->isEof() && token.type != Eof) {
-        token = scanner->getNext();
+    token tk;
+    while (tk != t_eof) {
+        tk = lex_get_next(scanner);
         
         if (token.type != Import) {
-            writer << scanner->getRawBuffer();
+            content += scanner->getRawBuffer();
             continue;
         }
+        
+        // Indicate we have an import line
+        content += "#pragma count\n";
         
         // Build the include path
         token = scanner->getNext();
@@ -60,8 +65,8 @@ std::string preprocessFile(std::string input) {
         
         // Load the include path
         // TODO: We need better path support
-        path = "/usr/local/include/orka/" + path + ".oh";
-        std::string preprocInclude = preprocessFile(path);
+        path = "/usr/local/include/tinylang/" + path + ".th";
+        std::string preprocInclude = preprocessFile(path, false);
         
         std::ifstream reader(preprocInclude.c_str());
         if (!reader.is_open()) {
@@ -71,8 +76,12 @@ std::string preprocessFile(std::string input) {
         
         std::string line = "";
         while (std::getline(reader, line)) {
-            writer << line;
+            if (line == "" || line.length() == 0) continue;
+            content += "#pragma nocount\n";
+            content += line + "\n";
         }
+        int last = content.length() - 1;
+        if (content[last] == '\n') content[last] = ' ';
         
         reader.close();
         remove(preprocInclude.c_str());
@@ -81,7 +90,17 @@ std::string preprocessFile(std::string input) {
         scanner->getRawBuffer();
     }
     
+    if (print) std::cout << content << std::endl;
+    
+    std::ofstream writer(newPath, std::ios_base::out | std::ios_base::trunc);
+    if (writer.is_open()) {
+        writer << content;
+        writer.close();
+    } else {
+        std::cerr << "Unable to open new file in preproc" << std::endl;
+    }
+    
     delete scanner;
-    return newPath;
+    return newPath;*/
 }
 

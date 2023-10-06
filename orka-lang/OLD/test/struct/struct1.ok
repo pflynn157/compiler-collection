@@ -1,0 +1,29 @@
+
+#OUTPUT
+#X: 10
+#Y: 20
+#Changed X: 25
+#END
+
+#RET 0
+
+import std.io;
+
+struct S1 is
+    x : int := 10;
+    y : int := 20;
+end
+
+func main -> int is
+    struct s : S1;
+
+    var v1 : int := s.x;
+    
+    printf("X: %d\n", v1);
+    printf("Y: %d\n", s.y);
+    
+    s.x := 25;
+    printf("Changed X: %d\n", s.x);
+    
+    return 0;
+end

@@ -1,10 +1,11 @@
 project(orka)
 
+#add_subdirectory(stdlib)
+
 include_directories(.)
 
 set(SRC
-    lex/Lex.cpp
-    
+    parser/Expression.cpp
     parser/Flow.cpp
     parser/Function.cpp
     parser/Parser.cpp
@@ -13,9 +14,12 @@ set(SRC
     
     preproc/Preproc.cpp
     
-    main.cpp
+    lex/lex.cpp
+    lex/lex_debug.cpp  
 )
 
-add_executable(orka ${SRC})
-target_link_libraries(orka compiler_llvm)
+# Build the LLVM-based compiler
+add_executable(okcc ${SRC} main.cpp)
+target_link_libraries(okcc compiler_llvm)
+
 

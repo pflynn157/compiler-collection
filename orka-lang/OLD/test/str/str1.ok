@@ -1,0 +1,27 @@
+
+#OUTPUT
+#Hello!
+# How are you?
+#Hello! How are you?
+#Hello!!
+#END
+
+#RET 0
+
+import std.io;
+
+func main(args:str[]) -> int is
+    var str1 : str := "Hello!";
+    var str2 : str := " How are you?";
+    
+    println(str1);
+    println(str2);
+    
+    var str3 : str := str1 + str2;
+    println(str3);
+    
+    var str4 : str := str1 + '!';
+    println(str4);
+    
+    return 0;
+end

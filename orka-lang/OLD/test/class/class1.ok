@@ -1,0 +1,19 @@
+
+#OUTPUT
+#hi
+#END
+
+#RET 0
+
+import std.io;
+
+class C1 is
+    func C1 is
+        println("hi");
+    end
+end
+
+func main -> int is
+    class var1 : C1;
+    return 0;
+end

@@ -1,0 +1,16 @@
+
+#OUTPUT
+#-3
+#END
+
+#RET 0
+
+import std.io;
+
+func main -> int is
+    var x : int := -1 + -2;
+    
+    printf("%d\n", x);
+    
+    return 0;
+end

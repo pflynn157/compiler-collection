@@ -1,26 +1,25 @@
 //
 // Copyright 2021 Patrick Flynn
-// This file is part of the Orka compiler.
-// Orka is licensed under the BSD-3 license. See the COPYING file for more information.
+// This file is part of the Tiny Lang compiler.
+// Tiny Lang is licensed under the BSD-3 license. See the COPYING file for more information.
 //
 #include <iostream>
 #include <string>
 #include <cstdio>
+#include <memory>
+#include <cstdlib>
 
 #include <preproc/Preproc.hpp>
 #include <parser/Parser.hpp>
-#include <ast.hpp>
+#include <ast/ast.hpp>
 
-#include <LLVM/Compiler.hpp>
-#include <LLIR/LLIRCompiler.hpp>
+#include <llvm/Compiler.hpp>
 
 bool isError = false;
 
-// TODO: I'm not sure actually if the lex testing actually works
-//
-AstTree *getAstTree(std::string input, bool testLex, bool printAst) {
-    Parser *frontend = new Parser(input);
-    AstTree *tree;
+std::shared_ptr<AstTree> getAstTree(std::string input, bool testLex, bool printAst, bool emitDot) {
+    std::unique_ptr<Parser> frontend = std::make_unique<Parser>(input);
+    std::shared_ptr<AstTree> tree;
     
     if (testLex) {
         frontend->debugScanner();
@@ -29,26 +28,60 @@ AstTree *getAstTree(std::string input, bool testLex, bool printAst) {
     }
     
     if (!frontend->parse()) {
-        delete frontend;
         isError = true;
         return nullptr;
     }
     
     tree = frontend->getTree();
     
-    delete frontend;
-    remove(input.c_str());
-    
     if (printAst) {
         tree->print();
+        return nullptr;
+    }
+    
+    if (emitDot) {
+        tree->dot();
         return nullptr;
     }
     
     return tree;
 }
 
-int compileLLVM(AstTree *tree, CFlags flags, bool printLLVM, bool emitLLVM, bool emitNVPTX) {
-    Compiler *compiler = new Compiler(tree, flags);
+void assemble(CFlags cflags) {
+    std::string cmd = "as /tmp/" + cflags.name + ".asm -o /tmp/" + cflags.name + ".o";
+    system(cmd.c_str());
+}
+
+#ifdef DEV_LINK_MODE
+
+#ifndef LINK_LOCATION
+#define LINK_LOCATION = "."
+#endif
+
+void link(CFlags cflags) {
+    std::string cmd = "ld ";
+    cmd += std::string(LINK_LOCATION) + "/amd64_start.o ";
+    cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
+    cmd += " -L" + std::string(LINK_LOCATION) + "/corelib -lcorelib ";
+    system(cmd.c_str());
+    //printf("LINK: %s\n", cmd.c_str());
+}
+
+#else
+
+void link(CFlags cflags) {
+    /*std::string cmd = "ld ";
+    cmd += "/usr/local/lib/tinylang/ti_start.o ";
+    cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
+    cmd += " -dynamic-linker /lib64/ld-linux-x86-64.so.2 ";
+    cmd += "-ltinylang -lc";
+    system(cmd.c_str());*/
+}
+
+#endif
+
+int compileLLVM(std::shared_ptr<AstTree> tree, CFlags flags, bool printLLVM, bool emitLLVM) {
+    std::unique_ptr<Compiler> compiler = std::make_unique<Compiler>(tree, flags);
     compiler->compile();
         
     if (printLLVM) {
@@ -67,19 +100,9 @@ int compileLLVM(AstTree *tree, CFlags flags, bool printLLVM, bool emitLLVM, bool
     }
         
     compiler->writeAssembly();
+    assemble(flags);
+    link(flags);
     
-    if (!emitNVPTX) {
-        compiler->assemble();
-        compiler->link();
-    }
-    
-    return 0;
-}
-
-int compileLLIR(AstTree *tree, std::string outputName) {
-    LLIRCompiler *compiler = new LLIRCompiler(tree, outputName);
-    compiler->compile();
-    compiler->debug();
     return 0;
 }
 
@@ -92,33 +115,31 @@ int main(int argc, char **argv) {
     // Compiler (codegen) flags
     CFlags flags;
     flags.name = "a.out";
-    flags.nvptx = false;
     
     // Other flags
     std::string input = "";
+    bool emitPreproc = false;
     bool testLex = false;
     bool printAst = false;
+    bool emitDot = false;
     bool printLLVM = false;
     bool emitLLVM = false;
-    bool emitNVPTX = false;
-    bool useLLVM = true;
     
     for (int i = 1; i<argc; i++) {
         std::string arg = argv[i];
         
-        if (arg == "--test-lex") {
+        if (arg == "-E") {
+            emitPreproc = true;
+        } else if (arg == "--test-lex") {
             testLex = true;
         } else if (arg == "--ast") {
             printAst = true;
+        } else if (arg == "--dot") {
+            emitDot = true;
         } else if (arg == "--llvm") {
             printLLVM = true;
         } else if (arg == "--emit-llvm") {
             emitLLVM = true;
-        } else if (arg == "--emit-nvptx") {
-            emitNVPTX = true;
-            flags.nvptx = true;
-        } else if (arg == "--host") {
-            useLLVM = false;
         } else if (arg == "-o") {
             flags.name = argv[i+1];
             i += 1;
@@ -130,24 +151,18 @@ int main(int argc, char **argv) {
         }
     }
     
-    std::string newInput = preprocessFile(input);
+    std::string newInput = preprocessFile(input, emitPreproc);
     if (newInput == "") {
         return 1;
     }
     
-    AstTree *tree = getAstTree(newInput, testLex, printAst);
+    std::shared_ptr<AstTree> tree = getAstTree(newInput, testLex, printAst, emitDot);
     if (tree == nullptr) {
         if (isError) return 1;
         return 0;
     }
 
-    //test
-    if (useLLVM) {
-        return compileLLVM(tree, flags, printLLVM, emitLLVM, emitNVPTX);
-    } else {
-        return compileLLIR(tree, "output1");
-    }
-    
-    return 0;
+    // Compile
+    return compileLLVM(tree, flags, printLLVM, emitLLVM);
 }
 

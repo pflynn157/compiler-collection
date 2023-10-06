@@ -1,0 +1,14 @@
+
+#OUTPUT
+#Hi
+#END
+
+#RET 2
+
+extern println(s:str);
+
+func main -> int is
+    println("Hi");
+    return 2;
+end
+

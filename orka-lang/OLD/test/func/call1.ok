@@ -1,0 +1,20 @@
+
+#OUTPUT
+#X: 53
+#END
+
+#RET 0
+
+extern printf(line:str, x:int);
+
+func getNumber(x:int, y:int) -> int is
+    return 20 + x + y;
+end
+
+func main -> int is
+    var x : int := getNumber(23, 10);
+    printf("X: %d\n", x);
+    
+    return 0;
+end
+

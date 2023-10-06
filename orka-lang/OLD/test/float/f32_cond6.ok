@@ -1,0 +1,38 @@
+
+#OUTPUT
+#True
+#3.140000
+#False
+#30.229999
+#END
+
+#RET 0
+
+import std.io;
+
+extern println(ln:str);
+
+func test1(x:float) is
+    if x <= 3.14 then println("True");
+    else println("False");
+    end
+    
+    printFloat(x);
+end
+
+func test2(x:float) is
+    if x <= 3.14 then println("True");
+    else println("False");
+    end
+    
+    printFloat(x);
+end
+
+func main -> int is
+    var x1 : float := 3.14;
+    var x2 : float := 30.23;
+    
+    test1(x1);
+    test2(x2);
+    return 0;
+end

@@ -1,0 +1,19 @@
+
+#OUTPUT
+#A
+#A
+#END
+
+#RET 0
+
+extern printf(line:str, x:int);
+
+func main -> int is
+    var c : char := 'A';
+    var c2 : char := c;
+    
+    printf("%c\n", c);
+    printf("%c\n", c2);
+    return 0;
+end
+

@@ -1,0 +1,26 @@
+
+#OUTPUT
+#0|2|4|6|8|10|12|14|16|18|20|
+#Done
+#END
+
+#RET 0
+
+extern printf(ln:str, x:int);
+
+func main -> int is
+    var i : int := 0;
+    
+    repeat
+        printf("%d|", i);
+        i := i + 2;
+        
+        if i = 22 then break; end
+    end
+    
+    printf("\n");
+    printf("Done\n");
+    
+    return 0;
+end
+

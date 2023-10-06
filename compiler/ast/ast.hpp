@@ -73,6 +73,7 @@ enum class V_AstType {
     I16L,
     I32L,
     I64L,
+    FloatL,
     StringL,
     ID,
     ArrayAccess,
@@ -89,6 +90,9 @@ enum class V_AstType {
     Int16,
     Int32,
     Int64,
+    Float32,
+    Float64,
+    
     String,
     Ptr,
     Struct,
@@ -603,6 +607,17 @@ struct AstI64 : AstExpression {
     void print();
     
     uint64_t value = 0;
+};
+
+// Represents a floating-point literal
+struct AstFloat : AstExpression {
+    explicit AstFloat(double value) : AstExpression(V_AstType::FloatL) {
+        this->value = value;
+    }
+    
+    void print();
+    
+    double value = 0;
 };
 
 // Represents a string literal

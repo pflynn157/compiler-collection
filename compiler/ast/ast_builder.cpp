@@ -36,6 +36,14 @@ std::shared_ptr<AstDataType> buildInt64Type(bool isUnsigned) {
     return std::make_shared<AstDataType>(V_AstType::Int64, isUnsigned);
 }
 
+std::shared_ptr<AstDataType> buildFloat32Type() {
+    return std::make_shared<AstDataType>(V_AstType::Float32);
+}
+
+std::shared_ptr<AstDataType> buildFloat64Type() {
+    return std::make_shared<AstDataType>(V_AstType::Float64);
+}
+
 std::shared_ptr<AstDataType> buildStringType() {
     return std::make_shared<AstDataType>(V_AstType::String);
 }

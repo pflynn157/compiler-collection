@@ -427,6 +427,10 @@ void AstI64::print() {
     std::cout << value;
 }
 
+void AstFloat::print() {
+    std::cout << value;
+}
+
 void AstString::print() {
     std::cout << "\"" << value << "\"";
 }

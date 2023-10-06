@@ -27,7 +27,7 @@ public:
     void debugScanner();
 protected:
     // Function.cpp
-    bool getFunctionArgs(std::vector<Var> &args);
+    bool getFunctionArgs(std::vector<Var> &args, std::shared_ptr<AstBlock> block);
     bool buildFunction(Token startToken, std::string className = "");
     bool buildFunctionCallStmt(std::shared_ptr<AstBlock> block, Token idToken);
     bool buildReturn(std::shared_ptr<AstBlock> block);

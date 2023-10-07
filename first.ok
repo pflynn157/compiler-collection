@@ -1,11 +1,25 @@
-import std.io;
+
+#OUTPUT
+#242
+#Size: 10
+#END
+
+#RET 0
+
+extern printf(line:str, x:int);
+
+func printArray(numbers:int[]) is
+    var x : int := numbers[2];
+    
+    printf("%d\n", x);
+    printf("Size: %d\n", sizeof(numbers));
+end
 
 func main -> int is
     var numbers : int[10];
     numbers[2] := 242;
     
-    printf("%d\n", numbers[2]);
-    printf("%d\n", sizeof(numbers));
+    printArray(numbers);
     
     return 0;
 end

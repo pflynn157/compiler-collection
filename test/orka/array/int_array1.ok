@@ -1,11 +1,4 @@
-
-#OUTPUT
-#242
-#END
-
-#RET 0
-
-extern printf(line:str, x:int);
+import std.io;
 
 func main -> int is
     var numbers : int[5];

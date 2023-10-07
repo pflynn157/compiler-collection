@@ -71,11 +71,29 @@ Parser::Parser(std::string input) : BaseParser(input) {
     tree->addGlobalStatement(FT7);
     
     // Create structures for the internal arrays
+    // Int8
+    auto int8ArrayStruct = std::make_shared<AstStruct>("__int8_array");
+    int8ArrayStruct->addItem(Var(AstBuilder::buildPointerType(AstBuilder::buildInt8Type()), "ptr"), nullptr);
+    int8ArrayStruct->addItem(Var(AstBuilder::buildInt32Type(), "size"), std::make_shared<AstI32>(0));
+    tree->addStruct(int8ArrayStruct);
+    
+    // Int16
+    auto int16ArrayStruct = std::make_shared<AstStruct>("__int16_array");
+    int16ArrayStruct->addItem(Var(AstBuilder::buildPointerType(AstBuilder::buildInt16Type()), "ptr"), nullptr);
+    int16ArrayStruct->addItem(Var(AstBuilder::buildInt32Type(), "size"), std::make_shared<AstI32>(0));
+    tree->addStruct(int16ArrayStruct);
+    
     // Int32
-    auto intArrayStruct = std::make_shared<AstStruct>("__int32_array");
-    intArrayStruct->addItem(Var(AstBuilder::buildPointerType(AstBuilder::buildInt32Type()), "ptr"), nullptr);
-    intArrayStruct->addItem(Var(AstBuilder::buildInt32Type(), "size"), std::make_shared<AstI32>(0));
-    tree->addStruct(intArrayStruct);
+    auto int32ArrayStruct = std::make_shared<AstStruct>("__int32_array");
+    int32ArrayStruct->addItem(Var(AstBuilder::buildPointerType(AstBuilder::buildInt32Type()), "ptr"), nullptr);
+    int32ArrayStruct->addItem(Var(AstBuilder::buildInt32Type(), "size"), std::make_shared<AstI32>(0));
+    tree->addStruct(int32ArrayStruct);
+    
+    // Int64
+    auto int64ArrayStruct = std::make_shared<AstStruct>("__int64_array");
+    int64ArrayStruct->addItem(Var(AstBuilder::buildPointerType(AstBuilder::buildInt64Type()), "ptr"), nullptr);
+    int64ArrayStruct->addItem(Var(AstBuilder::buildInt32Type(), "size"), std::make_shared<AstI32>(0));
+    tree->addStruct(int64ArrayStruct);
 }
 
 Parser::~Parser() {
@@ -241,12 +259,27 @@ std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
             
             //dataType = AstBuilder::buildPointerType(dataType);
             // TODO: Get this properly
-            dataType = AstBuilder::buildStructType("__int32_array");
+            dataType = AstBuilder::buildStructType(getArrayType(dataType));
         } else {
             scanner->rewind(tk);
         }
     }
     
     return dataType;
+}
+
+std::string Parser::getArrayType(std::shared_ptr<AstDataType> dataType) {
+    switch (dataType->type) {
+        case V_AstType::Char:
+        case V_AstType::Int8: return "__int8_array";
+        case V_AstType::Int16: return "__int16_array";
+        case V_AstType::Int64: return "__int64_array";
+        case V_AstType::Float32: return "__f32_array";
+        case V_AstType::Float64: return "__f64_array";
+        
+        default: {}
+    }
+    
+    return "__int32_array";
 }
 

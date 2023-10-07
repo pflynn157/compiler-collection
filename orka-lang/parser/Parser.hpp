@@ -63,6 +63,7 @@ protected:
     bool buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent = nullptr);
     std::shared_ptr<AstExpression> checkCondExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstExpression> toCheck);
     std::shared_ptr<AstDataType> buildDataType(bool checkBrackets = true);
+    std::string getArrayType(std::shared_ptr<AstDataType> dataType);
 private:
     std::unique_ptr<Scanner> scanner;
 };

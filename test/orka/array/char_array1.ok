@@ -1,13 +1,4 @@
-
-#OUTPUT
-#ABCDEFG??
-#ABCDEFG??
-#END
-
-#RET 0
-
-extern printf(line:str, x:int);
-extern printCharArray(array:char[]);
+import std.io;
 
 func main -> int is
     var c : char := 'A';

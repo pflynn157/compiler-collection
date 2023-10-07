@@ -73,11 +73,17 @@ Value *Compiler::compileStructAccess(std::shared_ptr<AstExpression> expr, bool i
     // Now, load the structure element
     Value *ep = builder->CreateStructGEP(strType, ptr, pos);
     if (sa->access_expression) {
+        Type *baseElementType;
+        if (strTypeName == "__int8_array") baseElementType = Type::getInt8Ty(*context);
+        else if (strTypeName == "__int16_array") baseElementType = Type::getInt16Ty(*context);
+        else if (strTypeName == "__int64_array") baseElementType = Type::getInt64Ty(*context);
+        else baseElementType = Type::getInt32Ty(*context);
+    
         Value *idx = compileValue(sa->access_expression);
         Value *ep_load = builder->CreateLoad(elementType, ep);
-        Value *ep_idx = builder->CreateGEP(Type::getInt32Ty(*context), ep_load, idx);
+        Value *ep_idx = builder->CreateGEP(baseElementType, ep_load, idx);
         if (isAssign) return ep_idx;
-        else return builder->CreateLoad(Type::getInt32Ty(*context), ep_idx);
+        else return builder->CreateLoad(baseElementType, ep_idx);
     } else {
         if (isAssign) return ep;
         else return builder->CreateLoad(elementType, ep);

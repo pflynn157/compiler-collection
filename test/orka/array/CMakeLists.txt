@@ -1,6 +1,12 @@
 set(CORE_TEST_SRC
     array1
-    array_func1
+    array_func1 #char_array1
+    int64_array1 #int64_array2
+    uint64_array1 #uint64_array2
+    int_array1 #int_array2
+    sizeof1
+    #str_array1 str_array2
+    uint_array1 #uint_array2
 )
 
 foreach(ITEM ${CORE_TEST_SRC})

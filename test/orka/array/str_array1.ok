@@ -1,15 +1,4 @@
-
-#OUTPUT
-#Hi!
-#How are you?
-#Good!
-#END
-
-#RET 0
-
 import std.io;
-
-extern println(s:str);
 
 func main -> int is
     var args : str[3];

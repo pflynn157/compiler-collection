@@ -50,8 +50,8 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
     
     // We have an array
     if (tk.type == t_lbracket) {
-        // TODO: Fix this
-        std::string dataType_name = "__int32_array";
+        std::shared_ptr<AstDataType> baseType = dataType;
+        std::string dataType_name = getArrayType(dataType);
         dataType = AstBuilder::buildStructType(dataType_name);
         std::shared_ptr<AstStructDec> dec = std::make_shared<AstStructDec>("", dataType_name);
         
@@ -79,14 +79,12 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
             std::shared_ptr<AstExprList> list = std::make_shared<AstExprList>();
             
             // Get the size
-            // TODO: Fix this:
-            std::shared_ptr<AstI32> size = std::make_shared<AstI32>(4);
-            /*std::shared_ptr<AstI32> size;
-            std::shared_ptr<AstDataType> baseType = std::static_pointer_cast<AstPointerType>(dataType)->base_type;
+            //std::shared_ptr<AstI32> size = std::make_shared<AstI32>(4);
+            std::shared_ptr<AstI32> size;
             if (baseType->type == V_AstType::Int32) size = std::make_shared<AstI32>(4);
             else if (baseType->type == V_AstType::Int64) size = std::make_shared<AstI32>(8);
             else if (baseType->type == V_AstType::String) size = std::make_shared<AstI32>(8);
-            else size = std::make_shared<AstI32>(1);*/
+            else size = std::make_shared<AstI32>(1);
             
             std::shared_ptr<AstMulOp> mul_op = std::make_shared<AstMulOp>();
             mul_op->lval = size;

@@ -5,7 +5,7 @@ set(CORE_TEST_SRC
     uint64_array1 #uint64_array2
     int_array1 #int_array2
     sizeof1
-    #str_array1 str_array2
+    str_array1 #str_array2 str_array3
     uint_array1 #uint_array2
 )
 

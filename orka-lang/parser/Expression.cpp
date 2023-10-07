@@ -116,15 +116,15 @@ bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, Token tk, std::shared_
             return false;
         }
         
-        // Set the value
-        //std::shared_ptr<AstArrayAccess> acc = std::make_shared<AstArrayAccess>(name);
-        //acc->index = index;
-        
-        // Access the array pointer
-        std::shared_ptr<AstStructAccess> sa_acc = std::make_shared<AstStructAccess>(name, "ptr");
-        sa_acc->access_expression = index;
-        
-        ctx->output.push(sa_acc);
+        if (block->symbolTable[name]->type == V_AstType::String) {
+            std::shared_ptr<AstArrayAccess> acc = std::make_shared<AstArrayAccess>(name);
+            acc->index = index;
+            ctx->output.push(acc);
+        } else {
+            std::shared_ptr<AstStructAccess> sa_acc = std::make_shared<AstStructAccess>(name, "ptr");
+            sa_acc->access_expression = index;
+            ctx->output.push(sa_acc);
+        }
     } else if (tk.type == t_lparen) {
         if (currentLine != 0) {
             syntax->addWarning(0, "Function call on newline- possible logic error.");

@@ -6,7 +6,7 @@ set(CORE_TEST_SRC
     short1 ushort1
     int64_1 uint64_1
     uint1
-    #string1
+    string1
 )
 
 foreach(ITEM ${CORE_TEST_SRC})

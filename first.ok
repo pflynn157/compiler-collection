@@ -1,18 +1,13 @@
-
-#OUTPUT
-#243
-#END
-
-#RET 0
-
-extern printf(line:str, x:int);
+import std.io;
 
 func main -> int is
-    var numbers : int64[5];
-    numbers[2] := 243;
+    var args : str[3];
+    args[0] := "Hi!";
+    args[1] := "How are you?";
+    args[2] := "Good!";
     
-    var x : int64 := numbers[2];
-    printf("%d\n", x);
+    println(args[1]);
+    
     return 0;
 end
 

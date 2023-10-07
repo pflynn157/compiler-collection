@@ -116,16 +116,22 @@ bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, Token tk, std::shared_
             return false;
         }
         
-        std::shared_ptr<AstArrayAccess> acc = std::make_shared<AstArrayAccess>(name);
-        acc->index = index;
-        ctx->output.push(acc);
+        // Set the value
+        //std::shared_ptr<AstArrayAccess> acc = std::make_shared<AstArrayAccess>(name);
+        //acc->index = index;
+        
+        // Access the array pointer
+        std::shared_ptr<AstStructAccess> sa_acc = std::make_shared<AstStructAccess>(name, "ptr");
+        sa_acc->access_expression = index;
+        
+        ctx->output.push(sa_acc);
     } else if (tk.type == t_lparen) {
         if (currentLine != 0) {
             syntax->addWarning(0, "Function call on newline- possible logic error.");
         }
         
         if (!block->isFunc(name)) {
-            syntax->addError(0, "Unknown function call.");
+            syntax->addError(0, "Unknown function call: " + name);
             return false;
         }
     
@@ -195,6 +201,34 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
             
             case t_id: {
                 if (!buildIDExpr(block, tk, ctx)) return nullptr;
+            } break;
+            
+            case t_sizeof: {
+                ctx->lastWasOp = false;
+                
+                if (isConst) {
+                    syntax->addError(scanner->getLine(), "Invalid constant value.");
+                    return nullptr;
+                }
+                
+                std::string name = tk.id_val;
+                
+                Token token1 = scanner->getNext();
+                Token token2 = scanner->getNext();
+                Token token3 = scanner->getNext();
+                
+                if (token1.type != t_lparen || token2.type != t_id || token3.type != t_rparen) {
+                    syntax->addError(scanner->getLine(), "Invalid token in sizeof.");
+                    tk.print();
+                    return nullptr;
+                }
+                
+                //auto id = std::make_shared<AstID>(token2.id_val);
+                //auto size = std::make_shared<AstSizeof>(id);
+                //ctx->output.push(size);
+                
+                std::shared_ptr<AstStructAccess> val = std::make_shared<AstStructAccess>(token2.id_val, "size");
+                ctx->output.push(val);
             } break;
             
             case t_assign:

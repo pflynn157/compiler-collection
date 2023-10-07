@@ -50,11 +50,17 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
     
     // We have an array
     if (tk.type == t_lbracket) {
-        dataType = AstBuilder::buildPointerType(dataType);
-        std::shared_ptr<AstVarDec> empty = std::make_shared<AstVarDec>("", dataType);
-        std::shared_ptr<AstExpression> arg = buildExpression(block, AstBuilder::buildInt32Type(), t_rbracket);
-        if (!arg) return false;
-        empty->expression = arg; 
+        // TODO: Fix this
+        std::string dataType_name = "__int32_array";
+        dataType = AstBuilder::buildStructType(dataType_name);
+        std::shared_ptr<AstStructDec> dec = std::make_shared<AstStructDec>("", dataType_name);
+        
+        std::shared_ptr<AstExpression> size_arg = buildExpression(block, AstBuilder::buildInt32Type(), t_rbracket);
+        if (!size_arg) {
+            syntax->addError(0, "Invalid size argument in array declaration");
+            return false;
+        }
+        //empty->expression = arg; 
         
         tk = scanner->getNext();
         if (tk.type != t_semicolon) {
@@ -63,40 +69,58 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
         }
         
         for (std::string name : toDeclare) {
-            std::shared_ptr<AstVarDec> vd = std::make_shared<AstVarDec>(name, dataType);
-            block->addStatement(vd);
-            vd->expression = empty->expression;
+            std::shared_ptr<AstStructDec> dec = std::make_shared<AstStructDec>(name, dataType_name);
+            dec->no_init = true;
+            block->addStatement(dec);
             
-            // Create an assignment to a malloc call
-            std::shared_ptr<AstExprStatement> va = std::make_shared<AstExprStatement>();
-            va->setDataType(dataType);
-            block->addStatement(va);
-            
-            std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
-            std::shared_ptr<AstFuncCallExpr> callMalloc = std::make_shared<AstFuncCallExpr>("malloc");
-            std::shared_ptr<AstAssignOp> assign = std::make_shared<AstAssignOp>(id, callMalloc);
-            
-            va->expression = assign;
-            
-            // In order to get a proper malloc, we need to multiply the argument by
-            // the size of the type. Get the arguments, and do that
+            //
+            // Malloc
+            //
             std::shared_ptr<AstExprList> list = std::make_shared<AstExprList>();
-            callMalloc->args = list;
             
-            std::shared_ptr<AstI32> size;
+            // Get the size
+            // TODO: Fix this:
+            std::shared_ptr<AstI32> size = std::make_shared<AstI32>(4);
+            /*std::shared_ptr<AstI32> size;
             std::shared_ptr<AstDataType> baseType = std::static_pointer_cast<AstPointerType>(dataType)->base_type;
             if (baseType->type == V_AstType::Int32) size = std::make_shared<AstI32>(4);
             else if (baseType->type == V_AstType::Int64) size = std::make_shared<AstI32>(8);
             else if (baseType->type == V_AstType::String) size = std::make_shared<AstI32>(8);
-            else size = std::make_shared<AstI32>(1);
+            else size = std::make_shared<AstI32>(1);*/
             
-            std::shared_ptr<AstMulOp> op = std::make_shared<AstMulOp>();
-            op->lval = size;
-            op->rval = vd->expression;
-            list->add_expression(op);
+            std::shared_ptr<AstMulOp> mul_op = std::make_shared<AstMulOp>();
+            mul_op->lval = size;
+            mul_op->rval = size_arg;
+            list->add_expression(mul_op);
             
-            // Finally, set the size of the declaration
-            vd->size = vd->expression;
+            // Create the malloc call
+            std::shared_ptr<AstFuncCallExpr> call_malloc = std::make_shared<AstFuncCallExpr>("malloc");
+            call_malloc->args = list;
+            
+            std::shared_ptr<AstStructAccess> lval_alloc = std::make_shared<AstStructAccess>(name, "ptr");
+            std::shared_ptr<AstAssignOp> op1 = std::make_shared<AstAssignOp>();
+            op1->lval = lval_alloc;
+            op1->rval = call_malloc;
+            
+            std::shared_ptr<AstExprStatement> va_ptr = std::make_shared<AstExprStatement>();
+            va_ptr->setDataType(dataType);
+            va_ptr->expression = op1;
+            block->addStatement(va_ptr);
+            
+            //
+            // Set the size
+            //
+            // expression
+            std::shared_ptr<AstStructAccess> lval_size = std::make_shared<AstStructAccess>(name, "size");
+            std::shared_ptr<AstAssignOp> op = std::make_shared<AstAssignOp>();
+            op->lval = lval_size;
+            op->rval = size_arg;
+            
+            // The statement
+            std::shared_ptr<AstExprStatement> va_size = std::make_shared<AstExprStatement>();
+            va_size->setDataType(dataType);
+            va_size->expression = op;
+            block->addStatement(va_size);
             
             block->addSymbol(name, dataType);
         }

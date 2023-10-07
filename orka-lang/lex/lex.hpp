@@ -25,6 +25,7 @@ enum TokenType {
     t_import,
     t_true, t_false,
     t_lgand, t_lgor,
+    t_sizeof,
     
     t_dot, t_semicolon, t_comma,
     t_lparen, t_rparen, t_lbracket, t_rbracket,

@@ -133,6 +133,7 @@ void Compiler::compileStatement(std::shared_ptr<AstStatement> stmt) {
 
 // Converts an AST value to an LLVM value
 Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign) {
+    if (expr == nullptr) return nullptr;
     switch (expr->type) {
         case V_AstType::I8L: {
             std::shared_ptr<AstI8> i8 = std::static_pointer_cast<AstI8>(expr);

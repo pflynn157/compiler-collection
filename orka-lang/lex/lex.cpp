@@ -245,6 +245,7 @@ TokenType Scanner::getKeyword() {
     else if (buffer == "false") return t_false;
     else if (buffer == "and") return t_lgand;
     else if (buffer == "or") return t_lgor;
+    else if (buffer == "sizeof") return t_sizeof;
     return t_none;
 }
 

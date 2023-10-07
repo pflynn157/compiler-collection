@@ -67,6 +67,8 @@ enum class V_AstType {
     LogicalAnd,
     LogicalOr,
     
+    Sizeof,
+    
     // Literals and identifiers
     CharL,
     I8L,
@@ -671,6 +673,10 @@ struct AstStructAccess : AstExpression {
     // Member variables
     std::string var = "";
     std::string member = "";
+    
+    // TODO: I don't love this
+    // This is specific for members that are arrays
+    std::shared_ptr<AstExpression> access_expression = nullptr;
 };
 
 // Represents a function call
@@ -687,6 +693,16 @@ struct AstFuncCallExpr : AstExpression {
     std::string name = "";
 };
 
+// Represents the sizeof operator
+struct AstSizeof : AstExpression {
+    explicit AstSizeof(std::shared_ptr<AstID> value) : AstExpression(V_AstType::Sizeof) {
+        this->value = value;
+    }
+    
+    void print();
+
+    std::shared_ptr<AstID> value;
+};
 
 //
 // -----------------------------------------------------

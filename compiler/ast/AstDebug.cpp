@@ -123,7 +123,10 @@ void AstStruct::print() {
         std::cout << var.name << " : ";
         var.type->print();
         std::cout << " ";
-        default_expressions[var.name]->print();
+        if (default_expressions[var.name])
+            default_expressions[var.name]->print();
+        else
+            std::cout << "NULL";
         std::cout << std::endl;
     }
     std::cout << std::endl;
@@ -447,11 +450,22 @@ void AstArrayAccess::print() {
 
 void AstStructAccess::print() {
     std::cout << var << "." << member;
+    if (access_expression) {
+        std::cout << "[";
+        access_expression->print();
+        std::cout << "]";
+    }
 }
 
 void AstFuncCallExpr::print() {
     std::cout << name << "(";
     args->print();
+    std::cout << ")";
+}
+
+void AstSizeof::print() {
+    std::cout << "SIZEOF(";
+    value->print();
     std::cout << ")";
 }
 

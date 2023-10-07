@@ -69,6 +69,13 @@ Parser::Parser(std::string input) : BaseParser(input) {
     FT7->addArgument(Var(AstBuilder::buildCharType(), "c"));
     FT7->data_type = AstBuilder::buildStringType();
     tree->addGlobalStatement(FT7);
+    
+    // Create structures for the internal arrays
+    // Int32
+    auto intArrayStruct = std::make_shared<AstStruct>("__int32_array");
+    intArrayStruct->addItem(Var(AstBuilder::buildPointerType(AstBuilder::buildInt32Type()), "ptr"), nullptr);
+    intArrayStruct->addItem(Var(AstBuilder::buildInt32Type(), "size"), std::make_shared<AstI32>(0));
+    tree->addStruct(intArrayStruct);
 }
 
 Parser::~Parser() {

@@ -39,6 +39,8 @@ void Token::print() {
         case t_false: std::cout << "false" << std::endl; break;
         case t_lgand: std::cout << "and" << std::endl; break;
         case t_lgor: std::cout << "or" << std::endl; break;
+        case t_sizeof: std::cout << "sizeof" << std::endl; break;
+        
         case t_dot: std::cout << "." << std::endl; break;
         case t_semicolon: std::cout << ";" << std::endl; break;
         case t_comma: std::cout << "," << std::endl; break;

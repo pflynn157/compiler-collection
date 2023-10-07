@@ -72,7 +72,15 @@ Value *Compiler::compileStructAccess(std::shared_ptr<AstExpression> expr, bool i
     
     // Now, load the structure element
     Value *ep = builder->CreateStructGEP(strType, ptr, pos);
-    if (isAssign) return ep;
-    else return builder->CreateLoad(elementType, ep);
+    if (sa->access_expression) {
+        Value *idx = compileValue(sa->access_expression);
+        Value *ep_load = builder->CreateLoad(elementType, ep);
+        Value *ep_idx = builder->CreateGEP(Type::getInt32Ty(*context), ep_load, idx);
+        if (isAssign) return ep_idx;
+        else return builder->CreateLoad(Type::getInt32Ty(*context), ep_idx);
+    } else {
+        if (isAssign) return ep;
+        else return builder->CreateLoad(elementType, ep);
+    }
 }
 

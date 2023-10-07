@@ -1,12 +1,5 @@
 set(CORE_TEST_SRC
-    first
-    
-    bool1 char1 byte1 ubyte1
-    const1 math1 op_pred neg1
-    short1 ushort1
-    int64_1 uint64_1
-    uint1
-    #string1
+    array1
 )
 
 foreach(ITEM ${CORE_TEST_SRC})
@@ -26,9 +19,9 @@ foreach(ITEM ${CORE_TEST_SRC})
     )
 endforeach()
 
-add_custom_target(test_orka_basic
+add_custom_target(test_orka_array
     DEPENDS ${TEST_OUTPUTS}
 )
 
-add_dependencies(test_orka_basic okcc)
+add_dependencies(test_orka_array okcc)
 

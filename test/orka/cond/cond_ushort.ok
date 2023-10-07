@@ -1,16 +1,4 @@
-
-#OUTPUT
-#True
-#20
-#False
-#31
-#END
-
-#RET 0
-
 import std.io;
-
-extern println(ln:str);
 
 func test1(x:ushort) is
     if x = 20 then println("True");

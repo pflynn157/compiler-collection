@@ -1,14 +1,4 @@
-
-#OUTPUT
-#X: 20 | Y: 20
-#X: 22 | Y: 66
-#END
-
-#RET 0
-
 import std.io;
-
-extern println(ln:str);
 
 func main -> int is
     var x, y : int := 20;
@@ -22,3 +12,4 @@ func main -> int is
     
     return 0;
 end
+

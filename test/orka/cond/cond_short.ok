@@ -1,18 +1,6 @@
-
-#OUTPUT
-#True
-#20
-#False
-#31
-#END
-
-#RET 0
-
 import std.io;
 
-extern println(ln:str);
-
-func test1(x:uint64) is
+func test1(x:short) is
     if x = 20 then println("True");
     else println("False");
     end
@@ -20,7 +8,7 @@ func test1(x:uint64) is
     printf("%d\n", x);
 end
 
-func test2(x:uint64) is
+func test2(x:short) is
     if x = 20 then println("True");
     else println("False");
     end
@@ -29,8 +17,8 @@ func test2(x:uint64) is
 end
 
 func main -> int is
-    var x1 : uint64 := 20;
-    var x2 : uint64 := 31;
+    var x1 : short := 20;
+    var x2 : short := 31;
     
     test1(x1);
     test2(x2);

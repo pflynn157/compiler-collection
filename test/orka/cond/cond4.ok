@@ -1,25 +1,4 @@
-
-#OUTPUT
-#Equal
-#NEQ
-#GT
-#Not
-#LT
-#Not
-#NEQ
-#Not
-#GTE
-#GTE
-#Not
-#LTE
-#LTE
-#Not
-#END
-
-#RET 0
-
-extern printf(ln:str, x:int);
-extern println(ln:str);
+import std.io;
 
 func cmp1(x:int) is
     if x = 10 then

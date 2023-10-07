@@ -1,16 +1,4 @@
-
-#OUTPUT
-#X greater than 20.
-#IDK
-#X greater than 10.
-#X greater than 5.
-#IDK
-#END
-
-#RET 0
-
-extern printf(ln:str, x:int);
-extern println(ln:str);
+import std.io;
 
 func cmp(x:int) is
     if x > 20 then
@@ -19,8 +7,6 @@ func cmp(x:int) is
         println("X greater than 10.");
     elif x > 5 then
         println("X greater than 5.");
-    else
-        println("IDK");
     end
 end
 

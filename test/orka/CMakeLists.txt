@@ -1,33 +1,14 @@
-set(CORE_TEST_SRC
-    first
-    
-    bool1 char1 byte1 ubyte1
-    const1 math1 op_pred neg1
-    short1 ushort1
-    int64_1 uint64_1
-    uint1 string1
+add_subdirectory(basic)
+add_subdirectory(cond)
+add_subdirectory(str)
+add_subdirectory(struct)
+add_subdirectory(syntax)
+
+add_custom_target(test_orka DEPENDS
+    test_orka_basic
+    test_orka_cond
+    test_orka_str
+    test_orka_struct
+    test_orka_syntax
 )
-
-foreach(ITEM ${CORE_TEST_SRC})
-    add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ITEM}.exe
-        COMMAND ${CMAKE_BINARY_DIR}/orka-lang/okcc ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ok -o ${ITEM}.exe
-        COMMAND ./${ITEM}.exe > output.txt
-        COMMAND rm ${ITEM}.exe
-        COMMAND diff ${CMAKE_CURRENT_SOURCE_DIR}/out/${ITEM}.out ./output.txt
-        COMMAND rm output.txt
-        COMMAND echo "[PASS] ${ITEM}.ok"
-    )
-    
-    set(TEST_OUTPUTS
-        ${TEST_OUTPUTS}
-        ${CMAKE_CURRENT_BINARY_DIR}/${ITEM}.exe
-    )
-endforeach()
-
-add_custom_target(test_orka
-    DEPENDS ${TEST_OUTPUTS}
-)
-
-add_dependencies(test_orka okcc)
 

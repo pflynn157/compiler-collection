@@ -1,0 +1,15 @@
+import std.io;
+
+func main -> int is
+    var x : int := 0;
+    
+    while x < 10 do
+        if x = 5 then break; end
+        
+        printf("%d\n", x);
+        x := x + 1;
+    end
+    
+    return 0;
+end
+

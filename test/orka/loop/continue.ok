@@ -1,21 +1,13 @@
-
-#OUTPUT
-#0
-#1
-#2
-#3
-#4
-#END
-
-#RET 0
-
-extern printf(ln:str, x:int);
+import std.io;
 
 func main -> int is
     var x : int := 0;
     
     while x < 10 do
-        if x = 5 then break; end
+        if x = 5 then
+            x := x + 2;
+            continue;
+        end
         
         printf("%d\n", x);
         x := x + 1;

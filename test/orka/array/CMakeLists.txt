@@ -1,5 +1,6 @@
 set(CORE_TEST_SRC
     array1
+    array_func1
 )
 
 foreach(ITEM ${CORE_TEST_SRC})

@@ -239,7 +239,9 @@ std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
                 return nullptr;
             }
             
-            dataType = AstBuilder::buildPointerType(dataType);
+            //dataType = AstBuilder::buildPointerType(dataType);
+            // TODO: Get this properly
+            dataType = AstBuilder::buildStructType("__int32_array");
         } else {
             scanner->rewind(tk);
         }

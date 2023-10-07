@@ -1,12 +1,20 @@
-import std.io;
+
+#OUTPUT
+#0|1|2|3|4|5|6|7|8|9|
+#Done
+#END
+
+#RET 0
+
+extern printf(ln:str, x:int);
 
 func main -> int is
-    var args : str[3];
-    args[0] := "Hi!";
-    args[1] := "How are you?";
-    args[2] := "Good!";
+    for i in 0 .. 10 step 1 do
+        printf("%d|", i);
+    end
     
-    println(args[1]);
+    printf("\n");
+    printf("Done\n");
     
     return 0;
 end

@@ -43,6 +43,7 @@ protected:
     // Flow.cpp
     bool buildConditional(std::shared_ptr<AstBlock> block);
     bool buildWhile(std::shared_ptr<AstBlock> block);
+    bool buildFor(std::shared_ptr<AstBlock> block);
     bool buildLoopCtrl(std::shared_ptr<AstBlock> block, bool isBreak);
     
     // Structure.cpp

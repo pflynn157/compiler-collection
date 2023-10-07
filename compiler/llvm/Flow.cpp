@@ -88,3 +88,70 @@ void Compiler::compileWhileStatement(std::shared_ptr<AstStatement> stmt) {
     continueStack.pop();
 }
 
+// Translates a for loop to LLVM
+void Compiler::compileForStatement(std::shared_ptr<AstStatement> stmt) {
+    auto loop = std::static_pointer_cast<AstForStmt>(stmt);
+    
+    BasicBlock *loopBlock = BasicBlock::Create(*context, "loop_body" + std::to_string(blockCount), currentFunc);
+    BasicBlock *loopInc = BasicBlock::Create(*context, "loop_inc" + std::to_string(blockCount), currentFunc);
+    BasicBlock *loopCmp = BasicBlock::Create(*context, "loop_cmp" + std::to_string(blockCount), currentFunc);
+    BasicBlock *loopEnd = BasicBlock::Create(*context, "loop_end" + std::to_string(blockCount), currentFunc);
+    ++blockCount;
+
+    BasicBlock *current = builder->GetInsertBlock();
+    loopBlock->moveAfter(current);
+    loopInc->moveAfter(loopBlock);
+    loopCmp->moveAfter(loopInc);
+    loopEnd->moveAfter(loopCmp);
+    
+    breakStack.push(loopEnd);
+    continueStack.push(loopCmp);
+    
+    // Create the induction variable and back up the symbol tables
+    std::map<std::string, AllocaInst *> symtableOld = symtable;
+    std::map<std::string, std::shared_ptr<AstDataType>> typeTableOld = typeTable;
+    Type *data_type = translateType(loop->data_type);
+    
+    std::string indexName = loop->index->value;
+    AllocaInst *indexVar = builder->CreateAlloca(data_type);
+    symtable[indexName] = indexVar;
+    typeTable[indexName] = loop->data_type;
+    
+    Value *startVal = compileValue(loop->start);
+    builder->CreateStore(startVal, indexVar);
+    
+    // Create the rest of the loop
+    builder->CreateBr(loopCmp);
+    builder->SetInsertPoint(loopCmp);
+    
+    Value *indexVal = builder->CreateLoad(data_type, indexVar);
+    Value *endVal = compileValue(loop->end);
+    Value *cond = builder->CreateICmpSLT(indexVal, endVal);
+    builder->CreateCondBr(cond, loopBlock, loopEnd);
+    
+    // Loop increment
+    builder->SetInsertPoint(loopInc);
+    
+    indexVal = builder->CreateLoad(data_type, indexVar);
+    Value *incVal = compileValue(loop->step);
+    indexVal = builder->CreateAdd(indexVal, incVal);
+    builder->CreateStore(indexVal, indexVar);
+    
+    builder->CreateBr(loopCmp);
+
+    // The body
+    builder->SetInsertPoint(loopBlock);
+    for (auto stmt : loop->block->getBlock()) {
+        compileStatement(stmt);
+    }
+    builder->CreateBr(loopInc);
+    
+    builder->SetInsertPoint(loopEnd);
+    
+    breakStack.pop();
+    continueStack.pop();
+    
+    symtable = symtableOld;
+    typeTable = typeTableOld;
+}
+

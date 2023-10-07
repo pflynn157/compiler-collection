@@ -1,7 +1,7 @@
 set(CORE_TEST_SRC
     break
     continue
-    #for1
+    for1
     #forall1
     #nested1
     #nested2

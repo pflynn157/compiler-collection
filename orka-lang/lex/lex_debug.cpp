@@ -40,6 +40,9 @@ void Token::print() {
         case t_lgand: std::cout << "and" << std::endl; break;
         case t_lgor: std::cout << "or" << std::endl; break;
         case t_sizeof: std::cout << "sizeof" << std::endl; break;
+        case t_for: std::cout << "for" << std::endl; break;
+        case t_in: std::cout << "in" << std::endl; break;
+        case t_step: std::cout << "step" << std::endl; break;
         
         case t_dot: std::cout << "." << std::endl; break;
         case t_semicolon: std::cout << ";" << std::endl; break;
@@ -65,6 +68,7 @@ void Token::print() {
         case t_lte: std::cout << "<=" << std::endl; break;
         case t_eq: std::cout << "=" << std::endl; break;
         case t_neq: std::cout << "!=" << std::endl; break;
+        case t_range: std::cout << ".." << std::endl; break;
         
         case t_id: std::cout << "ID(" << id_val << ")" << std::endl; break;
         case t_string_literal: std::cout << "STR(" << id_val << ")" << std::endl; break;

@@ -7,6 +7,7 @@
 
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
+#include <ast/ast_builder.hpp>
 #include <lex/lex.hpp>
 
 // Called if a conditional statement has only one operand. If it does,
@@ -84,6 +85,46 @@ bool Parser::buildWhile(std::shared_ptr<AstBlock> block) {
     
     std::shared_ptr<AstBlock> block2 = std::make_shared<AstBlock>();
     block2->mergeSymbols(block);
+    buildBlock(block2);
+    loop->block = block2;
+    
+    return true;
+}
+
+// Builds a for loop
+bool Parser::buildFor(std::shared_ptr<AstBlock> block) {
+    std::shared_ptr<AstForStmt> loop = std::make_shared<AstForStmt>();
+    block->addStatement(loop);
+    
+    // Get the index
+    Token token = scanner->getNext();
+    if (token.type != t_id) {
+        syntax->addError(scanner->getLine(), "Expected variable name for index.");
+        return false;
+    }
+    
+    std::string idx_name = token.id_val;
+    loop->index = std::make_shared<AstID>(token.id_val);
+    std::shared_ptr<AstDataType> dataType = AstBuilder::buildInt32Type();
+    
+    token = scanner->getNext();
+    if (token.type != t_in) {
+        syntax->addError(scanner->getLine(), "Expected \"in\".");
+        return false;
+    }
+    
+    std::shared_ptr<AstExpression> start = buildExpression(block, dataType, t_range);
+    std::shared_ptr<AstExpression> end = buildExpression(block, dataType, t_step);
+    std::shared_ptr<AstExpression> step = buildExpression(block, dataType, t_do);
+    
+    loop->start = start;
+    loop->end = end;
+    loop->step = step;
+    loop->data_type = dataType;
+    
+    std::shared_ptr<AstBlock> block2 = std::make_shared<AstBlock>();
+    block2->mergeSymbols(block);
+    block2->addSymbol(idx_name, dataType);
     buildBlock(block2);
     loop->block = block2;
     

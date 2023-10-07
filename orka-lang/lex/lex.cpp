@@ -246,12 +246,14 @@ TokenType Scanner::getKeyword() {
     else if (buffer == "and") return t_lgand;
     else if (buffer == "or") return t_lgor;
     else if (buffer == "sizeof") return t_sizeof;
+    else if (buffer == "for") return t_for;
+    else if (buffer == "in") return t_in;
+    else if (buffer == "step") return t_step;
     return t_none;
 }
 
 TokenType Scanner::getSymbol(char c) {
     switch (c) {
-        case '.': return t_dot;
         case ';': return t_semicolon;
         case ',': return t_comma;
         case '(': return t_lparen;
@@ -313,6 +315,16 @@ TokenType Scanner::getSymbol(char c) {
                 return t_neq;
             } else {
                 reader.unget();
+            }
+        } break;
+        case '.': {
+            char c2 = reader.get();
+            if (c2 == '.') {
+                rawBuffer += c2;
+                return t_range;
+            } else {
+                reader.unget();
+                return t_dot;
             }
         } break;
         default: return t_none;

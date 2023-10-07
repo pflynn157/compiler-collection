@@ -117,6 +117,11 @@ void Compiler::compileStatement(std::shared_ptr<AstStatement> stmt) {
             compileWhileStatement(stmt);
         } break;
         
+        // A for loop
+        case V_AstType::For: {
+            compileForStatement(stmt);
+        } break;
+        
         // A break statement
         case V_AstType::Break: {
             builder->CreateBr(breakStack.top());

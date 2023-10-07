@@ -107,6 +107,9 @@ void AstBlock::print(int indent) {
             case V_AstType::While: {
                 std::static_pointer_cast<AstWhileStmt>(stmt)->print(indent);
             } break;
+            case V_AstType::For: {
+                std::static_pointer_cast<AstForStmt>(stmt)->print(indent);
+            } break;
             
             default: stmt->print();
         }
@@ -211,11 +214,11 @@ void AstRepeatStmt::print(int indent) {
 void AstForStmt::print(int indent) {
     std::cout << "    ";
     std::cout << "FOR ";
-    indexVar->print();
+    index->print();
     std::cout << " IN ";
-    startBound->print();
+    start->print();
     std::cout << " .. ";
-    endBound->print();
+    end->print();
     std::cout << " STEP ";
     step->print();
     std::cout << std::endl;

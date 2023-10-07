@@ -882,10 +882,11 @@ struct AstForStmt : public AstStatement {
     
     void print(int indent = 0);
     
-    std::shared_ptr<AstID> indexVar;
-    std::shared_ptr<AstExpression> startBound;
-    std::shared_ptr<AstExpression> endBound;
-    std::shared_ptr<AstI32> step;
+    std::shared_ptr<AstID> index;
+    std::shared_ptr<AstExpression> start;
+    std::shared_ptr<AstExpression> end;
+    std::shared_ptr<AstExpression> step;
+    std::shared_ptr<AstDataType> data_type;
     std::shared_ptr<AstBlock> block = nullptr;
 };
 

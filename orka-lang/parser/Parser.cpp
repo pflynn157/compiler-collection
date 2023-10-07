@@ -182,12 +182,13 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
             
             // Handle loops
             case t_while: code = buildWhile(block); break;
+            case t_for: code = buildFor(block); break;
             case t_break: code = buildLoopCtrl(block, true); break;
             case t_continue: code = buildLoopCtrl(block, false); break;
             
             default: {
                 syntax->addError(0, "Invalid token in block.");
-                //token.print();
+                tk.print();
                 return false;
             }
         }

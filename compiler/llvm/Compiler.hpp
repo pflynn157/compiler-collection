@@ -44,6 +44,7 @@ protected:
     // Flow.cpp
     void compileIfStatement(std::shared_ptr<AstStatement> stmt);
     void compileWhileStatement(std::shared_ptr<AstStatement> stmt);
+    void compileForStatement(std::shared_ptr<AstStatement> stmt);
     
     // Variable.cpp
     void compileStructDeclaration(std::shared_ptr<AstStatement> stmt);

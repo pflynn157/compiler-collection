@@ -12,8 +12,8 @@ add_custom_command(
 
 add_custom_command(
     OUTPUT libcorelib.a
-    COMMAND ar rcs libcorelib.a io.o str.o sys.o syscall_x86.o x64_start.o
-    DEPENDS io.o str.o sys.o syscall_x86.o x64_start.o
+    COMMAND ar rcs libcorelib.a  syscall_x86.o x64_start.o io.o str.o sys.o
+    DEPENDS syscall_x86.o x64_start.o io.o str.o sys.o
 )
 
 add_custom_target(lib_orka_corelib ALL DEPENDS libcorelib.a)

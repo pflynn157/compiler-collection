@@ -1,13 +1,4 @@
-
-#OUTPUT
-#True
-#END
-
-#RET 0
-
 import std.io;
-
-extern println(ln:str);
 
 func main -> int is
     var x : bool := true;
@@ -18,3 +9,4 @@ func main -> int is
     
     return 0;
 end
+

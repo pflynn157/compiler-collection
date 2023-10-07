@@ -1,12 +1,4 @@
-
-#OUTPUT
-#21
-#END
-
-#RET 0
-
-extern println(line:str);
-extern printf(line:str, x:int);
+import std.io;
 
 func main -> int is
     var x : ubyte := 0x21;

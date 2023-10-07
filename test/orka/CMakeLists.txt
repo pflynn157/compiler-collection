@@ -1,5 +1,11 @@
 set(CORE_TEST_SRC
     first
+    
+    bool1 char1 byte1 ubyte1
+    const1 math1 op_pred neg1
+    short1 ushort1
+    int64_1 uint64_1
+    uint1 string1
 )
 
 foreach(ITEM ${CORE_TEST_SRC})

@@ -222,11 +222,11 @@ TokenType Scanner::getKeyword() {
     else if (buffer == "const") return t_const;
     else if (buffer == "bool") return t_bool;
     else if (buffer == "char") return t_char;
-    else if (buffer == "string") return t_string;
-    else if (buffer == "int8") return t_i8;
-    else if (buffer == "uint8") return t_u8;
-    else if (buffer == "int16") return t_i16;
-    else if (buffer == "uint16") return t_u16;
+    else if (buffer == "str") return t_string;
+    else if (buffer == "byte") return t_i8;
+    else if (buffer == "ubyte") return t_u8;
+    else if (buffer == "short") return t_i16;
+    else if (buffer == "ushort") return t_u16;
     else if (buffer == "int") return t_i32;
     else if (buffer == "uint") return t_u32;
     else if (buffer == "int64") return t_i64;

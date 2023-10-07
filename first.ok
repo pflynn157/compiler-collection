@@ -1,8 +1,0 @@
-
-import std.io;
-
-func main -> int is
-    println("Hello!");
-    return 0;
-end
-

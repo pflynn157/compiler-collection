@@ -1,11 +1,4 @@
-
-#OUTPUT
-#CONST: 20, 30
-#END
-
-#RET 0
-
-extern printf(ln:str, x:int);
+import std.io;
 
 const Top : int := 30;
 

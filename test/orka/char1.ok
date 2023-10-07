@@ -1,12 +1,4 @@
-
-#OUTPUT
-#A
-#A
-#END
-
-#RET 0
-
-extern printf(line:str, x:int);
+import std.io;
 
 func main -> int is
     var c : char := 'A';

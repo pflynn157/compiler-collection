@@ -1,14 +1,4 @@
-
-#OUTPUT
-#X1: 30
-#X2: 10
-#X3: 200
-#X4: 2
-#END
-
-#RET 0
-
-extern printf(ln : str, x : int);
+import std.io;
 
 func main -> int is
     var y : int := 20;

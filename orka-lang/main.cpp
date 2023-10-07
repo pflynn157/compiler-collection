@@ -65,8 +65,9 @@ void assemble(CFlags cflags) {
 void link(CFlags cflags) {
     std::string cmd = "ld ";
     cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
-    cmd += " -L" + std::string(LINK_CORELIB_LOCATION) + " -lcorelib ";
     cmd += " -L" + std::string(LINK_STDLIB_LOCATION) + " -lstdlib ";
+    cmd += " -L" + std::string(LINK_CORELIB_LOCATION) + " -lcorelib ";
+    //cmd += " -L" + std::string(LINK_STDLIB_LOCATION) + " -lstdlib ";
     system(cmd.c_str());
     //printf("LINK: %s\n", cmd.c_str());
 }

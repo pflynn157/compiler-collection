@@ -1,25 +1,22 @@
-
-#OUTPUT
-#hi
-#Hello!
-#END
-
-#RET 0
-
 import std.io;
 
-class C1 is
-    func C1 is
-        println("hi");
-    end
+func main(args:str[]) -> int is
+    var x : float := 99.12300;
+    var y : float := 2.398100;
     
-    func sayHello is
-        println("Hello!");    
-    end
-end
-
-func main -> int is
-    class var1 : C1;
-    var1.sayHello();
+    printFloat(x);
+    printFloat(y);
+    println("---------------");
+    
+    var a1 : float := x + y;
+    var a2 : float := x - y;
+    var a3 : float := x * y;
+    var a4 : float := x / y;
+    
+    printFloat(a1);
+    printFloat(a2);
+    printFloat(a3);
+    printFloat(a4);
+    
     return 0;
 end

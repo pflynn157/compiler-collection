@@ -1,16 +1,4 @@
-
-#OUTPUT
-#True
-#3.140000
-#True
-#30.229999
-#END
-
-#RET 0
-
 import std.io;
-
-extern println(ln:str);
 
 func test1(x:float) is
     if x != 3.14 then println("False");

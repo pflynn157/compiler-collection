@@ -14,5 +14,6 @@ Here is our current project list:
 * tiny-lang -> The first language, a mini educational language
 * sal-lang -> Set Algorithmic Language- A language based on formal set theory with heavy emphasis on math.
 * espresso-lang -> An experimental language to test and demonstrate the libjava library
+* orka-lang-> A language based on Tiny-Lang, but with added features such as for loops, for-all loops, floating-point operations, and object oriented programming
 
 

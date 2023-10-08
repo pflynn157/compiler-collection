@@ -236,3 +236,190 @@ bool Parser::buildStructDec(std::shared_ptr<AstBlock> block) {
     return true;
 }
 
+//
+// Builds a class declaration
+//
+bool Parser::buildClass() {
+    Token token = scanner->getNext();
+    std::string name = token.id_val;
+    std::string baseClass = "";
+    
+    if (token.type != t_id) {
+        syntax->addError(scanner->getLine(), "Expected class name.");
+        return false;
+    }
+    
+    token = scanner->getNext();
+    if (token.type == t_extends) {
+        token = scanner->getNext();
+        if (token.type != t_id) {
+            syntax->addError(scanner->getLine(), "Expected extending class name.");
+            return false;
+        }
+        
+        baseClass = token.id_val;
+        
+        token = scanner->getNext();
+        if (token.type != t_is) {
+            syntax->addError(scanner->getLine(), "Expected \"is\".");
+            return false;
+        }
+    } else if (token.type != t_is) {
+        syntax->addError(scanner->getLine(), "Expected \"is\" or \"extends\".");
+        return false;
+    }
+    
+    auto clazzStruct = std::make_shared<AstStruct>(name);
+    tree->addStruct(clazzStruct);
+    
+    auto clazz = std::make_shared<AstClass>(name);
+    currentClass = clazz;
+    
+    if (baseClass != "") {
+        // First, build the inherited structure
+        std::shared_ptr<AstStruct> baseStruct = nullptr;
+        for (auto s : tree->structs) {
+            if (s->name == baseClass) {
+                baseStruct = s;
+                break;
+            }
+        }
+        
+        if (baseStruct == nullptr) {
+            syntax->addError(scanner->getLine(), "Unknown base class.");
+            return false;
+        }
+        
+        for (auto var : baseStruct->items) {
+            clazzStruct->addItem(var, baseStruct->default_expressions[var.name]);
+        }
+        
+        // Next, build the inherited class
+        std::shared_ptr<AstClass> baseAstClass = nullptr;
+        for (auto c : tree->classes) {
+            if (c->name == baseClass) {
+                baseAstClass = c;
+                break;
+            }
+        }
+        
+        if (baseAstClass == nullptr) {
+            syntax->addError(scanner->getLine(), "Unknown base class.");
+            return false;
+        }
+        
+        for (auto func : baseAstClass->functions) {
+            if (func->name == baseClass) continue;
+            clazz->addFunction(func);
+            
+            // Add it to the function scope in the AST tree
+            std::string newName = name + "_" + func->name;
+            
+            // Copy it
+            auto func2 = std::make_shared<AstFunction>(newName);
+            func2->data_type = func->data_type;
+            func2->args = func->args;
+            tree->addGlobalStatement(func2);
+            
+            std::shared_ptr<AstBlock> block2 = func->block;
+            func2->block->addStatements(block2->getBlock());
+        }
+    }
+    
+    do {
+        token = scanner->getNext();
+        bool code = true;
+        
+        switch (token.type) {
+            case t_func: code = buildFunction(token, name); break;
+            case t_var: {
+                token = scanner->getNext();
+                if (!buildStructMember(clazzStruct, token)) return false;
+            } break; 
+            
+            case t_end: break;
+            
+            default: {
+                syntax->addError(scanner->getLine(), "Invalid token in class.");
+                token.print();
+                code = false;
+            }
+        }
+        
+        if (!code) break;
+    } while (token.type != t_end);
+    
+    currentClass = clazz;
+    tree->addClass(clazz);
+    
+    return true;
+}
+
+// Builds a class declaration
+// A class declaration is basically a structure declaration with a function call
+//
+bool Parser::buildClassDec(std::shared_ptr<AstBlock> block) {
+    Token token = scanner->getNext();
+    std::string name = token.id_val;
+    
+    if (token.type != t_id) {
+        syntax->addError(scanner->getLine(), "Expected class name.");
+        return false;
+    }
+    
+    token = scanner->getNext();
+    if (token.type != t_colon) {
+        syntax->addError(scanner->getLine(), "Expected \":\"");
+        return false;
+    }
+    
+    token = scanner->getNext();
+    std::string className = token.id_val;
+    
+    if (token.type != t_id) {
+        syntax->addError(scanner->getLine(), "Expected class name.");
+        return false;
+    }
+    
+    // Make sure the structure exists, and names a class
+    // TODO: Do the class check
+    std::shared_ptr<AstStruct> str = nullptr;
+    
+    for (auto s : tree->structs) {
+        if (s->name == className) {
+            str = s;
+            break;
+        }
+    }
+    
+    if (str == nullptr) {
+        syntax->addError(scanner->getLine(), "Unknown class.");
+        return false;
+    }
+    
+    // Build the structure declaration
+    auto dec = std::make_shared<AstStructDec>(name, className);
+    block->addStatement(dec);
+    
+    classMap[name] = className;
+    
+    // Call the constructor
+    auto classRef = std::make_shared<AstID>(name);
+    auto args = std::make_shared<AstExprList>();
+    args->add_expression(classRef);
+    
+    std::string constructor = className + "_" + className;
+    auto fc = std::make_shared<AstFuncCallStmt>(constructor);
+    block->addStatement(fc);
+    fc->expression = args;
+    
+    // Do the final syntax check
+    token = scanner->getNext();
+    if (token.type != t_semicolon) {
+        syntax->addError(scanner->getLine(), "Expected terminator.");
+        return false;
+    }
+    
+    return true;
+}
+

@@ -252,6 +252,8 @@ TokenType Scanner::getKeyword() {
     else if (buffer == "step") return t_step;
     else if (buffer == "repeat") return t_repeat;
     else if (buffer == "enum") return t_enum;
+    else if (buffer == "class") return t_class;
+    else if (buffer == "extends") return t_extends;
     return t_none;
 }
 

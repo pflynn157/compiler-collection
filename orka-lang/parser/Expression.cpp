@@ -141,16 +141,33 @@ bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, Token tk, std::shared_
         
         ctx->output.push(fc);
     } else if (tk.type == t_dot) {
-        // TODO: Search for structures here
-
         Token idToken = scanner->getNext();
         if (idToken.type != t_id) {
-            syntax->addError(0, "Expected identifier.");
+            syntax->addError(scanner->getLine(), "Expected identifier.");
             return false;
         }
         
-        std::shared_ptr<AstStructAccess> val = std::make_shared<AstStructAccess>(name, idToken.id_val);
-        ctx->output.push(val);
+        tk = scanner->getNext();
+        if (tk.type == t_lparen) {
+            std::string className = classMap[name];
+            className += "_" + idToken.id_val;
+            
+            auto fc = std::make_shared<AstFuncCallExpr>(className);
+            auto id = std::make_shared<AstID>(name);
+            
+            std::shared_ptr<AstExpression> args2 = buildExpression(block, ctx->varType, t_rparen, false, true);
+            std::shared_ptr<AstExprList> args = std::static_pointer_cast<AstExprList>(args2);
+            args->list.insert(args->list.begin(), id);
+            fc->args = args;
+            
+            ctx->output.push(fc);
+        } else {
+            scanner->rewind(tk);
+            
+            std::shared_ptr<AstStructAccess> val = std::make_shared<AstStructAccess>(name, idToken.id_val);
+            ctx->output.push(val);
+        }
+        
     } else if (tk.type == t_scope) {
         if (enums.find(name) == enums.end()) {
             syntax->addError(scanner->getLine(), "Unknown enum.");

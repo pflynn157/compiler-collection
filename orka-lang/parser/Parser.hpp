@@ -53,6 +53,8 @@ protected:
     bool buildStruct();
     bool buildStructMember(std::shared_ptr<AstStruct> str, Token tk);
     bool buildStructDec(std::shared_ptr<AstBlock> block);
+    bool buildClass();
+    bool buildClassDec(std::shared_ptr<AstBlock> block);
     
     // Expression.cpp
     std::shared_ptr<AstExpression> buildConstExpr(Token tk);
@@ -71,5 +73,8 @@ protected:
 private:
     std::unique_ptr<Scanner> scanner;
     std::map<std::string, AstEnum> enums;
+    
+    std::shared_ptr<AstClass> currentClass = nullptr;
+    std::map<std::string, std::string> classMap;
 };
 

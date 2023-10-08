@@ -932,11 +932,16 @@ struct AstTree {
         structs.push_back(s);
     }
     
+    void addClass(std::shared_ptr<AstClass> c) {
+        classes.push_back(c);
+    }
+    
     void print();
     void dot();
     
     std::string file = "";
     std::shared_ptr<AstBlock> block;
     std::vector<std::shared_ptr<AstStruct>> structs;
+    std::vector<std::shared_ptr<AstClass>> classes;
 };
 

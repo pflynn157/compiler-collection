@@ -72,6 +72,15 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     // Get arguments
     std::vector<Var> args;
     std::shared_ptr<AstBlock> block = std::make_shared<AstBlock>();
+    if (className != "") {
+        Var classV;
+        classV.name = "this";
+        classV.type = AstBuilder::buildStructType(className);
+        args.push_back(classV);
+        
+        block->symbolTable["this"] = classV.type;
+    }
+    
     if (!getFunctionArgs(block, args)) return false;
 
     // Check to see if there's any return type
@@ -111,8 +120,12 @@ bool Parser::buildFunction(Token startToken, std::string className) {
     func->block->mergeSymbols(tree->block);
     func->block->mergeSymbols(block);
     
+    if (className != "") {
+        std::string fullName = className + "_" + funcName;
+        func->name = fullName;
+    }
+    
     // Build the body
-    int stopLayer = 0;
     if (!buildBlock(func->block)) return false;
     
     // Make sure we end with a return statement
@@ -133,6 +146,16 @@ bool Parser::buildFunction(Token startToken, std::string className) {
             syntax->addError(0, "Expected return statement.");
             return false;
         }
+    }
+    
+    if (className != "") {
+        auto func2 = std::make_shared<AstFunction>(funcName);
+        func2->data_type = dataType;
+        func2->args = args;
+        currentClass->addFunction(func2);
+        
+        std::shared_ptr<AstBlock> block2 = func->block;
+        func2->block->addStatements(block2->getBlock());
     }
     
     return true;

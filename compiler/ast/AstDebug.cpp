@@ -13,6 +13,8 @@ void AstTree::print() {
     
     for (auto str : structs) str->print();
     
+    for (auto c : classes) c->print();
+    
     block->print();
 }
 

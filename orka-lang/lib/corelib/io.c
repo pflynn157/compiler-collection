@@ -19,8 +19,8 @@ typedef struct
     int size;
 } CharArray;
 
-void printCharArray(CharArray array)
+void printCharArray(CharArray *array)
 {
-    syscall_str4(1, 1, array.array, array.size);
+    syscall_str4(1, 1, array->array, array->size);
 }
 

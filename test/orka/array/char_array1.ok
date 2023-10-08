@@ -4,7 +4,7 @@ func main -> int is
     var c : char := 'A';
     var string : char[10];
     
-    for i in 0 .. 10 do
+    for i in 0 .. 10 step 1 do
         if i = 0 then string[0] := 'A';
         elif i = 1 then string[1] := 'B';
         elif i = 2 then string[2] := 'C';
@@ -17,11 +17,9 @@ func main -> int is
         end
     end
     
-    for i in 0 .. 10 do
+    for i in 0 .. 10 step 1 do
         printf("%c", string[i]);
     end
-    
-    printCharArray(string);
     
     return 0;
 end

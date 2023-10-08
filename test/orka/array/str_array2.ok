@@ -6,7 +6,7 @@ func main -> int is
     args[1] := "How are you?";
     args[2] := "Good!";
     
-    for i in 0 .. 3 do
+    for i in 0 .. 3 step 1 do
         println(args[i]);
     end
     

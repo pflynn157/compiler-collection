@@ -5,3 +5,5 @@ extern printDouble(num:double);
 extern printFloat(num:float);
 extern setPrecision(p:int);
 
+extern printCharArray(ca:char[]);
+

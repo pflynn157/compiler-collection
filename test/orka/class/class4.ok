@@ -1,31 +1,6 @@
-
-#OUTPUT
-#Rectangle
-#(Before) X: 20 | Y: 30
-#(After) X: 40 | Y: 80
-#END
-
-#RET 0
-
 import std.io;
 
-class Square is
-    func Square is
-        println("square");
-    end
-    
-    func getX -> int is
-        return this.x;
-    end
-    
-    func setX(x:int) is
-        this.x := x;
-    end
-    
-    var x : int := 20;
-end
-
-class Rectangle extends Square is
+class Rectangle is
     func Rectangle is
         println("Rectangle");
     end
@@ -38,6 +13,15 @@ class Rectangle extends Square is
         this.y := y;
     end
     
+    func getX -> int is
+        return this.x;
+    end
+    
+    func setX(x:int) is
+        this.x := x;
+    end
+    
+    var x : int := 20;
     var y : int := 30;
 end
 

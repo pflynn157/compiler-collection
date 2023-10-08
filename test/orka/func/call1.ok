@@ -1,11 +1,4 @@
-
-#OUTPUT
-#X: 53
-#END
-
-#RET 0
-
-extern printf(line:str, x:int);
+import std.io;
 
 func getNumber(x:int, y:int) -> int is
     return 20 + x + y;

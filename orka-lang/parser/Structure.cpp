@@ -13,6 +13,94 @@
 #include <ast/ast_builder.hpp>
 #include <lex/lex.hpp>
 
+// Parses and builds an enumeration
+bool Parser::buildEnum() {
+    Token token = scanner->getNext();
+    std::string name = token.id_val;
+    
+    if (token.type != t_id) {
+        syntax->addError(scanner->getLine(), "Expected enum name.");
+        return false;
+    }
+    
+    // See if we have a type for the enum. Default is int
+    token = scanner->getNext();
+    std::shared_ptr<AstDataType> dataType = AstBuilder::buildInt32Type();
+    bool useDefault = false;
+    
+    switch (token.type) {
+        case t_bool: dataType = AstBuilder::buildBoolType(); break;
+        case t_char: dataType = AstBuilder::buildCharType(); break;
+        case t_i8: dataType = AstBuilder::buildInt8Type(); break;
+        case t_u8: dataType = AstBuilder::buildInt8Type(true); break;
+        case t_i16: dataType = AstBuilder::buildInt16Type(); break;
+        case t_u16: dataType = AstBuilder::buildInt16Type(true); break;
+        case t_i32: dataType = AstBuilder::buildInt32Type(); break;
+        case t_u32: dataType = AstBuilder::buildInt32Type(true); break;
+        case t_i64: dataType = AstBuilder::buildInt64Type(); break;
+        case t_u64: dataType = AstBuilder::buildInt64Type(true); break;
+        case t_string: dataType = AstBuilder::buildStringType(); break;
+        
+        case t_is: useDefault = true; break;
+        
+        default: {
+            syntax->addError(scanner->getLine(), "Unknown token in enum declaration");
+            return false;
+        }
+    }
+    
+    // Syntax check
+    if (!useDefault) {
+        token = scanner->getNext();
+        if (token.type != t_is) {
+            syntax->addError(scanner->getLine(), "Expected \"is\"");
+            return false;
+        }
+    }
+    
+    // Loop and get all the values
+    std::map<std::string, std::shared_ptr<AstExpression>> values;
+    int index = 0;
+    
+    while (token.type != t_end && token.type != t_eof) {
+        token = scanner->getNext();
+        std::string valName = token.id_val;
+        
+        if (token.type != t_id) {
+            syntax->addError(scanner->getLine(), "Expected enum value.");
+            token.print();
+            return false;
+        }
+        
+        token = scanner->getNext();
+        std::shared_ptr<AstExpression> value = nullptr;
+        
+        if (token.type == t_assign) {
+        
+        } else if (token.type != t_comma && token.type != t_end) {
+            syntax->addError(scanner->getLine(), "Unknown token in enum.");
+            token.print();
+            return false;
+        }
+        
+        if (value == nullptr) {
+            value = checkExpression(std::make_shared<AstI32>(index), dataType);
+            ++index;
+        }
+        
+        values[valName] = value;
+    }
+    
+    // Put it all together
+    AstEnum theEnum;
+    theEnum.name = name;
+    theEnum.type = dataType;
+    theEnum.values = values;
+    enums[name] = theEnum;
+    
+    return true;
+}
+
 // Parses and builds a structure
 bool Parser::buildStruct() {
     Token tk = scanner->getNext();

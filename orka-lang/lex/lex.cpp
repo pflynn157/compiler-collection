@@ -251,6 +251,7 @@ TokenType Scanner::getKeyword() {
     else if (buffer == "in") return t_in;
     else if (buffer == "step") return t_step;
     else if (buffer == "repeat") return t_repeat;
+    else if (buffer == "enum") return t_enum;
     return t_none;
 }
 
@@ -284,6 +285,9 @@ TokenType Scanner::getSymbol(char c) {
             if (c2 == '=') {
                 rawBuffer += c2;
                 return t_assign;
+            } else if (c2 == ':') {
+                rawBuffer += c2;
+                return t_scope;
             } else {
                 reader.unget();
                 return t_colon;

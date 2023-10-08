@@ -49,6 +49,7 @@ protected:
     bool buildLoopCtrl(std::shared_ptr<AstBlock> block, bool isBreak);
     
     // Structure.cpp
+    bool buildEnum();
     bool buildStruct();
     bool buildStructMember(std::shared_ptr<AstStruct> str, Token tk);
     bool buildStructDec(std::shared_ptr<AstBlock> block);
@@ -69,5 +70,6 @@ protected:
     std::string getArrayType(std::shared_ptr<AstDataType> dataType);
 private:
     std::unique_ptr<Scanner> scanner;
+    std::map<std::string, AstEnum> enums;
 };
 

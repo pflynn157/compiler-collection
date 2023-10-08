@@ -1,26 +1,17 @@
 import std.io;
 
+enum Vals is
+    A,
+    B,
+    C
+end
+
 func main -> int is
-    var c : char := 'A';
-    var string : char[10];
+    var x : int = Vals::B;
     
-    for i in 0 .. 10 step 1 do
-        if i = 0 then string[0] := 'A';
-        elif i = 1 then string[1] := 'B';
-        elif i = 2 then string[2] := 'C';
-        elif i = 3 then string[3] := 'D';
-        elif i = 4 then string[4] := 'E';
-        elif i = 5 then string[5] := 'F';
-        elif i = 6 then string[6] := 'G';
-        elif i = 9 then string[9] := '\n';
-        else string[i] := '?';
-        end
-    end
-    
-    for i in 0 .. 10 step 1 do
-        printf("%c", string[i]);
-    end
+    printf("A: %d\n", Vals::A);
+    printf("B: %d\n", x);
+    printf("C: %d\n", Vals::C);
     
     return 0;
 end
-

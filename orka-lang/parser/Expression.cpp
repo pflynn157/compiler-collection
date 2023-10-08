@@ -151,6 +151,21 @@ bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, Token tk, std::shared_
         
         std::shared_ptr<AstStructAccess> val = std::make_shared<AstStructAccess>(name, idToken.id_val);
         ctx->output.push(val);
+    } else if (tk.type == t_scope) {
+        if (enums.find(name) == enums.end()) {
+            syntax->addError(scanner->getLine(), "Unknown enum.");
+            return false;
+        }
+        
+        tk = scanner->getNext();
+        if (tk.type != t_id) {
+            syntax->addError(scanner->getLine(), "Expected identifier.");
+            return false;
+        }
+        
+        AstEnum dec = enums[name];
+        std::shared_ptr<AstExpression> val = dec.values[tk.id_val];
+        ctx->output.push(val);
     } else {
         int constVal = block->isConstant(name);
         if (constVal > 0) {

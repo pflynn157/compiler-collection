@@ -71,6 +71,7 @@ void Token::print() {
         case t_eq: std::cout << "=" << std::endl; break;
         case t_neq: std::cout << "!=" << std::endl; break;
         case t_range: std::cout << ".." << std::endl; break;
+        case t_scope: std::cout << "::" << std::endl; break;
         
         case t_id: std::cout << "ID(" << id_val << ")" << std::endl; break;
         case t_string_literal: std::cout << "STR(" << id_val << ")" << std::endl; break;

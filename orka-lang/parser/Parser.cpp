@@ -112,6 +112,7 @@ bool Parser::parse() {
             } break;
             
             case t_const: code = buildConst(tree->block, true); break;
+            case t_enum: code = buildEnum(); break;
             case t_struct: code = buildStruct(); break;
             
             case t_eof: break;

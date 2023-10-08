@@ -1,20 +1,4 @@
-
-#OUTPUT
-#*
-#**
-#***
-#****
-#****!===!
-#****!===!
-#****!===!
-#****!===!
-#****!===!
-#****!===!
-#END
-
-#RET 0
-
-extern printf(ln:str, x:int);
+import std.io;
 
 func main -> int is
     var x : int := 0;

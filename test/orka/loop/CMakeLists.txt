@@ -2,13 +2,13 @@ set(CORE_TEST_SRC
     break
     continue
     for1
-    #forall1
-    #nested1
-    #nested2
-    #nested3
-    #repeat1
-    #step1
-    #while1
+    forall1
+    nested1
+    nested2
+    nested3
+    repeat1
+    step1
+    while1
 )
 
 foreach(ITEM ${CORE_TEST_SRC})

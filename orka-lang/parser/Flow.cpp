@@ -91,6 +91,19 @@ bool Parser::buildWhile(std::shared_ptr<AstBlock> block) {
     return true;
 }
 
+// Builds an infinite loop statement
+bool Parser::buildRepeat(std::shared_ptr<AstBlock> block) {
+    std::shared_ptr<AstRepeatStmt> loop = std::make_shared<AstRepeatStmt>();
+    block->addStatement(loop);
+    
+    std::shared_ptr<AstBlock> block2 = std::make_shared<AstBlock>();
+    block2->mergeSymbols(block);
+    buildBlock(block2);
+    loop->block = block2;
+
+    return true;
+}
+
 // Builds a for loop
 bool Parser::buildFor(std::shared_ptr<AstBlock> block) {
     std::shared_ptr<AstForStmt> loop = std::make_shared<AstForStmt>();
@@ -121,6 +134,62 @@ bool Parser::buildFor(std::shared_ptr<AstBlock> block) {
     loop->end = end;
     loop->step = step;
     loop->data_type = dataType;
+    
+    std::shared_ptr<AstBlock> block2 = std::make_shared<AstBlock>();
+    block2->mergeSymbols(block);
+    block2->addSymbol(idx_name, dataType);
+    buildBlock(block2);
+    loop->block = block2;
+    
+    return true;
+}
+
+// Builds a forall loop
+bool Parser::buildForAll(std::shared_ptr<AstBlock> block) {
+    std::shared_ptr<AstForAllStmt> loop = std::make_shared<AstForAllStmt>();
+    block->addStatement(loop);
+    
+    // Get the index
+    Token token = scanner->getNext();
+    if (token.type != t_id) {
+        syntax->addError(scanner->getLine(), "Expected variable name for index.");
+        return false;
+    }
+    
+    std::string idx_name = token.id_val;
+    loop->index = std::make_shared<AstID>(idx_name);
+    
+    token = scanner->getNext();
+    if (token.type != t_in) {
+        syntax->addError(scanner->getLine(), "Expected \"in\".");
+        return false;
+    }
+    
+    // Get the array we are iterating through
+    token = scanner->getNext();
+    if (token.type != t_id) {
+        syntax->addError(scanner->getLine(), "Expected array for iteration value.");
+        return false;
+    }
+    
+    std::string array_name = token.id_val;
+    loop->array = std::make_shared<AstID>(array_name);
+    
+    auto ptrType = std::static_pointer_cast<AstStructType>(block->symbolTable[array_name]);
+    std::shared_ptr<AstDataType> dataType;
+    for (auto const &s : tree->structs) {
+        if (ptrType->name == s->name) {
+            dataType = std::static_pointer_cast<AstPointerType>(s->items[0].type)->base_type;
+        }
+    }
+    loop->data_type = dataType;
+    
+    // Make sure we end with the "do" keyword
+    token = scanner->getNext();
+    if (token.type != t_do) {
+        syntax->addError(scanner->getLine(), "Expected \"do\".");
+        return false;
+    }
     
     std::shared_ptr<AstBlock> block2 = std::make_shared<AstBlock>();
     block2->mergeSymbols(block);

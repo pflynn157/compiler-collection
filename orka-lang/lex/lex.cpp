@@ -247,8 +247,10 @@ TokenType Scanner::getKeyword() {
     else if (buffer == "or") return t_lgor;
     else if (buffer == "sizeof") return t_sizeof;
     else if (buffer == "for") return t_for;
+    else if (buffer == "forall") return t_forall;
     else if (buffer == "in") return t_in;
     else if (buffer == "step") return t_step;
+    else if (buffer == "repeat") return t_repeat;
     return t_none;
 }
 

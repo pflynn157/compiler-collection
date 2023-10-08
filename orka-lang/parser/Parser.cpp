@@ -182,7 +182,9 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
             
             // Handle loops
             case t_while: code = buildWhile(block); break;
+            case t_repeat: code = buildRepeat(block); break;
             case t_for: code = buildFor(block); break;
+            case t_forall: code = buildForAll(block); break;
             case t_break: code = buildLoopCtrl(block, true); break;
             case t_continue: code = buildLoopCtrl(block, false); break;
             

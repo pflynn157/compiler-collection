@@ -896,9 +896,10 @@ struct AstForAllStmt : public AstStatement {
     
     void print(int indent = 0);
     
-    std::shared_ptr<AstID> indexVar;
-    std::shared_ptr<AstID> arrayVar;
+    std::shared_ptr<AstID> index;
+    std::shared_ptr<AstID> array;
     std::shared_ptr<AstBlock> block = nullptr;
+    std::shared_ptr<AstDataType> data_type;
 };
 
 // Represents a break statement for a loop

@@ -88,6 +88,35 @@ void Compiler::compileWhileStatement(std::shared_ptr<AstStatement> stmt) {
     continueStack.pop();
 }
 
+// Translates a repeat statement to LLVM
+void Compiler::compileRepeatStatement(std::shared_ptr<AstStatement> stmt) {
+    std::shared_ptr<AstRepeatStmt> loop = std::static_pointer_cast<AstRepeatStmt>(stmt);
+    
+    BasicBlock *loopBlock = BasicBlock::Create(*context, "loop_body" + std::to_string(blockCount), currentFunc);
+    BasicBlock *loopEnd = BasicBlock::Create(*context, "loop_end" + std::to_string(blockCount), currentFunc);
+    ++blockCount;
+    
+    BasicBlock *current = builder->GetInsertBlock();
+    loopBlock->moveAfter(current);
+    loopEnd->moveAfter(loopBlock);
+    
+    breakStack.push(loopEnd);
+    continueStack.push(loopBlock);
+    
+    builder->CreateBr(loopBlock);
+    builder->SetInsertPoint(loopBlock);
+    
+    for (auto stmt : loop->block->getBlock()) {
+        compileStatement(stmt);
+    }
+    builder->CreateBr(loopBlock);
+    
+    builder->SetInsertPoint(loopEnd);
+    
+    breakStack.pop();
+    continueStack.pop();
+}
+
 // Translates a for loop to LLVM
 void Compiler::compileForStatement(std::shared_ptr<AstStatement> stmt) {
     auto loop = std::static_pointer_cast<AstForStmt>(stmt);
@@ -141,6 +170,118 @@ void Compiler::compileForStatement(std::shared_ptr<AstStatement> stmt) {
 
     // The body
     builder->SetInsertPoint(loopBlock);
+    for (auto stmt : loop->block->getBlock()) {
+        compileStatement(stmt);
+    }
+    builder->CreateBr(loopInc);
+    
+    builder->SetInsertPoint(loopEnd);
+    
+    breakStack.pop();
+    continueStack.pop();
+    
+    symtable = symtableOld;
+    typeTable = typeTableOld;
+}
+
+// Translates a for-all loop to LLVM
+void Compiler::compileForAllStatement(std::shared_ptr<AstStatement> stmt) {
+    std::shared_ptr<AstForAllStmt> loop = std::static_pointer_cast<AstForAllStmt>(stmt);
+    
+    // Setup the blocks
+    BasicBlock *loopLoad = BasicBlock::Create(*context, "loop_load" + std::to_string(blockCount), currentFunc);
+    BasicBlock *loopBody = BasicBlock::Create(*context, "loop_body" + std::to_string(blockCount), currentFunc);
+    BasicBlock *loopInc = BasicBlock::Create(*context, "loop_inc" + std::to_string(blockCount), currentFunc);
+    BasicBlock *loopCmp = BasicBlock::Create(*context, "loop_cmp" + std::to_string(blockCount), currentFunc);
+    BasicBlock *loopEnd = BasicBlock::Create(*context, "loop_end" + std::to_string(blockCount), currentFunc);
+    ++blockCount;
+
+    BasicBlock *current = builder->GetInsertBlock();
+    loopLoad->moveAfter(current);
+    loopBody->moveAfter(loopLoad);
+    loopInc->moveAfter(loopBody);
+    loopCmp->moveAfter(loopInc);
+    loopEnd->moveAfter(loopCmp);
+    
+    breakStack.push(loopEnd);
+    continueStack.push(loopCmp);
+    
+    //
+    // Get the structure type for the array- will be needed later on
+    //
+    std::string arrayName = loop->array->value;
+    std::string indexName = loop->index->value;
+    Type *indexType = translateType(loop->data_type);
+    
+    std::string strTypeName = structVarTable[arrayName];
+    StructType *strType = structTable[strTypeName];             //struct
+    Type *elementType = structElementTypeTable[strTypeName][0];     //*i32
+    Type *sizeType = structElementTypeTable[strTypeName][1];        //i32
+    
+    ///
+    // Create the induction variable, the max-size variable, and the element variables
+    //
+    std::map<std::string, AllocaInst *> symtableOld = symtable;
+    std::map<std::string, std::shared_ptr<AstDataType>> typeTableOld = typeTable;
+    
+    // The induction variable
+    AllocaInst *indexVar = builder->CreateAlloca(indexType);
+    symtable[indexName] = indexVar;
+    typeTable[indexName] = loop->data_type;
+    
+    Type *idxType = Type::getInt32Ty(*context);
+    AllocaInst *inductionVar = builder->CreateAlloca(idxType);
+    builder->CreateStore(builder->getInt32(0), inductionVar);
+    
+    // The size value
+    AllocaInst *arrayPtr = symtable[arrayName];
+    
+    PointerType *strTypePtr = PointerType::getUnqual(strType);
+    Value *ptr = builder->CreateLoad(strTypePtr, arrayPtr);
+    
+    Value *sizePtr = builder->CreateStructGEP(strType, ptr, 1);
+    Value *sizeVal = builder->CreateLoad(indexType, sizePtr);
+    
+    ///
+    // Create the loop comparison
+    //
+    builder->CreateBr(loopCmp);
+    builder->SetInsertPoint(loopCmp);
+    
+    Value *inductionVarVal = builder->CreateLoad(indexType, inductionVar);
+    Value *cond = builder->CreateICmpSLT(inductionVarVal, sizeVal);
+    builder->CreateCondBr(cond, loopLoad, loopEnd);
+    
+    ///
+    // Loop increment
+    //
+    builder->SetInsertPoint(loopInc);
+    
+    inductionVarVal = builder->CreateLoad(indexType, inductionVar);
+    inductionVarVal = builder->CreateAdd(inductionVarVal, builder->getInt32(1));
+    builder->CreateStore(inductionVarVal, inductionVar);
+    
+    builder->CreateBr(loopCmp);
+    
+    ///
+    // Loop load-> loads the next element from the array
+    //
+    builder->SetInsertPoint(loopLoad);
+    
+    inductionVarVal = builder->CreateLoad(indexType, inductionVar);
+    
+    Value *arrayStructPtr = builder->CreateStructGEP(strType, ptr, 0);
+    Value *arrayLoad = builder->CreateLoad(elementType, arrayStructPtr);
+    Value *ep = builder->CreateGEP(indexType, arrayLoad, inductionVarVal);
+    Value *epLd = builder->CreateLoad(indexType, ep);
+    builder->CreateStore(epLd, indexVar);
+    
+    builder->CreateBr(loopBody);
+    
+    ///
+    // Loop body
+    //
+    builder->SetInsertPoint(loopBody);
     for (auto stmt : loop->block->getBlock()) {
         compileStatement(stmt);
     }

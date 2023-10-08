@@ -1,12 +1,4 @@
-
-#OUTPUT
-#0|2|4|6|8|10|12|14|16|18|20|
-#Done
-#END
-
-#RET 0
-
-extern printf(ln:str, x:int);
+import std.io;
 
 func main -> int is
     var i : int := 0;

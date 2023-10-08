@@ -110,6 +110,9 @@ void AstBlock::print(int indent) {
             case V_AstType::For: {
                 std::static_pointer_cast<AstForStmt>(stmt)->print(indent);
             } break;
+            case V_AstType::ForAll: {
+                std::static_pointer_cast<AstForAllStmt>(stmt)->print(indent);
+            } break;
             
             default: stmt->print();
         }
@@ -229,9 +232,9 @@ void AstForStmt::print(int indent) {
 void AstForAllStmt::print(int indent) {
     std::cout << "    ";
     std::cout << "FORALL ";
-    indexVar->print();
+    index->print();
     std::cout << " IN ";
-    arrayVar->print();
+    array->print();
     std::cout << std::endl;
     
     block->print(indent+4);

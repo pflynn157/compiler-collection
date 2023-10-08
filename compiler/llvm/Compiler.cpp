@@ -117,9 +117,19 @@ void Compiler::compileStatement(std::shared_ptr<AstStatement> stmt) {
             compileWhileStatement(stmt);
         } break;
         
+        // A repeat loop
+        case V_AstType::Repeat: {
+            compileRepeatStatement(stmt);
+        } break;
+        
         // A for loop
         case V_AstType::For: {
             compileForStatement(stmt);
+        } break;
+        
+        // A for-all loop
+        case V_AstType::ForAll: {
+            compileForAllStatement(stmt);
         } break;
         
         // A break statement

@@ -47,6 +47,8 @@ void Token::print() {
         case t_repeat: std::cout << "repeat" << std::endl; break;
         case t_class: std::cout << "class" << std::endl; break;
         case t_extends: std::cout << "extends" << std::endl; break;
+        case t_float: std::cout << "float" << std::endl; break;
+        case t_double: std::cout << "double" << std::endl; break;
         
         case t_dot: std::cout << "." << std::endl; break;
         case t_semicolon: std::cout << ";" << std::endl; break;

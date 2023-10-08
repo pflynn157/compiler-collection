@@ -28,6 +28,7 @@ enum TokenType {
     t_sizeof, t_for, t_forall,
     t_in, t_step, t_repeat, t_enum,
     t_class, t_extends,
+    t_float, t_double,
     
     t_dot, t_semicolon, t_comma,
     t_lparen, t_rparen, t_lbracket, t_rbracket,

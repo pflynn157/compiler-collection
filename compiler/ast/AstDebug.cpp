@@ -32,6 +32,8 @@ void AstDataType::print() {
         case V_AstType::Int16: std::cout << "int16"; break;
         case V_AstType::Int32: std::cout << "int32"; break;
         case V_AstType::Int64: std::cout << "int64"; break;
+        case V_AstType::Float32: std::cout << "float32"; break;
+        case V_AstType::Float64: std::cout << "float64"; break;
         case V_AstType::String: std::cout << "string"; break;
         default: {}
     }

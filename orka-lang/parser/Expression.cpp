@@ -18,6 +18,7 @@ std::shared_ptr<AstExpression> Parser::buildConstExpr(Token tk) {
         case t_false: return std::make_shared<AstI32>(0);
         case t_char_literal: return std::make_shared<AstChar>(tk.i8_val);
         case t_int_literal: return std::make_shared<AstI32>(tk.i32_val);
+        case t_float_literal: return std::make_shared<AstFloat>(tk.float_val);
         case t_string_literal: return std::make_shared<AstString>(tk.id_val);
         
         default: {}
@@ -225,6 +226,7 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
             case t_false:
             case t_char_literal:
             case t_int_literal:
+            case t_float_literal:
             case t_string_literal: {
                 ctx->lastWasOp = false;
                 std::shared_ptr<AstExpression> expr = buildConstExpr(tk);

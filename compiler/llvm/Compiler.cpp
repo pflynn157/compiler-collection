@@ -147,7 +147,7 @@ void Compiler::compileStatement(std::shared_ptr<AstStatement> stmt) {
 }
 
 // Converts an AST value to an LLVM value
-Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign) {
+Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, V_AstType dataType, bool isAssign) {
     if (expr == nullptr) return nullptr;
     switch (expr->type) {
         case V_AstType::I8L: {
@@ -168,6 +168,13 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
         case V_AstType::I64L: {
             std::shared_ptr<AstI64> i64 = std::static_pointer_cast<AstI64>(expr);
             return builder->getInt64(i64->value);
+        } break;
+        
+        case V_AstType::FloatL: {
+            std::shared_ptr<AstFloat> flt = std::static_pointer_cast<AstFloat>(expr);
+            if (dataType == V_AstType::Float64)
+                return ConstantFP::get(Type::getDoubleTy(*context), flt->value);
+            return ConstantFP::get(Type::getFloatTy(*context), flt->value);
         } break;
         
         case V_AstType::CharL: {
@@ -243,8 +250,11 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
             std::shared_ptr<AstAssignOp> op = std::static_pointer_cast<AstAssignOp >(expr);
             std::shared_ptr<AstExpression> lvalExpr = op->lval;
             
-            Value *ptr = compileValue(lvalExpr, true);
-            Value *rval = compileValue(op->rval);
+            auto lval_id = std::static_pointer_cast<AstID>(lvalExpr);
+            V_AstType dtype = typeTable[lval_id->value]->type;
+            
+            Value *ptr = compileValue(lvalExpr, V_AstType::Void, true);
+            Value *rval = compileValue(op->rval, dtype);
             
             builder->CreateStore(rval, ptr);
         } break;
@@ -300,6 +310,31 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
             Value *lval = compileValue(lvalExpr);
             Value *rval = compileValue(rvalExpr);
             
+            bool fltOp = false;
+            if (lvalExpr->type == V_AstType::FloatL || rvalExpr->type == V_AstType::FloatL) {
+                fltOp = true;
+                
+                if (lvalExpr->type == V_AstType::ID) {
+                    auto lvalID = std::static_pointer_cast<AstID>(lvalExpr);
+                    if (typeTable[lvalID->value]->type == V_AstType::Float64)
+                        rval = compileValue(rvalExpr, V_AstType::Float64);
+                } else if (rvalExpr->type == V_AstType::ID) {
+                    auto rvalID = std::static_pointer_cast<AstID>(rvalExpr);
+                    if (typeTable[rvalID->value]->type == V_AstType::Float64)
+                        lval = compileValue(lvalExpr, V_AstType::Float64);
+                }
+            } else if (lvalExpr->type == V_AstType::ID && rvalExpr->type == V_AstType::ID) {
+                auto lvalID = std::static_pointer_cast<AstID>(lvalExpr);
+                auto rvalID = std::static_pointer_cast<AstID>(rvalExpr);
+                
+                V_AstType lvalType = typeTable[lvalID->value]->type;
+                V_AstType rvalType = typeTable[rvalID->value]->type;
+                
+                if (lvalType == V_AstType::Float32 || lvalType == V_AstType::Float64) fltOp = true;
+                if (rvalType == V_AstType::Float32 || rvalType == V_AstType::Float64) fltOp = true;
+            }
+            
+            // TODO: I would like to consider moving some of this to the AST level
             bool strOp = false;
             bool rvalStr = false;
             
@@ -358,25 +393,43 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, bool isAssign
             }
             
             // Otherwise, build a normal comparison
-            switch (expr->type) {
-                case V_AstType::Add: return builder->CreateAdd(lval, rval);
-                case V_AstType::Sub: return builder->CreateSub(lval, rval);
-                case V_AstType::Mul: return builder->CreateMul(lval, rval);
-                case V_AstType::Div: return builder->CreateSDiv(lval, rval);
-                case V_AstType::Mod: return builder->CreateSRem(lval, rval);
-                
-                case V_AstType::And: return builder->CreateAnd(lval, rval);
-                case V_AstType::Or:  return builder->CreateOr(lval, rval);
-                case V_AstType::Xor: return builder->CreateXor(lval, rval);
+            if ((dataType == V_AstType::Float32 || dataType == V_AstType::Float64) || fltOp) {
+                switch (expr->type) {
+                    case V_AstType::Add: return builder->CreateFAdd(lval, rval);
+                    case V_AstType::Sub: return builder->CreateFSub(lval, rval);
+                    case V_AstType::Mul: return builder->CreateFMul(lval, rval);
+                    case V_AstType::Div: return builder->CreateFDiv(lval, rval);
                     
-                case V_AstType::EQ: return builder->CreateICmpEQ(lval, rval);
-                case V_AstType::NEQ: return builder->CreateICmpNE(lval, rval);
-                case V_AstType::GT: return builder->CreateICmpSGT(lval, rval);
-                case V_AstType::LT: return builder->CreateICmpSLT(lval, rval);
-                case V_AstType::GTE: return builder->CreateICmpSGE(lval, rval);
-                case V_AstType::LTE: return builder->CreateICmpSLE(lval, rval);
+                    case V_AstType::EQ: return builder->CreateFCmpOEQ(lval, rval);
+                    case V_AstType::NEQ: return builder->CreateFCmpONE(lval, rval);
+                    case V_AstType::GT: return builder->CreateFCmpOGT(lval, rval);
+                    case V_AstType::LT: return builder->CreateFCmpOLT(lval, rval);
+                    case V_AstType::GTE: return builder->CreateFCmpOGE(lval, rval);
+                    case V_AstType::LTE: return builder->CreateFCmpOLE(lval, rval);
                     
-                default: {}
+                    default: {}
+                }
+            } else {
+                switch (expr->type) {
+                    case V_AstType::Add: return builder->CreateAdd(lval, rval);
+                    case V_AstType::Sub: return builder->CreateSub(lval, rval);
+                    case V_AstType::Mul: return builder->CreateMul(lval, rval);
+                    case V_AstType::Div: return builder->CreateSDiv(lval, rval);
+                    case V_AstType::Mod: return builder->CreateSRem(lval, rval);
+                    
+                    case V_AstType::And: return builder->CreateAnd(lval, rval);
+                    case V_AstType::Or:  return builder->CreateOr(lval, rval);
+                    case V_AstType::Xor: return builder->CreateXor(lval, rval);
+                        
+                    case V_AstType::EQ: return builder->CreateICmpEQ(lval, rval);
+                    case V_AstType::NEQ: return builder->CreateICmpNE(lval, rval);
+                    case V_AstType::GT: return builder->CreateICmpSGT(lval, rval);
+                    case V_AstType::LT: return builder->CreateICmpSLT(lval, rval);
+                    case V_AstType::GTE: return builder->CreateICmpSGE(lval, rval);
+                    case V_AstType::LTE: return builder->CreateICmpSLE(lval, rval);
+                        
+                    default: {}
+                }
             }
         } break;
         
@@ -398,6 +451,8 @@ Type *Compiler::translateType(std::shared_ptr<AstDataType> dataType) {
         case V_AstType::Int16: type = Type::getInt16Ty(*context); break;
         case V_AstType::Int32: type = Type::getInt32Ty(*context); break;
         case V_AstType::Int64: type = Type::getInt64Ty(*context); break;
+        case V_AstType::Float32: type = Type::getFloatTy(*context); break;
+        case V_AstType::Float64: type = Type::getDoubleTy(*context); break;
         case V_AstType::String:  type = PointerType::getUnqual(Type::getInt8PtrTy(*context)); break;
         
         case V_AstType::Ptr: {

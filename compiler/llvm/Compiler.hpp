@@ -31,7 +31,7 @@ public:
     void writeAssembly();
 protected:
     void compileStatement(std::shared_ptr<AstStatement> stmt);
-    Value *compileValue(std::shared_ptr<AstExpression> expr, bool isAssign = false);
+    Value *compileValue(std::shared_ptr<AstExpression> expr, V_AstType dataType = V_AstType::Void, bool isAssign = false);
     Type *translateType(std::shared_ptr<AstDataType> dataType);
     int getStructIndex(std::string name, std::string member);
 

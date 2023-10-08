@@ -254,6 +254,8 @@ TokenType Scanner::getKeyword() {
     else if (buffer == "enum") return t_enum;
     else if (buffer == "class") return t_class;
     else if (buffer == "extends") return t_extends;
+    else if (buffer == "float") return t_float;
+    else if (buffer == "double") return t_double;
     return t_none;
 }
 

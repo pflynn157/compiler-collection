@@ -235,6 +235,8 @@ std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
         case t_u32: dataType = AstBuilder::buildInt32Type(true); break;
         case t_i64: dataType = AstBuilder::buildInt64Type(); break;
         case t_u64: dataType = AstBuilder::buildInt64Type(true); break;
+        case t_float: dataType = AstBuilder::buildFloat32Type(); break;
+        case t_double: dataType = AstBuilder::buildFloat64Type(); break;
         case t_string: dataType = AstBuilder::buildStringType(); break;
         
         case t_id: {

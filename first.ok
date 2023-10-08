@@ -1,22 +1,15 @@
 import std.io;
 
 func main(args:str[]) -> int is
-    var x : float := 99.12300;
-    var y : float := 2.398100;
+    var x : double := 2.3981;
+    var y : double := 99.123;
     
-    printFloat(x);
-    printFloat(y);
+    printDouble(x);
+    printDouble(y);
     println("---------------");
     
-    var a1 : float := x + y;
-    var a2 : float := x - y;
-    var a3 : float := x * y;
-    var a4 : float := x / y;
-    
-    printFloat(a1);
-    printFloat(a2);
-    printFloat(a3);
-    printFloat(a4);
+    var answer : double := x + y * 3.9112;
+    printDouble(answer);
     
     return 0;
 end

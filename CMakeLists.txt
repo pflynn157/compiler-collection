@@ -31,6 +31,7 @@ add_subdirectory(as)
 add_subdirectory(llir)
 add_subdirectory(compiler)
 add_subdirectory(java)
+add_subdirectory(vm)
 
 # Build the core compiler
 add_subdirectory(tiny-lang)
@@ -38,5 +39,4 @@ add_subdirectory(sal-lang)
 add_subdirectory(orka-lang)
 add_subdirectory(espresso-lang)
 add_subdirectory(test)
-
 

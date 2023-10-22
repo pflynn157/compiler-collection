@@ -17,3 +17,7 @@ Here is our current project list:
 * orka-lang-> A language based on Tiny-Lang, but with added features such as for loops, for-all loops, floating-point operations, and object oriented programming
 
 
+### Licensing
+
+This project is not licensed and placed in the public domain. Please see my website for more information on this decision.
+

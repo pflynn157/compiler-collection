@@ -1,7 +1,7 @@
 //
-// Copyright 2021 Patrick Flynn
-// This file is part of the Espresso compiler.
-// Espresso is licensed under the BSD-3 license. See the COPYING file for more information.
+// This software is licensed under BSD0 (public domain).
+// Therefore, this software belongs to humanity.
+// See COPYING for more info.
 //
 #include <iostream>
 #include <string>

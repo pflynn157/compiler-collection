@@ -1,7 +1,7 @@
 //
-// Copyright 2022 Patrick Flynn
-// This file is part of the LLIR framework.
-// LLIR is licensed under the BSD-3 license. See the COPYING file for more information.
+// This software is licensed under BSD0 (public domain).
+// Therefore, this software belongs to humanity.
+// See COPYING for more info.
 //
 #include "llir.hpp"
 

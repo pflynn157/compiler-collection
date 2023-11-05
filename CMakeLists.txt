@@ -29,7 +29,6 @@ add_subdirectory(libelf)
 add_subdirectory(as)
 add_subdirectory(compiler)
 add_subdirectory(java)
-add_subdirectory(vm)
 
 # Build the core compiler
 add_subdirectory(tiny-lang)

@@ -8,6 +8,8 @@ set(SRC
     
     parser/base_parser.cpp
     parser/ErrorManager.cpp
+    
+    midend/ast_midend.cpp
 )
 
 set(COMPILER_SRC

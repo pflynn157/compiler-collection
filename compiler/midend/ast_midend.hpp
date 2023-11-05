@@ -9,6 +9,8 @@ public:
     explicit AstMidend(std::shared_ptr<AstTree> tree);
     void run();
     
+    std::shared_ptr<AstTree> tree;
+    
     //
     // Public-facing processing statements
     //
@@ -60,8 +62,6 @@ public:
     virtual void process_logical_or_op(std::shared_ptr<AstLogicalOrOp> expr) {}
     // TODO: Finish
 private:
-    std::shared_ptr<AstTree> tree;
-    
     // Functions
     void it_process_block(std::shared_ptr<AstBlock> block);
     void it_process_statement(std::shared_ptr<AstStatement> stmt, std::shared_ptr<AstBlock> block);

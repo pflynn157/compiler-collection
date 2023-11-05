@@ -8,15 +8,14 @@
 #include <memory>
 
 #include <ast/ast.hpp>
+#include <midend/ast_midend.hpp>
 
 //
 // The main class for calling and managing the midend passes
 //
-struct Midend1 {
-    explicit Midend1(std::shared_ptr<AstTree> tree);
-    void run();
-    
-    // Member variables
-    std::shared_ptr<AstTree> tree;
+class Midend : public AstMidend {
+public:
+    explicit Midend(std::shared_ptr<AstTree> tree) : AstMidend(tree) {}
+    void process_function_call(std::shared_ptr<AstFuncCallStmt> call, std::shared_ptr<AstBlock> block) override;
 };
 

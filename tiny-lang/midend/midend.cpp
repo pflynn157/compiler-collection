@@ -3,101 +3,15 @@
 // Therefore, this software belongs to humanity.
 // See COPYING for more info.
 //
-#include <ast/ast.hpp>
+#include <memory>
 
-#include "ast_processor.hpp"
+#include "midend.hpp"
 
-//
-// Various initialization functions
-//
-AstProcessor::AstProcessor(std::shared_ptr<AstTree> tree) {
-    this->tree = tree;
-}
-
-void AstProcessor::run() {
-    for (auto gs : tree->block->block) {
-        proc_global_statement(gs);
+void Midend::process_function_call(std::shared_ptr<AstFuncCallStmt> call, std::shared_ptr<AstBlock> block) {
+    if (call->name != "print") {
+        return;
     }
-    
-    for (auto str : tree->structs) {
-        proc_struct_definition(str);
-    }
-}
 
-//
-// General functions for iterating over the tree
-//
-
-// Global statements
-void AstProcessor::proc_global_statement(std::shared_ptr<AstStatement> stmt) {
-    switch (stmt->type) {
-        case V_AstType::ExternFunc: {} break;
-        
-        case V_AstType::Func: {
-            auto func = std::static_pointer_cast<AstFunction>(stmt);
-            proc_block(func->block);
-        } break;
-        
-        default: {}
-    }
-}
-
-// Structure definitions
-void AstProcessor::proc_struct_definition(std::shared_ptr<AstStruct> def) {
-    // Nothing used right now
-}
-
-// Process blocks
-void AstProcessor::proc_block(std::shared_ptr<AstBlock> block) {
-    for (auto stmt : block->block) {
-        proc_statement(stmt, block);
-    }
-}
-
-// Process individual statements
-void AstProcessor::proc_statement(std::shared_ptr<AstStatement> stmt, std::shared_ptr<AstBlock> block) {
-    switch (stmt->type) {
-        case V_AstType::Return: {} break;
-        case V_AstType::ExprStmt: {} break;
-        
-        case V_AstType::FuncCallStmt: {
-            auto fc = std::static_pointer_cast<AstFuncCallStmt>(stmt);
-            if (fc->name == "print") {
-                proc_print(fc, block);
-            }
-        } break;
-        
-        case V_AstType::VarDec: {} break;
-        case V_AstType::StructDec: {} break;
-        
-        case V_AstType::If: {
-            auto cond = std::static_pointer_cast<AstIfStmt>(stmt);
-            proc_block(cond->true_block);
-            proc_block(cond->false_block);
-        } break;
-        
-        case V_AstType::While: {
-            auto loop = std::static_pointer_cast<AstWhileStmt>(stmt);
-            proc_block(loop->block);
-        } break;
-        
-        case V_AstType::Break: {} break;
-        case V_AstType::Continue: {} break;
-        
-        default: {}
-    }
-}
-
-void AstProcessor::proc_expression(std::shared_ptr<AstExpression> expr) {
-    // Nothing used right now
-}
-
-//
-// Functions for specific cases
-//
-
-// Resolves a print function call
-void AstProcessor::proc_print(std::shared_ptr<AstFuncCallStmt> call, std::shared_ptr<AstBlock> block) {
     auto args = call->expression;
     std::string fmt = "";
     

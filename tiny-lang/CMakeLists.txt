@@ -17,18 +17,11 @@ set(SRC
     lex/lex.cpp
     lex/lex_debug.cpp
     
-    midend/ast_processor.cpp
-    midend/midend1.cpp
-    midend/test_midend.cpp
+    midend/midend.cpp
 )
 
-# The main compiler binary
 add_executable(tlc ${SRC} main.cpp)
 target_link_libraries(tlc compiler)
-
-# This is a test executable
-add_executable(tlcmm ${SRC} main_midend.cpp)
-target_link_libraries(tlcmm compiler)
 
 # Enable dev linking mode
 if (DEV_LINK_MODE)

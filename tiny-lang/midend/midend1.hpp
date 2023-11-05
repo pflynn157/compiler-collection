@@ -12,8 +12,8 @@
 //
 // The main class for calling and managing the midend passes
 //
-struct Midend {
-    explicit Midend(std::shared_ptr<AstTree> tree);
+struct Midend1 {
+    explicit Midend1(std::shared_ptr<AstTree> tree);
     void run();
     
     // Member variables

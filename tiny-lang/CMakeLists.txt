@@ -18,7 +18,7 @@ set(SRC
     lex/lex_debug.cpp
     
     midend/ast_processor.cpp
-    midend/midend.cpp    
+    midend/midend1.cpp    
 )
 
 add_executable(tlc ${SRC} main.cpp)

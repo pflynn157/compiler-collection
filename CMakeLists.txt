@@ -1,12 +1,11 @@
 cmake_minimum_required(VERSION 3.15)
-project(riya_lang)
+project(ooto_lang)
 
 find_package(LLVM REQUIRED CONFIG)
 
 add_compile_options(-std=c++17 -g)
 
 include_directories(compiler)
-include_directories(llir/src)
 include_directories(java)
 include_directories(.)
 
@@ -28,7 +27,6 @@ endif()
 # Build supporting projects
 add_subdirectory(libelf)
 add_subdirectory(as)
-add_subdirectory(llir)
 add_subdirectory(compiler)
 add_subdirectory(java)
 add_subdirectory(vm)

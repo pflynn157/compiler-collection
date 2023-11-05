@@ -10,7 +10,7 @@ set(SRC
     parser/ErrorManager.cpp
 )
 
-set(LLVM_COMPILER_SRC
+set(COMPILER_SRC
     llvm/Builder.cpp
     llvm/Compiler.cpp
     llvm/Flow.cpp
@@ -18,16 +18,8 @@ set(LLVM_COMPILER_SRC
     llvm/Variable.cpp
 )
 
-set(LLIR_COMPILER_SRC
-    llir/Builder.cpp
-    llir/Compiler.cpp
-    llir/Flow.cpp
-    llir/Function.cpp
-)
-
 add_library(compiler_base STATIC ${SRC})
-add_library(compiler_llvm STATIC ${LLVM_COMPILER_SRC})
-add_library(compiler_llir STATIC ${LLIR_COMPILER_SRC})
+add_library(compiler STATIC ${COMPILER_SRC})
 
 llvm_map_components_to_libnames(llvm_libs support core irreader target asmparser
     X86AsmParser
@@ -35,10 +27,8 @@ llvm_map_components_to_libnames(llvm_libs support core irreader target asmparser
     X86Info
 )
 
-target_link_libraries(compiler_llvm
-    ${llvm_libs}
+target_link_libraries(compiler
     compiler_base
+    ${llvm_libs}
 )
-
-target_link_libraries(compiler_llir llir compiler_base)
 

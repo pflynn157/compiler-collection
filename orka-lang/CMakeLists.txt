@@ -20,7 +20,7 @@ set(SRC
 
 # Build the LLVM-based compiler
 add_executable(okcc ${SRC} main.cpp)
-target_link_libraries(okcc compiler_llvm)
+target_link_libraries(okcc compiler)
 
 # Enable dev linking mode
 if (DEV_LINK_MODE)

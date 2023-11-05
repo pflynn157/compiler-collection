@@ -12,8 +12,6 @@ set(SRC
     parser/Structure.cpp
     parser/Variable.cpp
     
-    preproc/Preproc.cpp
-    
     lex/lex.cpp
     lex/lex_debug.cpp
     

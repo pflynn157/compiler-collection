@@ -9,7 +9,6 @@
 #include <memory>
 #include <cstdlib>
 
-#include <preproc/Preproc.hpp>
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
 #include <midend/midend.hpp>
@@ -164,12 +163,7 @@ int main(int argc, char **argv) {
         }
     }
     
-    std::string newInput = preprocessFile(input, emitPreproc);
-    if (newInput == "") {
-        return 1;
-    }
-    
-    std::shared_ptr<AstTree> tree = getAstTree(newInput, testLex, printAst1, printAst, emitDot);
+    std::shared_ptr<AstTree> tree = getAstTree(input, testLex, printAst1, printAst, emitDot);
     if (tree == nullptr) {
         if (isError) return 1;
         return 0;

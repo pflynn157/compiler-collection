@@ -1,0 +1,8 @@
+extern def puts{s:string}.
+extern def printf{fmt:string, any}.
+
+func main{} of #32
+    print 20, 30, " ", "Hello!".
+    
+    return 5.
+end

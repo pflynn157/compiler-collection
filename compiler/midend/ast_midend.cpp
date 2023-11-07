@@ -1,3 +1,8 @@
+//
+// This software is licensed under BSD0 (public domain).
+// Therefore, this software belongs to humanity.
+// See COPYING for more info.
+//
 #include "ast_midend.hpp"
 
 AstMidend::AstMidend(std::shared_ptr<AstTree> tree) {
@@ -167,50 +172,55 @@ void AstMidend::it_process_expression(std::shared_ptr<AstExpression> &expr, std:
             auto binary_op = std::static_pointer_cast<AstBinaryOp>(expr);
             it_process_expression(binary_op->lval, block);
             it_process_expression(binary_op->rval, block);
-            auto expr2 = process_binary_op(binary_op, block);
+            std::shared_ptr<AstExpression> expr2 = process_binary_op(binary_op, block);
             if (expr2) {
                 expr = expr2;
                 return;
             }
             
             if (expr->type == V_AstType::Assign)
-                process_assign_op(std::static_pointer_cast<AstAssignOp>(expr), block);
+                expr2 = process_assign_op(std::static_pointer_cast<AstAssignOp>(expr), block);
             else if (expr->type == V_AstType::Add)
-                process_add_op(std::static_pointer_cast<AstAddOp>(expr), block);
+                expr2 = process_add_op(std::static_pointer_cast<AstAddOp>(expr), block);
             else if (expr->type == V_AstType::Sub)
-                process_sub_op(std::static_pointer_cast<AstSubOp>(expr), block);
+                expr2 = process_sub_op(std::static_pointer_cast<AstSubOp>(expr), block);
             else if (expr->type == V_AstType::Mul)
-                process_mul_op(std::static_pointer_cast<AstMulOp>(expr), block);
+                expr2 = process_mul_op(std::static_pointer_cast<AstMulOp>(expr), block);
             else if (expr->type == V_AstType::Div)
-                process_div_op(std::static_pointer_cast<AstDivOp>(expr), block);
+                expr2 = process_div_op(std::static_pointer_cast<AstDivOp>(expr), block);
             else if (expr->type == V_AstType::Mod)
-                process_mod_op(std::static_pointer_cast<AstModOp>(expr), block);
+                expr2 = process_mod_op(std::static_pointer_cast<AstModOp>(expr), block);
             else if (expr->type == V_AstType::And)
-                process_and_op(std::static_pointer_cast<AstAndOp>(expr), block);
+                expr2 = process_and_op(std::static_pointer_cast<AstAndOp>(expr), block);
             else if (expr->type == V_AstType::Or)
-                process_or_op(std::static_pointer_cast<AstOrOp>(expr), block);
+                expr2 = process_or_op(std::static_pointer_cast<AstOrOp>(expr), block);
             else if (expr->type == V_AstType::Xor)
-                process_xor_op(std::static_pointer_cast<AstXorOp>(expr), block);
+                expr2 = process_xor_op(std::static_pointer_cast<AstXorOp>(expr), block);
             else if (expr->type == V_AstType::Lsh)
-                process_lsh_op(std::static_pointer_cast<AstLshOp>(expr), block);
+                expr2 = process_lsh_op(std::static_pointer_cast<AstLshOp>(expr), block);
             else if (expr->type == V_AstType::Rsh)
-                process_rsh_op(std::static_pointer_cast<AstRshOp>(expr), block);
+                expr2 = process_rsh_op(std::static_pointer_cast<AstRshOp>(expr), block);
             else if (expr->type == V_AstType::EQ)
-                process_eq_op(std::static_pointer_cast<AstEQOp>(expr), block);
+                expr2 = process_eq_op(std::static_pointer_cast<AstEQOp>(expr), block);
             else if (expr->type == V_AstType::NEQ)
-                process_neq_op(std::static_pointer_cast<AstNEQOp>(expr), block);
+                expr2 = process_neq_op(std::static_pointer_cast<AstNEQOp>(expr), block);
             else if (expr->type == V_AstType::GT)
-                process_gt_op(std::static_pointer_cast<AstGTOp>(expr), block);
+                expr2 = process_gt_op(std::static_pointer_cast<AstGTOp>(expr), block);
             else if (expr->type == V_AstType::LT)
-                process_lt_op(std::static_pointer_cast<AstLTOp>(expr), block);
+                expr2 = process_lt_op(std::static_pointer_cast<AstLTOp>(expr), block);
             else if (expr->type == V_AstType::GTE)
-                process_gte_op(std::static_pointer_cast<AstGTEOp>(expr), block);
+                expr2 = process_gte_op(std::static_pointer_cast<AstGTEOp>(expr), block);
             else if (expr->type == V_AstType::LTE)
-                process_lte_op(std::static_pointer_cast<AstLTEOp>(expr), block);
+                expr2 = process_lte_op(std::static_pointer_cast<AstLTEOp>(expr), block);
             else if (expr->type == V_AstType::LogicalAnd)
-                process_logical_and_op(std::static_pointer_cast<AstLogicalAndOp>(expr), block);
+                expr2 = process_logical_and_op(std::static_pointer_cast<AstLogicalAndOp>(expr), block);
             else if (expr->type == V_AstType::LogicalOr)
-                process_logical_or_op(std::static_pointer_cast<AstLogicalOrOp>(expr), block);
+                expr2 = process_logical_or_op(std::static_pointer_cast<AstLogicalOrOp>(expr), block);
+            
+            if (expr2) {
+                expr = expr2;
+                return;
+            }
         } break;
         
         case V_AstType::Sizeof: break;

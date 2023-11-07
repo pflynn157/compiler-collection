@@ -77,3 +77,46 @@ void Midend::process_function_call(std::shared_ptr<AstFuncCallStmt> call, std::s
     args2->list.insert(args2->list.begin(), fmt_str);
 }
 
+//
+// Process comparison operation for strings
+//
+void Midend::process_eq_op(std::shared_ptr<AstEQOp> expr, std::shared_ptr<AstBlock> block) {
+    auto lval = expr->lval;
+    auto rval = expr->rval;
+    
+    bool string_op = false;
+    bool rval_str = false;
+    
+    if (lval->type == V_AstType::StringL || rval->type == V_AstType::StringL) {
+        string_op = true;
+        rval_str = true;
+    } else if (lval->type == V_AstType::StringL && rval->type == V_AstType::CharL) {
+        string_op = true;
+    } else if (lval->type == V_AstType::ID && rval->type == V_AstType::CharL) {
+        std::shared_ptr<AstID> lvalID = std::static_pointer_cast<AstID>(lval);
+        if (block->getDataType(lvalID->value)->type == V_AstType::String) string_op = true;
+    } else if (lval->type == V_AstType::ID && rval->type == V_AstType::ID) {
+        std::shared_ptr<AstID> lvalID = std::static_pointer_cast<AstID>(lval);
+        std::shared_ptr<AstID> rvalID = std::static_pointer_cast<AstID>(rval);
+        
+        if (block->getDataType(lvalID->value)->type == V_AstType::String) string_op = true;
+        if (block->getDataType(rvalID->value)->type == V_AstType::String) {
+            string_op = true;
+            rval_str = true;
+        } else if (block->getDataType(rvalID->value)->type == V_AstType::Char ||
+                   block->getDataType(rvalID->value)->type == V_AstType::Int8) {
+            string_op = true;          
+        }
+    }
+    
+    // Build the new comparison
+    auto args = std::make_shared<AstExprList>();
+    args->add_expression(lval);
+    args->add_expression(rval);
+    auto fc = std::make_shared<AstFuncCallExpr>("stringcmp");
+    fc->args = args;
+    expr->lval = fc;
+    
+    expr->rval = std::make_shared<AstI32>(1);
+}
+

@@ -27,7 +27,6 @@ enum class V_AstType {
     ExprStmt,
     
     FuncCallStmt,
-    FuncCallExpr,
     
     VarDec,
     StructDec,
@@ -83,6 +82,9 @@ enum class V_AstType {
     
     // Expression list
     ExprList,
+    
+    // Function call expressions
+    FuncCallExpr,
     
     // Data types
     Void,

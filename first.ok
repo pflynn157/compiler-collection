@@ -1,15 +1,17 @@
 import std.io;
 
 func main(args:str[]) -> int is
-    var x : double := 2.3981;
-    var y : double := 99.123;
+    var str1 : str := "Hello!";
+    var str2 : str := " How are you?";
     
-    printDouble(x);
-    printDouble(y);
-    println("---------------");
+    println(str1);
+    println(str2);
     
-    var answer : double := x + y * 3.9112;
-    printDouble(answer);
+    var str3 : str := str1 + str2;
+    println(str3);
+    
+    var str4 : str := str1 + '!';
+    println(str4);
     
     return 0;
 end

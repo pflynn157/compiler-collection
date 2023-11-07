@@ -15,7 +15,9 @@ set(SRC
     preproc/Preproc.cpp
     
     lex/lex.cpp
-    lex/lex_debug.cpp  
+    lex/lex_debug.cpp
+    
+    midend/midend.cpp
 )
 
 # Build the LLVM-based compiler

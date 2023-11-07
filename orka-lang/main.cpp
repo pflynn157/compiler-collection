@@ -12,6 +12,7 @@
 #include <preproc/Preproc.hpp>
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
+#include <midend/midend.hpp>
 
 #include <llvm/Compiler.hpp>
 
@@ -33,6 +34,10 @@ std::shared_ptr<AstTree> getAstTree(std::string input, bool testLex, bool printA
     }
     
     tree = frontend->getTree();
+    
+    std::unique_ptr<Midend> midend = std::make_unique<Midend>(tree);
+    midend->run();
+    tree = midend->tree;
     
     if (printAst) {
         tree->print();

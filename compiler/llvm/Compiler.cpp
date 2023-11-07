@@ -334,64 +334,6 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, V_AstType dat
                 if (rvalType == V_AstType::Float32 || rvalType == V_AstType::Float64) fltOp = true;
             }
             
-            // TODO: I would like to consider moving some of this to the AST level
-            bool strOp = false;
-            bool rvalStr = false;
-            
-            if (lvalExpr->type == V_AstType::StringL || rvalExpr->type == V_AstType::StringL) {
-                strOp = true;
-                rvalStr = true;
-            } else if (lvalExpr->type == V_AstType::StringL && rvalExpr->type == V_AstType::CharL) {
-                strOp = true;
-            } else if (lvalExpr->type == V_AstType::ID && rvalExpr->type == V_AstType::CharL) {
-                std::shared_ptr<AstID> lvalID = std::static_pointer_cast<AstID>(lvalExpr);
-                if (typeTable[lvalID->value]->type == V_AstType::String) strOp = true;
-            } else if (lvalExpr->type == V_AstType::ID && rvalExpr->type == V_AstType::ID) {
-                std::shared_ptr<AstID> lvalID = std::static_pointer_cast<AstID>(lvalExpr);
-                std::shared_ptr<AstID> rvalID = std::static_pointer_cast<AstID>(rvalExpr);
-                
-                if (typeTable[lvalID->value]->type == V_AstType::String) strOp = true;
-                if (typeTable[rvalID->value]->type == V_AstType::String) {
-                    strOp = true;
-                    rvalStr = true;
-                } else if (typeTable[rvalID->value]->type == V_AstType::Char ||
-                           typeTable[rvalID->value]->type == V_AstType::Int8) {
-                    strOp = true;          
-                }
-            }
-            
-            // Build a string comparison if necessary
-            if (strOp) {
-                std::vector<Value *> args;
-                args.push_back(lval);
-                args.push_back(rval);
-            
-                if (op->type == V_AstType::EQ || op->type == V_AstType::NEQ) {
-                    Function *strcmp = mod->getFunction("stringcmp");
-                    if (!strcmp) std::cerr << "Error: Corelib function \"stringcmp\" not found." << std::endl;
-                    Value *strcmpCall = builder->CreateCall(strcmp, args);
-                    
-                    int cmpVal = 0;
-                    if (op->type == V_AstType::NEQ) cmpVal = 0;
-                    Value *cmpValue = builder->getInt32(cmpVal);
-                    
-                    return builder->CreateICmpEQ(strcmpCall, cmpValue);
-                } else if (op->type == V_AstType::Add) {
-                    if (rvalStr) {
-                        Function *callee = mod->getFunction("strcat_str");
-                        if (!callee) std::cerr << "Error: corelib function \"strcat_str\" not found." << std::endl;
-                        return builder->CreateCall(callee, args);
-                    } else {
-                        Function *callee = mod->getFunction("strcat_char");
-                        if (!callee) std::cerr << "Error: corelib function \"strcat_char\" not found." << std::endl;
-                        return builder->CreateCall(callee, args);
-                    }
-                } else {
-                    // Invalid
-                    return nullptr;
-                }
-            }
-            
             // Otherwise, build a normal comparison
             if ((dataType == V_AstType::Float32 || dataType == V_AstType::Float64) || fltOp) {
                 switch (expr->type) {

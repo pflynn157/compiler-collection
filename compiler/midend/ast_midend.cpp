@@ -96,7 +96,7 @@ void AstMidend::it_process_statement(std::shared_ptr<AstStatement> stmt, std::sh
             auto stmt2 = std::static_pointer_cast<AstForStmt>(stmt);
             process_for(stmt2, block);
             
-            it_process_expression(stmt2->index, block);
+            //it_process_expression(stmt2->index, block);
             it_process_expression(stmt2->start, block);
             it_process_expression(stmt2->end, block);
             it_process_expression(stmt2->step, block);
@@ -108,8 +108,8 @@ void AstMidend::it_process_statement(std::shared_ptr<AstStatement> stmt, std::sh
             auto stmt2 = std::static_pointer_cast<AstForAllStmt>(stmt);
             process_forall(stmt2, block);
             
-            it_process_expression(stmt2->index, block);
-            it_process_expression(stmt2->array, block);
+            //it_process_expression(stmt2->index, block);
+            //it_process_expression(stmt2->array, block);
             //TODO: data type
             it_process_block(stmt2->block);
         } break;
@@ -134,7 +134,7 @@ void AstMidend::it_process_statement(std::shared_ptr<AstStatement> stmt, std::sh
     }
 }
 
-void AstMidend::it_process_expression(std::shared_ptr<AstExpression> expr, std::shared_ptr<AstBlock> block) {
+void AstMidend::it_process_expression(std::shared_ptr<AstExpression> &expr, std::shared_ptr<AstBlock> block) {
     if (expr == nullptr) return;
 
     // Call the public function
@@ -167,6 +167,11 @@ void AstMidend::it_process_expression(std::shared_ptr<AstExpression> expr, std::
             auto binary_op = std::static_pointer_cast<AstBinaryOp>(expr);
             it_process_expression(binary_op->lval, block);
             it_process_expression(binary_op->rval, block);
+            auto expr2 = process_binary_op(binary_op, block);
+            if (expr2) {
+                expr = expr2;
+                return;
+            }
             
             if (expr->type == V_AstType::Assign)
                 process_assign_op(std::static_pointer_cast<AstAssignOp>(expr), block);

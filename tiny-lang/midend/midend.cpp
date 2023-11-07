@@ -78,9 +78,9 @@ void Midend::process_function_call(std::shared_ptr<AstFuncCallStmt> call, std::s
 }
 
 //
-// Process comparison operation for strings
+// Process binary operation for strings
 //
-void Midend::process_eq_op(std::shared_ptr<AstEQOp> expr, std::shared_ptr<AstBlock> block) {
+std::shared_ptr<AstExpression> Midend::process_binary_op(std::shared_ptr<AstBinaryOp> expr, std::shared_ptr<AstBlock> block) {
     auto lval = expr->lval;
     auto rval = expr->rval;
     
@@ -110,13 +110,35 @@ void Midend::process_eq_op(std::shared_ptr<AstEQOp> expr, std::shared_ptr<AstBlo
     }
     
     // Build the new comparison
+    if (!string_op) {
+        return nullptr;
+    }
+    
     auto args = std::make_shared<AstExprList>();
     args->add_expression(lval);
     args->add_expression(rval);
-    auto fc = std::make_shared<AstFuncCallExpr>("stringcmp");
-    fc->args = args;
-    expr->lval = fc;
+
+    if (expr->type == V_AstType::EQ || expr->type == V_AstType::NEQ) {
+        auto fc = std::make_shared<AstFuncCallExpr>("stringcmp");
+        fc->args = args;
+        expr->lval = fc;
+        
+        if (expr->type == V_AstType::NEQ)
+            expr->rval = std::make_shared<AstI32>(0);
+        else
+            expr->rval = std::make_shared<AstI32>(1);
+    } else if (expr->type == V_AstType::Add) {
+        if (rval_str) {
+            auto fc = std::make_shared<AstFuncCallExpr>("strcat_str");
+            fc->args = args;
+            return fc;
+        } else {
+            auto fc = std::make_shared<AstFuncCallExpr>("strcat_char");
+            fc->args = args;
+            return fc;
+        }
+    }
     
-    expr->rval = std::make_shared<AstI32>(1);
+    return nullptr;
 }
 

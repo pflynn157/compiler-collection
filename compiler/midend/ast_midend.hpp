@@ -35,36 +35,38 @@ public:
     virtual void process_continue(std::shared_ptr<AstContinue> stmt, std::shared_ptr<AstBlock> block) {}
     
     // Expressions
-    virtual void process_expression(std::shared_ptr<AstExpression> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_expression_list(std::shared_ptr<AstExprList> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_op(std::shared_ptr<AstOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_unary_op(std::shared_ptr<AstUnaryOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_neg_op(std::shared_ptr<AstNegOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_binary_op(std::shared_ptr<AstBinaryOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_assign_op(std::shared_ptr<AstAssignOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_add_op(std::shared_ptr<AstAddOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_sub_op(std::shared_ptr<AstSubOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_mul_op(std::shared_ptr<AstMulOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_div_op(std::shared_ptr<AstDivOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_mod_op(std::shared_ptr<AstModOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_and_op(std::shared_ptr<AstAndOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_or_op(std::shared_ptr<AstOrOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_xor_op(std::shared_ptr<AstXorOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_lsh_op(std::shared_ptr<AstLshOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_rsh_op(std::shared_ptr<AstRshOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_eq_op(std::shared_ptr<AstEQOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_neq_op(std::shared_ptr<AstNEQOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_gt_op(std::shared_ptr<AstGTOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_lt_op(std::shared_ptr<AstLTOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_gte_op(std::shared_ptr<AstGTEOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_lte_op(std::shared_ptr<AstLTEOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_logical_and_op(std::shared_ptr<AstLogicalAndOp> expr, std::shared_ptr<AstBlock> block) {}
-    virtual void process_logical_or_op(std::shared_ptr<AstLogicalOrOp> expr, std::shared_ptr<AstBlock> block) {}
+    virtual std::shared_ptr<AstExpression> process_expression(std::shared_ptr<AstExpression> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_expression_list(std::shared_ptr<AstExprList> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_op(std::shared_ptr<AstOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_unary_op(std::shared_ptr<AstUnaryOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_neg_op(std::shared_ptr<AstNegOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_binary_op(std::shared_ptr<AstBinaryOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_assign_op(std::shared_ptr<AstAssignOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_add_op(std::shared_ptr<AstAddOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_sub_op(std::shared_ptr<AstSubOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_mul_op(std::shared_ptr<AstMulOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_div_op(std::shared_ptr<AstDivOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_mod_op(std::shared_ptr<AstModOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_and_op(std::shared_ptr<AstAndOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_or_op(std::shared_ptr<AstOrOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_xor_op(std::shared_ptr<AstXorOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_lsh_op(std::shared_ptr<AstLshOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_rsh_op(std::shared_ptr<AstRshOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_eq_op(std::shared_ptr<AstEQOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_neq_op(std::shared_ptr<AstNEQOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_gt_op(std::shared_ptr<AstGTOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_lt_op(std::shared_ptr<AstLTOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_gte_op(std::shared_ptr<AstGTEOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_lte_op(std::shared_ptr<AstLTEOp> expr, std::shared_ptr<AstBlock> block) { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_logical_and_op(std::shared_ptr<AstLogicalAndOp> expr, std::shared_ptr<AstBlock> block)
+        { return nullptr; }
+    virtual std::shared_ptr<AstExpression> process_logical_or_op(std::shared_ptr<AstLogicalOrOp> expr, std::shared_ptr<AstBlock> block)
+        { return nullptr; }
     // TODO: Finish
 private:
     // Functions
     void it_process_block(std::shared_ptr<AstBlock> block);
     void it_process_statement(std::shared_ptr<AstStatement> stmt, std::shared_ptr<AstBlock> block);
-    void it_process_expression(std::shared_ptr<AstExpression> expr, std::shared_ptr<AstBlock> block);
+    void it_process_expression(std::shared_ptr<AstExpression> &expr, std::shared_ptr<AstBlock> block);
 };
 

@@ -1,31 +1,6 @@
+module main.
 
-func main of i32 is
-    scalar x : i32 := 20.
-    scalar y : i32 := 30.
-    
-    print x.
-    print y.
-    
-    parallel for i in 0 ... 10 do
-        print i.
-    end
-    
-    return x + y.
-end
-
-def main is
-    dim N := 10.
-    tensor numbers : N.
-    
-    dim M := 10, 10.
-    tensor matrix : N.
-end
-
-def main is
-    array numbers : i32 := 10;
-end
-
-parallel def outlined is
-    print "Hello!".
+func main() of int is
+    return 10.
 end
 

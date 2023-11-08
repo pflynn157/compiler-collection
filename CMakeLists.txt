@@ -35,5 +35,6 @@ add_subdirectory(tiny-lang)
 add_subdirectory(sal-lang)
 add_subdirectory(orka-lang)
 add_subdirectory(espresso-lang)
+add_subdirectory(sia-lang)
 add_subdirectory(test)
 

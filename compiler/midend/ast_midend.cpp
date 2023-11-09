@@ -46,6 +46,13 @@ void AstMidend::it_process_statement(std::shared_ptr<AstStatement> stmt, std::sh
             // TODO: Types
         } break;
         
+        case V_AstType::BlockStmt: {
+            auto stmt2 = std::static_pointer_cast<AstBlockStmt>(stmt);
+            process_block_statement(stmt2, block);
+            
+            it_process_block(stmt2->block);
+        } break;
+        
         case V_AstType::Return: {
             auto stmt2 = std::static_pointer_cast<AstReturnStmt>(stmt);
             process_return(stmt2, block);

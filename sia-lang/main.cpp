@@ -4,6 +4,7 @@
 
 #include <lex/lex.hpp>
 #include <parser/parser.hpp>
+#include <midend/midend.hpp>
 #include <llvm/Compiler.hpp>
 
 void test_lex(std::string input) {
@@ -61,6 +62,14 @@ int main(int argc, char **argv) {
     parser->parse();
     
     auto tree = parser->getTree();
+    tree->print();
+    
+    std::cout << "----------------------------" << std::endl;
+    
+    std::unique_ptr<Midend> midend = std::make_unique<Midend>(tree);
+    midend->run();
+    tree = midend->tree;
+    
     tree->print();
     
     std::cout << "----------------------------" << std::endl;

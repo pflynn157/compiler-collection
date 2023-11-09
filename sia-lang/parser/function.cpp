@@ -34,6 +34,7 @@ void Parser::parse_function() {
 //
 void Parser::parse_return(std::shared_ptr<AstBlock> block) {
     auto ret = std::make_shared<AstReturnStmt>();
+    ret->expression = parse_expression(block);
     block->addStatement(ret);
 }
 

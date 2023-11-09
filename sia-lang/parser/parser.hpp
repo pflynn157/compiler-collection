@@ -23,6 +23,9 @@ public:
     void parse_function();
     void parse_return(std::shared_ptr<AstBlock> block);
     
+    // expression.cpp
+    std::shared_ptr<AstExpression> parse_expression(std::shared_ptr<AstBlock> block, token stop = t_period, bool is_list = false);
+    
 private:
     std::unique_ptr<Lex> lex;
     std::string module_name = "";

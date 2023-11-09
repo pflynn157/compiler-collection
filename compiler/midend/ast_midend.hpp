@@ -24,7 +24,7 @@ public:
     
     // Statements
     virtual void process_statement(std::shared_ptr<AstStatement> stmt, std::shared_ptr<AstBlock> block) {}
-    virtual void process_block_statement(std::shared_ptr<AstBlockStmt> stmt, std::shared_ptr<AstBlock> block) {}
+    virtual void process_block_statement(std::shared_ptr<AstBlockStmt> stmt, std::shared_ptr<AstBlock> block, int pos) {}
     virtual void process_extern_function(std::shared_ptr<AstExternFunction> stmt, std::shared_ptr<AstBlock> block) {}
     virtual void process_function(std::shared_ptr<AstFunction> stmt, std::shared_ptr<AstBlock> block) {}
     virtual void process_expr_statement(std::shared_ptr<AstExprStatement> stmt, std::shared_ptr<AstBlock> block) {}
@@ -72,7 +72,7 @@ public:
 private:
     // Functions
     void it_process_block(std::shared_ptr<AstBlock> block);
-    void it_process_statement(std::shared_ptr<AstStatement> stmt, std::shared_ptr<AstBlock> block);
+    void it_process_statement(std::shared_ptr<AstStatement> stmt, std::shared_ptr<AstBlock> block, int pos);
     void it_process_expression(std::shared_ptr<AstExpression> &expr, std::shared_ptr<AstBlock> block);
 };
 

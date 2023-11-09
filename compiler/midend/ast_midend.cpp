@@ -21,12 +21,13 @@ void AstMidend::it_process_block(std::shared_ptr<AstBlock> block) {
     process_block(block);
 
     // Continue processing
-    for (const auto &stmt : block->block) {
-        it_process_statement(stmt, block);
+    for (int i = 0; i<block->block.size(); i++) {
+        auto stmt = block->block[i];
+        it_process_statement(stmt, block, i);
     }
 }
 
-void AstMidend::it_process_statement(std::shared_ptr<AstStatement> stmt, std::shared_ptr<AstBlock> block) {
+void AstMidend::it_process_statement(std::shared_ptr<AstStatement> stmt, std::shared_ptr<AstBlock> block, int pos) {
     // Call the public function
     process_statement(stmt, block);
     
@@ -48,7 +49,7 @@ void AstMidend::it_process_statement(std::shared_ptr<AstStatement> stmt, std::sh
         
         case V_AstType::BlockStmt: {
             auto stmt2 = std::static_pointer_cast<AstBlockStmt>(stmt);
-            process_block_statement(stmt2, block);
+            process_block_statement(stmt2, block, pos);
             
             it_process_block(stmt2->block);
         } break;

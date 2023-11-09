@@ -11,6 +11,6 @@
 class Midend : public AstMidend {
 public:
     explicit Midend(std::shared_ptr<AstTree> tree) : AstMidend(tree) {}
-    void process_block_statement(std::shared_ptr<AstBlockStmt> stmt, std::shared_ptr<AstBlock> block) override;
+    void process_block_statement(std::shared_ptr<AstBlockStmt> stmt, std::shared_ptr<AstBlock> block, int pos) override;
 };
 

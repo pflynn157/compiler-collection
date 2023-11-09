@@ -49,6 +49,29 @@ bool Parser::parse() {
 }
 
 //
+// The loop to parse any block of statements
+//
+void Parser::parse_block(std::shared_ptr<AstBlock> block) {
+    token t = lex->get_next();
+    while (t != t_eof && t != t_end) {
+        switch (t) {
+            case t_return: parse_return(block); break;
+            
+            // Syntax error
+            default: {
+                syntax->addError(lex->line_number, "Unexpected token in block.");
+            }
+        }
+        
+        t = lex->get_next();
+    }
+    
+    if (t == t_eof) {
+        syntax->addError(lex->line_number, "Unexpected end of file.");
+    }
+}
+
+//
 // A helper function for getting and verifying a token
 //
 void Parser::consume_token(token t, std::string message) {

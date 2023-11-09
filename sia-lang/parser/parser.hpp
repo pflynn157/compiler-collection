@@ -14,12 +14,14 @@ public:
     bool parse() override;
     
     // parser.cpp
+    void parse_block(std::shared_ptr<AstBlock> block);
     void consume_token(token t, std::string message);
     std::string generate_name(std::string base);
     std::shared_ptr<AstDataType> get_data_type();
     
     // function.cpp
     void parse_function();
+    void parse_return(std::shared_ptr<AstBlock> block);
     
 private:
     std::unique_ptr<Lex> lex;

@@ -26,5 +26,14 @@ void Parser::parse_function() {
     tree->block->addStatement(func);
     
     // Build the function body
+    parse_block(func->block);
+}
+
+//
+// Parses a return statement
+//
+void Parser::parse_return(std::shared_ptr<AstBlock> block) {
+    auto ret = std::make_shared<AstReturnStmt>();
+    block->addStatement(ret);
 }
 

@@ -37,6 +37,7 @@ struct Lex {
     void debug_token(token t);
     
     std::string value = "";
+    int line_number = 0;
 private:
     std::ifstream reader;
     std::string buffer = "";

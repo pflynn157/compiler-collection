@@ -749,6 +749,12 @@ struct AstFunction : AstStatement {
         block = std::make_shared<AstBlock>();
     }
     
+    explicit AstFunction(std::string name, std::shared_ptr<AstDataType> data_type) : AstStatement(V_AstType::Func) {
+        this->name = name;
+        this->data_type = data_type;
+        block = std::make_shared<AstBlock>();
+    }
+    
     void addStatement(std::shared_ptr<AstStatement> statement) {
         block->addStatement(statement);
     }

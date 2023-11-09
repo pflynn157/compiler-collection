@@ -5,6 +5,7 @@ include_directories(.)
 set(SRC
     lex/lex.cpp
     
+    parser/function.cpp
     parser/parser.cpp
 
     main.cpp

@@ -30,6 +30,8 @@ token Lex::get_next() {
     while (!reader.eof()) {
         char c = reader.get();
         if (c == ' ' || c == '\n' || is_symbol(c)) {
+            if (c == '\n') ++line_number;
+        
             if (is_symbol(c)) {
                 token sym = get_symbol(c);
                 if (buffer == "") {

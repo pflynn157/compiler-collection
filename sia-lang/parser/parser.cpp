@@ -57,6 +57,36 @@ void Parser::parse_block(std::shared_ptr<AstBlock> block) {
         switch (t) {
             case t_return: parse_return(block); break;
             
+            // Annotated sub-block
+            case t_annot: {
+                consume_token(t_id, "Expected block name.");
+                auto name = lex->value;
+                
+                auto annot_block = std::make_shared<AstBlockStmt>(name);
+                block->addStatement(annot_block);
+                
+                t = lex->get_next();
+                while (t != t_eof && t != t_is) {
+                    if (t != t_id) {
+                        syntax->addError(lex->line_number, "Expected name.");
+                        return;
+                    }
+                    
+                    annot_block->clauses.push_back(lex->value);
+                    t = lex->get_next();
+                }
+                
+                if (t == t_eof) {
+                    syntax->addError(lex->line_number, "Unexpected EOF in annotated block.");
+                    return;
+                } else if (t != t_is) {
+                    syntax->addError(lex->line_number, "Expected \"is\" in annotated block.");
+                    return;
+                }
+                
+                parse_block(annot_block->block);
+            } break;
+            
             // Syntax error
             default: {
                 syntax->addError(lex->line_number, "Unexpected token in block.");

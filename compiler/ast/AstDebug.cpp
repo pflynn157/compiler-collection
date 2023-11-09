@@ -82,6 +82,16 @@ void AstFunction::print() {
     block->print();
 }
 
+void AstBlockStmt::print(int indent) {
+    std::cout << "BLOCK " << name << " ";
+    std::cout << "[";
+    for (auto clause : clauses) {
+        std::cout << clause << " ";
+    }
+    std::cout << "]" << std::endl;
+    block->print(indent+4);
+}
+
 void AstBlock::print(int indent) {
     // Print the symbol table
     for (int i = 0; i<indent; i++) std::cout << " ";
@@ -116,6 +126,9 @@ void AstBlock::print(int indent) {
             } break;
             case V_AstType::ForAll: {
                 std::static_pointer_cast<AstForAllStmt>(stmt)->print(indent);
+            } break;
+            case V_AstType::BlockStmt: {
+                std::static_pointer_cast<AstBlockStmt>(stmt)->print(indent);
             } break;
             
             default: stmt->print();

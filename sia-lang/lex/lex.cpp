@@ -71,6 +71,7 @@ token Lex::get_next() {
 bool Lex::is_symbol(char c) {
     switch (c) {
         case '.':
+        case '@':
         case '(': case ')':
             return true;
         
@@ -85,6 +86,7 @@ token Lex::get_symbol(char c) {
         case '.': return t_period;
         case '(': return t_lparen;
         case ')': return t_rparen;
+        case '@': return t_annot;
         
         default: {}
     }
@@ -118,6 +120,7 @@ void Lex::debug_token(token t) {
         case t_period: std::cout << "." << std::endl; break;
         case t_lparen: std::cout << "(" << std::endl; break;
         case t_rparen: std::cout << ")" << std::endl; break;
+        case t_annot: std::cout << "@" << std::endl; break;
         
         case t_id: std::cout << "ID(" << value << ")" << std::endl; break;
         case t_int_literal: std::cout << "INT(" << value << ")" << std::endl; break;

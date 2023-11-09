@@ -23,6 +23,7 @@ enum token {
     t_period,
     t_lparen,
     t_rparen,
+    t_annot,
     
     t_id,
     t_int_literal,

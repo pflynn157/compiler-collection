@@ -103,6 +103,19 @@ std::string AstExprStatement::dot(std::string parent) {
     return output;
 }
 
+std::string AstBlockStmt::dot(std::string parent) {
+    std::string name = "block" + std::to_string(idx);
+    ++idx;
+    
+    std::string output = name + "[label=\"block " + this->name + "\"];\n";
+    output += parent + " -> " + name + ";\n";
+    
+    output += expression->dot(name);
+    output += block->dot(name);
+    
+    return output;
+}
+
 std::string AstFuncCallStmt::dot(std::string parent) {
     std::string name = "fc" + std::to_string(idx);
     ++idx;

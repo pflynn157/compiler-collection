@@ -25,6 +25,7 @@ enum class V_AstType {
     // Statements
     Return,
     ExprStmt,
+    BlockStmt,
     
     FuncCallStmt,
     
@@ -772,6 +773,23 @@ struct AstFunction : AstStatement {
     // These attributes are language specific
     Attr attr = Attr::Public;
     bool routine = false;
+};
+
+// Represents an annontated block statement
+// An annotated block has a name and multiple clauses
+struct AstBlockStmt : AstStatement {
+    explicit AstBlockStmt(std::string name = "") : AstStatement(V_AstType::BlockStmt) {
+        this->name = name;
+        block = std::make_shared<AstBlock>();
+    }
+    
+    void print(int indent = 0);
+    std::string dot(std::string parent) override;
+    
+    // Member variables
+    std::string name = "";
+    std::vector<std::string> clauses;
+    std::shared_ptr<AstBlock> block;
 };
 
 // Represents an AST expression statement

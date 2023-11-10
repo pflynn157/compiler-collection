@@ -87,6 +87,11 @@ enum class V_AstType {
     // Function call expressions
     FuncCallExpr,
     
+    // Various reference operators
+    FuncRef,
+    PtrTo,
+    Ref,
+    
     // Data types
     Void,
     Bool,
@@ -641,6 +646,44 @@ struct AstString : AstExpression {
 struct AstID: AstExpression {
     explicit AstID(std::string val) : AstExpression(V_AstType::ID) {
         this->value = val;
+    }
+    
+    void print();
+    std::string dot(std::string parent) override;
+    
+    std::string value = "";
+};
+
+
+// Represents a function reference
+struct AstFuncRef : AstExpression {
+    explicit AstFuncRef(std::string value) : AstExpression(V_AstType::FuncRef) {
+        this->value = value;
+    }
+    
+    void print();
+    std::string dot(std::string parent) override;
+    
+    std::string value = "";
+};
+
+// Represents a pointer to something
+struct AstPtrTo : AstExpression {
+    explicit AstPtrTo(std::string value) : AstExpression(V_AstType::PtrTo) {
+        this->value = value;
+    }
+    
+    void print();
+    std::string dot(std::string parent) override;
+    
+    std::string value = "";
+};
+
+
+// Represents a reference to something
+struct AstRef : AstExpression {
+    explicit AstRef(std::string value) : AstExpression(V_AstType::Ref) {
+        this->value = value;
     }
     
     void print();

@@ -465,6 +465,18 @@ void AstID::print() {
     std::cout << value;
 }
 
+void AstFuncRef::print() {
+    std::cout << "FUNCREF(" << value << ")";
+}
+
+void AstPtrTo::print() {
+    std::cout << "PTR(" << value << ")";
+}
+
+void AstRef::print() {
+    std::cout << "REF(" << value << ")";
+}
+
 void AstArrayAccess::print() {
     std::cout << value << "[";
     index->print();

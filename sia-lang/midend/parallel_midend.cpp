@@ -56,8 +56,17 @@ void ParallelMidend::process_block_statement(std::shared_ptr<AstBlockStmt> &stmt
         outlined_func->block->addStatement(ret);
         
         // Add a call
-        auto fc = std::make_shared<AstFuncCallStmt>("outlined");
-        fc->expression = std::make_shared<AstExprList>();
+        auto arg1 = std::make_shared<AstI32>(0);
+        auto arg2 = std::make_shared<AstI32>(0);        // no shared arguments
+        auto arg3 = std::make_shared<AstFuncRef>("outlined");
+        // calling arguments here
+        auto args = std::make_shared<AstExprList>();
+        args->add_expression(arg1);
+        args->add_expression(arg2);
+        args->add_expression(arg3);
+        
+        auto fc = std::make_shared<AstFuncCallStmt>("__kmpc_fork_call");
+        fc->expression = args;
         block->addStatement(fc);
     } else {
         for (const auto &stmt2 : stmt->block->block) {

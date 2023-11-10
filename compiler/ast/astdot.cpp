@@ -477,6 +477,33 @@ std::string AstID::dot(std::string parent) {
     return output;
 }
 
+std::string AstFuncRef::dot(std::string parent) {
+    std::string name = "id" + std::to_string(idx);
+    ++idx;
+    
+    std::string output = name + "[label=FUNCREF\"" + value + "\"];\n";
+    output += parent + " -> " + name + ";\n";
+    return output;
+}
+
+std::string AstPtrTo::dot(std::string parent) {
+    std::string name = "id" + std::to_string(idx);
+    ++idx;
+    
+    std::string output = name + "[label=PTR\"" + value + "\"];\n";
+    output += parent + " -> " + name + ";\n";
+    return output;
+}
+
+std::string AstRef::dot(std::string parent) {
+    std::string name = "id" + std::to_string(idx);
+    ++idx;
+    
+    std::string output = name + "[label=REF\"" + value + "\"];\n";
+    output += parent + " -> " + name + ";\n";
+    return output;
+}
+
 std::string AstArrayAccess::dot(std::string parent) {
     std::string name = "array_acc" + std::to_string(idx);
     ++idx;

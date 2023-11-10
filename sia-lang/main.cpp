@@ -36,7 +36,7 @@ void link(CFlags cflags) {
     cmd += "/usr/lib/x86_64-linux-gnu/crtn.o ";
     cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
     cmd += " -dynamic-linker /lib64/ld-linux-x86-64.so.2 ";
-    cmd += "-lc";
+    cmd += "-lc -lomp5";
     system(cmd.c_str());
     //printf("LINK: %s\n", cmd.c_str());
 }

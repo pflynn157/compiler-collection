@@ -57,6 +57,11 @@ std::shared_ptr<AstPointerType> buildPointerType(std::shared_ptr<AstDataType> ba
     return std::make_shared<AstPointerType>(base);
 }
 
+std::shared_ptr<AstPointerType> buildInt32PointerType() {
+    auto base = buildInt32Type();
+    return buildPointerType(base);
+}
+
 std::shared_ptr<AstStructType> buildStructType(std::string name) {
     return std::make_shared<AstStructType>(name);
 }

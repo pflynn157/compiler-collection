@@ -239,6 +239,29 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, V_AstType dat
             return builder->CreateCall(callee, args);
         } break;
         
+        case V_AstType::FuncRef: {
+            auto ref = std::static_pointer_cast<AstFuncRef>(expr);
+            
+            Function *callee = mod->getFunction(ref->value);
+            if (!callee) std::cerr << "Invalid function reference." << std::endl;
+            return builder->CreatePointerCast(callee, PointerType::getUnqual(builder->getVoidTy()));
+        }
+        
+        case V_AstType::PtrTo: {
+            auto id = std::static_pointer_cast<AstPtrTo>(expr);
+            AllocaInst *ptr = symtable[id->value];
+            Type *type = translateType(typeTable[id->value]);
+            
+            Value *ld1 = builder->CreateLoad(type, ptr);
+            return builder->CreateLoad(Type::getInt32Ty(*context), ld1);
+        }
+        
+        case V_AstType::Ref: {
+            auto ref = std::static_pointer_cast<AstRef>(expr);
+            AllocaInst *ptr2 = symtable[ref->value];
+            return ptr2;
+        }
+        
         case V_AstType::Neg: {
             std::shared_ptr<AstNegOp> op = std::static_pointer_cast<AstNegOp>(expr);
             Value *val = compileValue(op->value);

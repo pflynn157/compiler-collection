@@ -5,16 +5,16 @@
 
 #include "midend.hpp"
 
-SiaMidend::SiaMidend(std::shared_ptr<AstTree> tree) {
+Midend::Midend(std::shared_ptr<AstTree> tree) {
     this->parse_tree = tree;
     this->tree = std::make_shared<AstTree>(parse_tree->file);
 }
 
-void SiaMidend::run() {
+void Midend::run() {
     it_process_block(parse_tree->block, tree->block);
 }
 
-void SiaMidend::it_process_block(std::shared_ptr<AstBlock> &block, std::shared_ptr<AstBlock> &new_block) {
+void Midend::it_process_block(std::shared_ptr<AstBlock> &block, std::shared_ptr<AstBlock> &new_block) {
     new_block->mergeSymbols(block);
 
     for (auto const &stmt : block->block) {
@@ -49,7 +49,7 @@ void SiaMidend::it_process_block(std::shared_ptr<AstBlock> &block, std::shared_p
     }
 }
 
-void SiaMidend::process_block_statement(std::shared_ptr<AstBlockStmt> &stmt, std::shared_ptr<AstBlock> &block) {
+void Midend::process_block_statement(std::shared_ptr<AstBlockStmt> &stmt, std::shared_ptr<AstBlock> &block) {
     if (stmt->name == "parallel") {
         auto outlined_func = std::make_shared<AstFunction>("outlined", AstBuilder::buildVoidType());
         //tree->block->block.insert(tree->block->block.begin(), outlined_func);
@@ -78,7 +78,7 @@ void SiaMidend::process_block_statement(std::shared_ptr<AstBlockStmt> &stmt, std
 // This is similar to the one in the other compilers, but here we convert to printf rather than
 // a built-in library call.
 //
-void SiaMidend::process_print(std::shared_ptr<AstFuncCallStmt> &call, std::shared_ptr<AstBlock> &block) {
+void Midend::process_print(std::shared_ptr<AstFuncCallStmt> &call, std::shared_ptr<AstBlock> &block) {
     auto args = call->expression;
     call->name = "printf";
     std::string fmt = "";

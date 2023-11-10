@@ -7,9 +7,9 @@
 //
 // The main class for calling and managing the midend passes
 //
-class SiaMidend {
+class Midend {
 public:
-    explicit SiaMidend(std::shared_ptr<AstTree> tree);
+    explicit Midend(std::shared_ptr<AstTree> tree);
     void run();
     
     std::shared_ptr<AstTree> tree;

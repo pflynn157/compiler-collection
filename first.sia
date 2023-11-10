@@ -1,6 +1,7 @@
 
 func main() of int is
     scalar i : int := 20.
+    print i.
     return 0.
 end
 

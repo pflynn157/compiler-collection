@@ -24,6 +24,7 @@ void Parser::parse_function() {
     // Build the AST node
     auto func = std::make_shared<AstFunction>(func_name, data_type);
     tree->block->addStatement(func);
+    tree->block->addSymbol(func_name, data_type);
     
     // Build the function body
     parse_block(func->block);

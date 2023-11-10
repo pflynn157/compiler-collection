@@ -25,6 +25,20 @@ std::shared_ptr<AstExpression> Parser::parse_expression(std::shared_ptr<AstBlock
                 auto s = std::make_shared<AstString>(lex->value);
                 ctx->output.push(s);
             } break;
+            
+            // Identifiers
+            case t_id: {
+                std::string name = lex->value;
+                if (block->isVar(name)) {
+                    auto i = std::make_shared<AstID>(name);
+                    ctx->output.push(i);
+                } else if (block->isFunc(name)) {
+                
+                } else {
+                    syntax->addError(lex->line_number, "Invalid identifier in expression.");
+                    return nullptr;
+                }
+            } break;
         }
         
         t = lex->get_next();

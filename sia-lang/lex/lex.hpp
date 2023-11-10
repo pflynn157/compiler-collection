@@ -28,6 +28,7 @@ enum token {
     t_annot,
     t_colon,
     t_assign,
+    t_comma,
     
     t_id,
     t_int_literal,

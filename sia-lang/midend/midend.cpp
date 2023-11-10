@@ -39,6 +39,7 @@ void Midend::it_process_block(std::shared_ptr<AstBlock> &block, std::shared_ptr<
             case V_AstType::Func: {
                 auto func = std::static_pointer_cast<AstFunction>(stmt);
                 auto func2 = std::make_shared<AstFunction>(func->name, func->data_type);
+                func2->args = func->args;
                 it_process_block(func->block, func2->block);
                 new_block->addStatement(func2);
             } break;

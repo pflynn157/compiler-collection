@@ -1,6 +1,33 @@
 #include "parser.hpp"
 
 //
+// Parses function arguments
+//
+void Parser::parse_arguments(std::vector<Var> &args) {
+    consume_token(t_lparen, "Expected \'(\' after function name.");
+    token t = lex->get_next();
+    while (t != t_rparen) {
+        // Parse
+        if (t != t_id) {
+            syntax->addError(lex->line_number, "Expected argument name.");
+            return;
+        }
+        std::string name = lex->value;
+        
+        consume_token(t_colon, "Expected \':\' in function arguments.");
+        
+        std::shared_ptr<AstDataType> data_type = get_data_type();
+        
+        // Add the variable
+        args.push_back(Var(data_type, name));
+        
+        // Next token
+        t = lex->get_next();
+        if (t == t_comma) t = lex->get_next();
+    }
+}
+
+//
 // Parses a function
 //
 void Parser::parse_function() {
@@ -9,10 +36,8 @@ void Parser::parse_function() {
     std::string func_name = generate_name(lex->value);
     
     // Function arguments
-    consume_token(t_lparen, "Expected \'(\' after function name.");
-    // Temporary- consume arguments
-    token t = lex->get_next();
-    while (t != t_rparen) t = lex->get_next();
+    std::vector<Var> args;
+    parse_arguments(args);
     
     // Data type
     consume_token(t_of, "Expected \"of\" in function declaration.");
@@ -23,11 +48,15 @@ void Parser::parse_function() {
     
     // Build the AST node
     auto func = std::make_shared<AstFunction>(func_name, data_type);
+    func->args = args;
     tree->block->addStatement(func);
     tree->block->funcs.push_back(func_name);
     
     // Build the function body
     func->block->mergeSymbols(tree->block);
+    for (auto var : args) {
+        func->block->addSymbol(var.name, var.type);
+    }
     parse_block(func->block);
     
     // If we have a function function, add a return statement

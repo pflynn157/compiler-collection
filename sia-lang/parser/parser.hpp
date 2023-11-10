@@ -20,6 +20,7 @@ public:
     std::shared_ptr<AstDataType> get_data_type();
     
     // function.cpp
+    void parse_arguments(std::vector<Var> &args);
     void parse_function();
     void parse_return(std::shared_ptr<AstBlock> block);
     void parse_function_call(std::shared_ptr<AstBlock> block, std::string name);

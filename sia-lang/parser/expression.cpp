@@ -39,6 +39,16 @@ std::shared_ptr<AstExpression> Parser::parse_expression(std::shared_ptr<AstBlock
                     return nullptr;
                 }
             } break;
+            
+            // Commas- for lists
+            case t_comma: {
+                applyAssoc(ctx);
+                
+                std::shared_ptr<AstExpression> expr = checkExpression(ctx->output.top(), ctx->varType);
+                ctx->output.pop();
+                
+                list.push_back(expr);
+            } break;
         }
         
         t = lex->get_next();

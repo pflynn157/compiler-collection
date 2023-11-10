@@ -95,6 +95,7 @@ bool Lex::is_symbol(char c) {
         case '.':
         case '@':
         case ':':
+        case ',':
         case '(': case ')':
             return true;
         
@@ -110,6 +111,7 @@ token Lex::get_symbol(char c) {
         case '(': return t_lparen;
         case ')': return t_rparen;
         case '@': return t_annot;
+        case ',': return t_comma;
         
         case ':': {
             char c2 = reader.get();

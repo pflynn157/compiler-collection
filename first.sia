@@ -1,8 +1,9 @@
 
 func main() of int is
-    @parallel is
-        print "Hello!".
+    iter i of 0:10 by 1 do
+        print i.
     end
+    
     return 0.
 end
 

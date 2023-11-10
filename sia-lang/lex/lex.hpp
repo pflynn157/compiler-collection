@@ -18,6 +18,9 @@ enum token {
     t_return,
     t_end,
     t_scalar,
+    t_iter,
+    t_do,
+    t_by,
     
     t_void,
     t_int,

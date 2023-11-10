@@ -19,6 +19,9 @@ public:
     std::string generate_name(std::string base);
     std::shared_ptr<AstDataType> get_data_type();
     
+    // flow.cpp
+    void parse_iter(std::shared_ptr<AstBlock> block);
+    
     // function.cpp
     void parse_arguments(std::vector<Var> &args);
     void parse_function();

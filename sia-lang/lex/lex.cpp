@@ -70,6 +70,9 @@ token Lex::get_next() {
             else if (buffer == "return") t = t_return;
             else if (buffer == "end") t = t_end;
             else if (buffer == "scalar") t = t_scalar;
+            else if (buffer == "iter") t = t_iter;
+            else if (buffer == "do") t = t_do;
+            else if (buffer == "by") t = t_by;
             else if (buffer == "void") t = t_void;
             else if (buffer == "int") t = t_int;
             else if (is_integer()) {
@@ -149,6 +152,9 @@ void Lex::debug_token(token t) {
         case t_return: std::cout << "RETURN" << std::endl; break;
         case t_end: std::cout << "END" << std::endl; break;
         case t_scalar: std::cout << "SCALAR" << std::endl; break;
+        case t_iter: std::cout << "ITER" << std::endl; break;
+        case t_do: std::cout << "DO" << std::endl; break;
+        case t_by: std::cout << "BY" << std::endl; break;
         
         case t_void: std::cout << "VOID" << std::endl; break;
         case t_int: std::cout << "INT" << std::endl; break;

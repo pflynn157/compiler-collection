@@ -94,6 +94,7 @@ void Parser::parse_block(std::shared_ptr<AstBlock> block) {
             // Statements in separate functions
             case t_scalar: parse_scalar(block); break;
             case t_return: parse_return(block); break;
+            case t_iter: parse_iter(block); break;
             
             // Statements beginning with an identifier
             case t_id: {

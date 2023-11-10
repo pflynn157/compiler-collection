@@ -9,6 +9,7 @@ set(SRC
     midend/parallel_midend.cpp
     
     parser/expression.cpp
+    parser/flow.cpp
     parser/function.cpp
     parser/parser.cpp
     parser/variable.cpp

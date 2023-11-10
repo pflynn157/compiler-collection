@@ -37,6 +37,18 @@ void Midend::it_process_block(std::shared_ptr<AstBlock> &block, std::shared_ptr<
                 it_process_block(func->block, func2->block);
                 new_block->addStatement(func2);
             } break;
+            
+            case V_AstType::For: {
+                auto iter = std::static_pointer_cast<AstForStmt>(stmt);
+                auto iter2 = std::make_shared<AstForStmt>();
+                iter2->index = iter->index;
+                iter2->start = iter->start;
+                iter2->end = iter->end;
+                iter2->step = iter->step;
+                iter2->data_type = iter->data_type;
+                it_process_block(iter->block, iter2->block);
+                new_block->addStatement(iter2);
+            } break;
         
             // By default, add the statement to the new block
             default: {

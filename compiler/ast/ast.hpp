@@ -947,6 +947,7 @@ struct AstRepeatStmt : public AstStatement {
 struct AstForStmt : public AstStatement {
     explicit AstForStmt() : AstStatement(V_AstType::For) {
         step = std::make_shared<AstI32>(1);
+        block = std::make_shared<AstBlock>();
     }
     
     void print(int indent = 0);

@@ -104,6 +104,7 @@ void Parser::parse_block(std::shared_ptr<AstBlock> block) {
                     return;
                 }
                 
+                annot_block->block->mergeSymbols(block);
                 parse_block(annot_block->block);
             } break;
             

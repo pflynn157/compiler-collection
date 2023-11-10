@@ -5,6 +5,7 @@
 #include <lex/lex.hpp>
 #include <parser/parser.hpp>
 #include <midend/midend.hpp>
+#include <midend/parallel_midend.hpp>
 #include <llvm/Compiler.hpp>
 
 void test_lex(std::string input) {
@@ -65,12 +66,18 @@ int main(int argc, char **argv) {
     tree->print();
     
     std::cout << "----------------------------" << std::endl;
-     
-    auto midend = std::make_unique<Midend>(tree);
-    midend->run();
-    tree = midend->tree;
     
-    //tree->print();
+    // Run the parallel processing midend
+    auto midend1 = std::make_unique<ParallelMidend>(tree);
+    midend1->run();
+    tree = midend1->tree;
+     
+    // Run the general midend
+    auto midend2 = std::make_unique<Midend>(tree);
+    midend2->run();
+    tree = midend2->tree;
+    
+    tree->print();
     
     std::cout << "----------------------------" << std::endl;
     

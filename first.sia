@@ -1,14 +1,8 @@
 
-func printout(x:int, y:int) of void is
-    print 30.
-    print x.
-    print y.
-end
-
 func main() of int is
-    scalar i : int := 20.
-    print i.
-    printout 44, 33.
+    @parallel is
+        print "Hello!".
+    end
     return 0.
 end
 

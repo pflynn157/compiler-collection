@@ -1,6 +1,6 @@
 
 func main() of int is
-    @parallel is
+    @parallel1 is
         return.
     end
     return 10.

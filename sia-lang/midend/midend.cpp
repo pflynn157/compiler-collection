@@ -58,6 +58,10 @@ void SiaMidend::process_block_statement(std::shared_ptr<AstBlockStmt> &stmt, std
         auto fc = std::make_shared<AstFuncCallStmt>("outlined");
         fc->expression = std::make_shared<AstExprList>();
         block->addStatement(fc);
+    } else {
+        for (const auto &stmt2 : stmt->block->block) {
+            block->addStatement(stmt2);
+        }
     }
 }
 

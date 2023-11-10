@@ -54,7 +54,10 @@ std::shared_ptr<AstExpression> Parser::parse_expression(std::shared_ptr<AstBlock
     }
     
     // Build (if needed) and return the final structure
-    if (ctx->output.empty()) return nullptr;
+    if (ctx->output.empty()) {
+        if (is_list) return std::make_shared<AstExprList>();
+        return nullptr;
+    }
     if (is_list) {
         std::shared_ptr<AstExpression> expr = checkExpression(ctx->output.top(), ctx->varType);
         list.push_back(expr);

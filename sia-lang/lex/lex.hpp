@@ -19,6 +19,7 @@ enum token {
     t_end,
     t_scalar,
     
+    t_void,
     t_int,
     
     t_period,

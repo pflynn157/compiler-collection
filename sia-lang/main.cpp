@@ -55,7 +55,7 @@ void link(CFlags cflags) {
 
 int main(int argc, char **argv) {
     std::string input = "../first.sia";
-    test_lex(input);
+    //test_lex(input);
     std::cout << "----------------------------" << std::endl;
     
     std::unique_ptr<Parser> parser = std::make_unique<Parser>(input);
@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
     midend->run();
     tree = midend->tree;
     
-    tree->print();
+    //tree->print();
     
     std::cout << "----------------------------" << std::endl;
     

@@ -14,6 +14,7 @@ Parser::Parser(std::string input) : BaseParser(input) {
     fc1->varargs = true;
     fc1->addArgument(Var(AstBuilder::buildStringType(), "fmt"));
     tree->block->addStatement(fc1);
+    tree->block->funcs.push_back("print");
 }
 
 //
@@ -149,6 +150,7 @@ std::string Parser::generate_name(std::string base) {
 std::shared_ptr<AstDataType> Parser::get_data_type() {
     token t = lex->get_next();
     switch (t) {
+        case t_void: return AstBuilder::buildVoidType();
         case t_int: return AstBuilder::buildInt32Type();
         
         default:

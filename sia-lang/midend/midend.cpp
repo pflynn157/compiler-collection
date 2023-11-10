@@ -30,6 +30,8 @@ void Midend::it_process_block(std::shared_ptr<AstBlock> &block, std::shared_ptr<
                 auto fc = std::static_pointer_cast<AstFuncCallStmt>(stmt);
                 if (fc->name == "print") {
                     process_print(fc, new_block);
+                } else {
+                    new_block->addStatement(fc);
                 }
             } break;
         

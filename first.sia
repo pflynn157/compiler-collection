@@ -1,7 +1,12 @@
 
+func printout() of void is
+    print 30.
+end
+
 func main() of int is
     scalar i : int := 20.
     print i.
+    printout.
     return 0.
 end
 

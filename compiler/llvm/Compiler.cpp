@@ -235,7 +235,7 @@ Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, V_AstType dat
             }
             
             Function *callee = mod->getFunction(fc->name);
-            if (!callee) std::cerr << "Invalid function call statement." << std::endl;
+            if (!callee) std::cerr << "Invalid function call statement: " << fc->name << std::endl;
             return builder->CreateCall(callee, args);
         } break;
         

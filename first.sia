@@ -1,7 +1,9 @@
 
 func main() of int is
-    iter i of 0:10 by 1 do
-        print i.
+    @parallel is
+        iter i of 0:10 by 1 do
+            print i.
+        end
     end
     
     return 0.

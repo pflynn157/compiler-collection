@@ -38,6 +38,15 @@ void Midend::it_process_block(std::shared_ptr<AstBlock> &block, std::shared_ptr<
                 new_block->addStatement(func2);
             } break;
             
+            case V_AstType::While: {
+                auto loop = std::static_pointer_cast<AstWhileStmt>(stmt);
+                auto loop2 = std::make_shared<AstWhileStmt>();
+                loop2->block = std::make_shared<AstBlock>();
+                loop2->expression = loop->expression;
+                it_process_block(loop->block, loop2->block);
+                new_block->addStatement(loop2);
+            } break;
+            
             case V_AstType::For: {
                 auto iter = std::static_pointer_cast<AstForStmt>(stmt);
                 auto iter2 = std::make_shared<AstForStmt>();

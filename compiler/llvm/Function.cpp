@@ -119,7 +119,7 @@ void Compiler::compileFuncCallStatement(std::shared_ptr<AstStatement> stmt) {
     }
     
     Function *callee = mod->getFunction(fc->name);
-    if (!callee) std::cerr << "Invalid function call statement." << std::endl;
+    if (!callee) std::cerr << "Invalid function call statement: " << fc->name << std::endl;
     builder->CreateCall(callee, args);
 }
 

@@ -1,8 +1,6 @@
 
 func main() of int is
-    @parallel1 is
-        return.
-    end
+    printf "Hello!".
     return 10.
 end
 

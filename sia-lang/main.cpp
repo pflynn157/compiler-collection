@@ -66,13 +66,13 @@ int main(int argc, char **argv) {
     
     std::cout << "----------------------------" << std::endl;
      
-    std::unique_ptr<SiaMidend> midend = std::make_unique<SiaMidend>(tree);
+    /*std::unique_ptr<SiaMidend> midend = std::make_unique<SiaMidend>(tree);
     midend->run();
     tree = midend->tree;
     
     tree->print();
     
-    std::cout << "----------------------------" << std::endl;
+    std::cout << "----------------------------" << std::endl;*/
     
     CFlags flags;
     flags.name = "first";

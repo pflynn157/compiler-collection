@@ -7,6 +7,13 @@
 //
 Parser::Parser(std::string input) : BaseParser(input) {
     lex = std::make_unique<Lex>(input);
+    
+    // Add built-in functions
+    auto fc1 = std::make_shared<AstExternFunction>("printf");
+    fc1->data_type = AstBuilder::buildVoidType();
+    fc1->varargs = true;
+    fc1->addArgument(Var(AstBuilder::buildStringType(), "fmt"));
+    tree->block->addStatement(fc1);
 }
 
 //
@@ -55,7 +62,18 @@ void Parser::parse_block(std::shared_ptr<AstBlock> block) {
     token t = lex->get_next();
     while (t != t_eof && t != t_end) {
         switch (t) {
+            // Return statements
             case t_return: parse_return(block); break;
+            
+            // Statements beginning with an identifier
+            case t_id: {
+                std::string name = lex->value;
+                token next = lex->get_next();
+                lex->unget(next);
+                
+                // TODO: Check assign
+                parse_function_call(block, name);
+            } break;
             
             // Annotated sub-block
             case t_annot: {

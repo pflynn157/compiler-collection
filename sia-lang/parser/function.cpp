@@ -38,3 +38,12 @@ void Parser::parse_return(std::shared_ptr<AstBlock> block) {
     block->addStatement(ret);
 }
 
+//
+// Parses a function call
+//
+void Parser::parse_function_call(std::shared_ptr<AstBlock> block, std::string name) {
+    auto fc = std::make_shared<AstFuncCallStmt>(name);
+    fc->expression = parse_expression(block, t_period, true);
+    block->addStatement(fc);
+}
+

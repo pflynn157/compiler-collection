@@ -14,6 +14,13 @@ Lex::Lex(std::string input) {
 }
 
 //
+// Ungets the token from the stream
+//
+void Lex::unget(token t) {
+    token_stack.push(t);
+}
+
+//
 // Get the next token in the stream
 //
 token Lex::get_next() {
@@ -29,6 +36,19 @@ token Lex::get_next() {
     
     while (!reader.eof()) {
         char c = reader.get();
+        
+        if (c == '\"') {
+            value = "";
+            
+            c = reader.get();
+            while (c != '\"' && !reader.eof()) {
+                value += c;
+                c = reader.get();     
+            }
+            
+            return t_string_literal;
+        }
+        
         if (c == ' ' || c == '\n' || is_symbol(c)) {
             if (c == '\n') ++line_number;
         
@@ -124,6 +144,7 @@ void Lex::debug_token(token t) {
         
         case t_id: std::cout << "ID(" << value << ")" << std::endl; break;
         case t_int_literal: std::cout << "INT(" << value << ")" << std::endl; break;
+        case t_string_literal: std::cout << "STRING(" << value << ")" << std::endl; break;
         
         default: std::cout << "???" << std::endl;
     }

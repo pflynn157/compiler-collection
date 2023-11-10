@@ -22,6 +22,7 @@ public:
     // function.cpp
     void parse_function();
     void parse_return(std::shared_ptr<AstBlock> block);
+    void parse_function_call(std::shared_ptr<AstBlock> block, std::string name);
     
     // expression.cpp
     std::shared_ptr<AstExpression> parse_expression(std::shared_ptr<AstBlock> block, token stop = t_period, bool is_list = false);

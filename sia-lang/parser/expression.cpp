@@ -8,6 +8,7 @@
 //
 std::shared_ptr<AstExpression> Parser::parse_expression(std::shared_ptr<AstBlock> block, token stop, bool is_list) {
     auto ctx = std::make_shared<ExprContext>();
+    std::vector<std::shared_ptr<AstExpression>> list;
     
     token t = lex->get_next();
     while (t != t_eof && t != stop) {
@@ -17,6 +18,12 @@ std::shared_ptr<AstExpression> Parser::parse_expression(std::shared_ptr<AstBlock
                 int value = std::stoi(lex->value);
                 auto i = std::make_shared<AstI32>(value);
                 ctx->output.push(i);
+            } break;
+            
+            // String literals
+            case t_string_literal: {
+                auto s = std::make_shared<AstString>(lex->value);
+                ctx->output.push(s);
             } break;
         }
         
@@ -35,7 +42,15 @@ std::shared_ptr<AstExpression> Parser::parse_expression(std::shared_ptr<AstBlock
     // Build (if needed) and return the final structure
     if (ctx->output.empty()) return nullptr;
     if (is_list) {
-        // TODO
+        std::shared_ptr<AstExpression> expr = checkExpression(ctx->output.top(), ctx->varType);
+        list.push_back(expr);
+        
+        auto ast_list = std::make_shared<AstExprList>();
+        for (auto const &item : list) {
+            ast_list->add_expression(item);
+        }
+        
+        return ast_list;
     }
     
     std::shared_ptr<AstExpression> expr = checkExpression(ctx->output.top(), ctx->varType);

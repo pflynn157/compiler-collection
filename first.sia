@@ -1,6 +1,6 @@
 
 func main() of int is
-    print "Hello!".
-    return 10.
+    scalar i : int := 20.
+    return 0.
 end
 

@@ -62,7 +62,8 @@ void Parser::parse_block(std::shared_ptr<AstBlock> block) {
     token t = lex->get_next();
     while (t != t_eof && t != t_end) {
         switch (t) {
-            // Return statements
+            // Statements in separate functions
+            case t_scalar: parse_scalar(block); break;
             case t_return: parse_return(block); break;
             
             // Statements beginning with an identifier

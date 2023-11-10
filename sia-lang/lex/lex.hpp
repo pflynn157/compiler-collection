@@ -17,6 +17,7 @@ enum token {
     t_is,
     t_return,
     t_end,
+    t_scalar,
     
     t_int,
     
@@ -24,6 +25,8 @@ enum token {
     t_lparen,
     t_rparen,
     t_annot,
+    t_colon,
+    t_assign,
     
     t_id,
     t_int_literal,

@@ -27,6 +27,9 @@ public:
     // expression.cpp
     std::shared_ptr<AstExpression> parse_expression(std::shared_ptr<AstBlock> block, token stop = t_period, bool is_list = false);
     
+    // variable.cpp
+    void parse_scalar(std::shared_ptr<AstBlock> block);
+    
 private:
     std::unique_ptr<Lex> lex;
     std::string module_name = "";

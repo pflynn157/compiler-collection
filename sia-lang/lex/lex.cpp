@@ -69,6 +69,7 @@ token Lex::get_next() {
             else if (buffer == "is") t = t_is;
             else if (buffer == "return") t = t_return;
             else if (buffer == "end") t = t_end;
+            else if (buffer == "scalar") t = t_scalar;
             else if (buffer == "int") t = t_int;
             else if (is_integer()) {
                 t = t_int_literal;
@@ -92,6 +93,7 @@ bool Lex::is_symbol(char c) {
     switch (c) {
         case '.':
         case '@':
+        case ':':
         case '(': case ')':
             return true;
         
@@ -107,6 +109,15 @@ token Lex::get_symbol(char c) {
         case '(': return t_lparen;
         case ')': return t_rparen;
         case '@': return t_annot;
+        
+        case ':': {
+            char c2 = reader.get();
+            if (c2 == '=') {
+                return t_assign;
+            }
+            reader.unget();
+            return t_colon;
+        }
         
         default: {}
     }
@@ -134,6 +145,7 @@ void Lex::debug_token(token t) {
         case t_is: std::cout << "IS" << std::endl; break;
         case t_return: std::cout << "RETURN" << std::endl; break;
         case t_end: std::cout << "END" << std::endl; break;
+        case t_scalar: std::cout << "SCALAR" << std::endl; break;
         
         case t_int: std::cout << "INT" << std::endl; break;
         
@@ -141,6 +153,8 @@ void Lex::debug_token(token t) {
         case t_lparen: std::cout << "(" << std::endl; break;
         case t_rparen: std::cout << ")" << std::endl; break;
         case t_annot: std::cout << "@" << std::endl; break;
+        case t_colon: std::cout << ":" << std::endl; break;
+        case t_assign: std::cout << ":=" << std::endl; break;
         
         case t_id: std::cout << "ID(" << value << ")" << std::endl; break;
         case t_int_literal: std::cout << "INT(" << value << ")" << std::endl; break;

@@ -10,6 +10,7 @@ set(SRC
     parser/expression.cpp
     parser/function.cpp
     parser/parser.cpp
+    parser/variable.cpp
 
     main.cpp
 )

@@ -65,8 +65,8 @@ int main(int argc, char **argv) {
     tree->print();
     
     std::cout << "----------------------------" << std::endl;
-    
-    std::unique_ptr<Midend> midend = std::make_unique<Midend>(tree);
+     
+    std::unique_ptr<SiaMidend> midend = std::make_unique<SiaMidend>(tree);
     midend->run();
     tree = midend->tree;
     

@@ -10,7 +10,6 @@ set(SRC
     parser/ErrorManager.cpp
     
     midend/ast_midend.cpp
-    midend/rebuild_midend.cpp
 )
 
 set(COMPILER_SRC

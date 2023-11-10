@@ -1,6 +1,6 @@
 
 func main() of int is
-    printf "Hello!".
+    print "Hello!".
     return 10.
 end
 

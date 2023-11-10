@@ -18,5 +18,6 @@ private:
     
     void it_process_block(std::shared_ptr<AstBlock> &block, std::shared_ptr<AstBlock> &new_block);
     void process_block_statement(std::shared_ptr<AstBlockStmt> &stmt, std::shared_ptr<AstBlock> &block);
+    void process_print(std::shared_ptr<AstFuncCallStmt> &call, std::shared_ptr<AstBlock> &block);
 };
 

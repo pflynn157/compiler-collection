@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <filesystem>
+#include <functional>
 
 #include <lex/lex.hpp>
 #include <parser/parser.hpp>
@@ -56,6 +58,11 @@ void link(CFlags cflags) {
 
 int main(int argc, char **argv) {
     std::string input = "../first.sia";
+    std::string name = std::filesystem::path(input).stem();
+    
+    std::function<void(std::string)> f_test_lex = test_lex;
+    f_test_lex(input);
+    
     //test_lex(input);
     std::cout << "----------------------------" << std::endl;
     
@@ -82,7 +89,8 @@ int main(int argc, char **argv) {
     std::cout << "----------------------------" << std::endl;
     
     CFlags flags;
-    flags.name = "first";
+    flags.name = name;
+    std::cout << "FILENAME: " << name << std::endl;
     
     std::unique_ptr<Compiler> compiler = std::make_unique<Compiler>(tree, flags);
     compiler->compile();

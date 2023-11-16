@@ -1,5 +1,7 @@
 project(libcompiler)
 
+include_directories(. java)
+
 set(SRC
     ast/ast.cpp
     ast/ast_builder.cpp
@@ -20,8 +22,18 @@ set(COMPILER_SRC
     llvm/Variable.cpp
 )
 
+set(JAVA_SRC
+    java/Java/JavaBuilder.cpp
+    java/Java/JavaWriter.cpp
+    java/Java/JavaCode.cpp
+    
+    java/JavaCompiler.cpp
+    java/JavaUtils.cpp
+)
+
 add_library(compiler_base STATIC ${SRC})
 add_library(compiler STATIC ${COMPILER_SRC})
+add_library(coffee-maker STATIC ${JAVA_SRC})
 
 llvm_map_components_to_libnames(llvm_libs support core irreader target asmparser
     X86AsmParser

@@ -6,7 +6,7 @@ find_package(LLVM REQUIRED CONFIG)
 add_compile_options(-std=c++17 -g)
 
 include_directories(compiler)
-include_directories(java)
+include_directories(compiler/java)
 include_directories(.)
 
 include_directories(${LLVM_INCLUDE_DIRS})
@@ -25,10 +25,8 @@ if (DEV_LINK_MODE)
 endif()
 
 # Build supporting projects
-add_subdirectory(libelf)
 add_subdirectory(as)
 add_subdirectory(compiler)
-add_subdirectory(java)
 
 # Build the core compiler
 add_subdirectory(tiny-lang)

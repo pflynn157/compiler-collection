@@ -7,7 +7,6 @@ add_compile_options(-std=c++17 -g)
 
 include_directories(compiler)
 include_directories(compiler/java)
-include_directories(.)
 
 include_directories(${LLVM_INCLUDE_DIRS})
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})

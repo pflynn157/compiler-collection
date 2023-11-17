@@ -167,7 +167,68 @@ bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, token tk, std::shared_
     return true;
 }
 
+// Potential helper function
+// TODO: Overload all of the "is" functions
+bool Parser::is_constant(token tk) {
+    switch (tk) {
+        case t_true:
+        case t_false:
+        case t_char_literal:
+        case t_int_literal:
+        case t_string_literal: return true;
+        
+        default: {}
+    }
+    return false;
+}
+
+bool Parser::is_id(token tk) {
+    if (tk == t_id) return true;
+    return false;
+}
+
+bool Parser::is_operator(token tk) {
+    switch (tk) {
+        case t_assign:
+        case t_plus: 
+        case t_minus:
+        case t_mul:
+        case t_div:
+        case t_mod:
+        case t_and:
+        case t_or:
+        case t_xor:
+        case t_eq:
+        case t_neq:
+        case t_gt:
+        case t_lt:
+        case t_gte:
+        case t_lte:
+        case t_lgand:
+        case t_lgor: return true;
+        
+        default: {}
+    }
+    return false;
+}
+
+bool Parser::is_sub_expr_start(token tk) {
+    if (tk == t_lparen) return true;
+    return false;
+}
+
+bool Parser::is_sub_expr_end(token tk) {
+    if (tk == t_rparen) return true;
+    return false;
+}
+
+bool Parser::is_list_delim(token tk) {
+    if (tk == t_comma) return true;
+    return false;
+}
+
 // Our new expression builder
+// This should be universal
 std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
                                                         token stopToken, bool isConst, bool buildList) {
     std::shared_ptr<ExprContext> ctx = std::make_shared<ExprContext>();
@@ -179,68 +240,35 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
     
     token tk = lex->get_next();
     while (tk != t_eof && tk != stopToken) {
-        switch (tk) {
-            case t_true:
-            case t_false:
-            case t_char_literal:
-            case t_int_literal:
-            case t_string_literal: {
-                ctx->lastWasOp = false;
-                std::shared_ptr<AstExpression> expr = buildConstExpr(tk);
-                ctx->output.push(expr);
-            } break;
-            
-            case t_id: {
-                if (!buildIDExpr(block, tk, ctx)) return nullptr;
-            } break;
-            
-            case t_assign:
-            case t_plus: 
-            case t_minus:
-            case t_mul:
-            case t_div:
-            case t_mod:
-            case t_and:
-            case t_or:
-            case t_xor:
-            case t_eq:
-            case t_neq:
-            case t_gt:
-            case t_lt:
-            case t_gte:
-            case t_lte:
-            case t_lgand:
-            case t_lgor: {
-                if (!buildOperator(tk, ctx)) {
-                    return nullptr;
-                }
-            } break;
-            
-            case t_lparen: {
-                std::shared_ptr<AstExpression> subExpr = buildExpression(block, ctx->varType, t_rparen, false, isList);
-                if (!subExpr) {
-                    return nullptr;
-                }
-                ctx->output.push(subExpr);
-                ctx->lastWasOp = false;
-            } break;
-            
-            // TODO: We need some syntax checking with this
-            case t_rparen: break;
-            
-            case t_comma: {
-                applyAssoc(ctx);
-                std::shared_ptr<AstExpression> expr = checkExpression(ctx->output.top(), ctx->varType);
-                list->add_expression(expr);
-                while (ctx->output.size() > 0) ctx->output.pop();
-                while (ctx->opStack.size() > 0) ctx->opStack.pop();
-                isList = true;
-            } break;
-            
-            default: {
-                syntax->addError(lex->line_number, "Invalid Token in expression.");
+        if  (is_constant(tk)) {
+            ctx->lastWasOp = false;
+            std::shared_ptr<AstExpression> expr = buildConstExpr(tk);
+            ctx->output.push(expr);
+        } else if (is_id(tk)) {
+            if (!buildIDExpr(block, tk, ctx)) return nullptr;
+        } else if (is_operator(tk)) {
+            if (!buildOperator(tk, ctx)) {
                 return nullptr;
             }
+        } else if (is_sub_expr_start(tk)) {
+            std::shared_ptr<AstExpression> subExpr = buildExpression(block, ctx->varType, t_rparen, false, isList);
+            if (!subExpr) {
+                return nullptr;
+            }
+            ctx->output.push(subExpr);
+            ctx->lastWasOp = false;
+        } else if (is_sub_expr_end(tk)) {
+            // Do nothing
+        } else if (is_list_delim(tk)) {
+            applyAssoc(ctx);
+            std::shared_ptr<AstExpression> expr = checkExpression(ctx->output.top(), ctx->varType);
+            list->add_expression(expr);
+            while (ctx->output.size() > 0) ctx->output.pop();
+            while (ctx->opStack.size() > 0) ctx->opStack.pop();
+            isList = true;
+        } else {
+            syntax->addError(lex->line_number, "Invalid Token in expression.");
+            return nullptr;
         }
         
         if (!ctx->lastWasOp && ctx->opStack.size() > 0) {

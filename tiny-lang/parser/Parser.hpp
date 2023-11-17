@@ -51,6 +51,13 @@ protected:
     bool buildStructDec(std::shared_ptr<AstBlock> block);
     
     // Expression.cpp
+    bool is_constant(token tk);
+    bool is_id(token tk);
+    bool is_operator(token tk);
+    bool is_sub_expr_start(token tk);
+    bool is_sub_expr_end(token tk);
+    bool is_list_delim(token tk);
+    
     std::shared_ptr<AstExpression> buildConstExpr(token tk);
     bool buildOperator(token tk, std::shared_ptr<ExprContext> ctx);
     bool buildIDExpr(std::shared_ptr<AstBlock> block, token tk, std::shared_ptr<ExprContext> ctx);

@@ -26,6 +26,22 @@ std::shared_ptr<AstExpression> Parser::buildConstExpr(token tk) {
     return nullptr;
 }
 
+void Parser::post_process_operator(std::shared_ptr<ExprContext> ctx, std::shared_ptr<AstBinaryOp> op, std::shared_ptr<AstUnaryOp> op1, bool is_unary) {
+    if (ctx->opStack.size() > 0 && is_unary == false) {
+        std::shared_ptr<AstOp> top = ctx->opStack.top();
+            if (top->is_binary) {
+            std::shared_ptr<AstBinaryOp> op2 = std::static_pointer_cast<AstBinaryOp>(top);
+            if (op->precedence > op2->precedence) {
+                if (!applyHigherPred(ctx)) return;
+            }
+        }
+    }
+    
+    if (is_unary) ctx->opStack.push(op1);
+    else ctx->opStack.push(op);
+    ctx->lastWasOp = true;
+}
+
 bool Parser::buildOperator(token tk, std::shared_ptr<ExprContext> ctx) {
     switch (tk) {
         case t_assign:
@@ -76,19 +92,7 @@ bool Parser::buildOperator(token tk, std::shared_ptr<ExprContext> ctx) {
                 } break;
             }
             
-            if (ctx->opStack.size() > 0 && useUnary == false) {
-                std::shared_ptr<AstOp> top = ctx->opStack.top();
-                    if (top->is_binary) {
-                    std::shared_ptr<AstBinaryOp> op2 = std::static_pointer_cast<AstBinaryOp>(top);
-                    if (op->precedence > op2->precedence) {
-                        if (!applyHigherPred(ctx)) return false;
-                    }
-                }
-            }
-            
-            if (useUnary) ctx->opStack.push(op1);
-            else ctx->opStack.push(op);
-            ctx->lastWasOp = true;
+            post_process_operator(ctx, op, op1, useUnary);
         } break;
         
         default: {}

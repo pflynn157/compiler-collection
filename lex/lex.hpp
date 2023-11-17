@@ -4,11 +4,13 @@
 #include <fstream>
 #include <stack>
 
+#include <parser/base_lex.hpp>
+
 //
 // Represents token data
 //
 enum token {
-    t_eof,
+    t_eof = 0,
     t_none,
     
     ///LEX_KEYWORDS
@@ -25,15 +27,12 @@ enum token {
 //
 // The lexical analyzer
 //
-struct Lex {
+struct Lex : BaseLex {
     explicit Lex(std::string input);
-    void unget(int t);
-    token get_next();
-    void debug_token(token t);
+    void unget(int t) override;
+    int get_next() override;
+    void debug_token(int t) override;
     
-    std::string value = "";
-    int i_value = 0;
-    int line_number = 0;
 private:
     std::ifstream reader;
     std::string buffer = "";

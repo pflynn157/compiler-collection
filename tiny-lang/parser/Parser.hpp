@@ -31,7 +31,7 @@ public:
 protected:
     // Function.cpp
     bool getFunctionArgs(std::shared_ptr<AstBlock> block, std::vector<Var> &args);
-    bool buildFunction(token startToken, std::string className = "");
+    bool buildFunction(int startToken, std::string className = "");
     bool buildFunctionCallStmt(std::shared_ptr<AstBlock> block, std::string fc_name);
     bool buildReturn(std::shared_ptr<AstBlock> block);
     
@@ -47,7 +47,7 @@ protected:
     
     // Structure.cpp
     bool buildStruct();
-    bool buildStructMember(std::shared_ptr<AstStruct> str, token tk);
+    bool buildStructMember(std::shared_ptr<AstStruct> str, int tk);
     bool buildStructDec(std::shared_ptr<AstBlock> block);
     
     // Expression.cpp
@@ -58,13 +58,10 @@ protected:
     bool is_sub_expr_start(int tk) override;
     bool is_sub_expr_end(int tk) override;
     bool is_list_delim(int tk) override;
+    int get_sub_expr_end() override;
     bool build_operator(int tk, std::shared_ptr<ExprContext> ctx) override;
     
     // TODO: Move to library
-    std::shared_ptr<AstExpression> buildExpression(
-                        std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
-                        token stopToken = t_semicolon,
-                        bool isConst = false, bool buildList = false);
     
     std::shared_ptr<AstExpression> build_constant(int tk) override;
     bool build_identifier(std::shared_ptr<AstBlock> block, int tk, std::shared_ptr<ExprContext> ctx) override;
@@ -75,6 +72,6 @@ protected:
     std::shared_ptr<AstDataType> buildDataType(bool checkBrackets = true);
     void consume_token(token expected, std::string msg);
 private:
-    std::unique_ptr<Lex> lex;
+    //std::unique_ptr<Lex> lex;
 };
 

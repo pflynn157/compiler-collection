@@ -13,13 +13,13 @@
 
 // Returns the function arguments
 bool Parser::getFunctionArgs(std::shared_ptr<AstBlock> block, std::vector<Var> &args) {
-    token tk = lex->get_next();
+    int tk = lex->get_next();
     if (tk == t_lparen) {
         tk = lex->get_next();
         while (tk != t_eof && tk != t_rparen) {
-            token t1 = tk;
+            int t1 = tk;
             std::string name = lex->value;
-            token t2 = lex->get_next();
+            int t2 = lex->get_next();
             Var v;
             
             if (t1 != t_id) {
@@ -51,8 +51,8 @@ bool Parser::getFunctionArgs(std::shared_ptr<AstBlock> block, std::vector<Var> &
 }
 
 // Builds a function
-bool Parser::buildFunction(token startToken, std::string className) {
-    token tk;
+bool Parser::buildFunction(int startToken, std::string className) {
+    int tk;
     bool isExtern = false;
 
     // Handle extern function
@@ -157,7 +157,7 @@ bool Parser::buildReturn(std::shared_ptr<AstBlock> block) {
     std::shared_ptr<AstReturnStmt> stmt = std::make_shared<AstReturnStmt>();
     block->addStatement(stmt);
     
-    std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr);
+    std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr, t_semicolon);
     if (!arg) return false;
     stmt->expression = arg;
     

@@ -75,7 +75,7 @@ Parser::~Parser() {
 }
 
 bool Parser::parse() {
-    token tk;
+    int tk;
     do {
         tk = lex->get_next();
         bool code = true;
@@ -113,7 +113,7 @@ bool Parser::parse() {
 
 // Builds a statement block
 bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent) {
-    token tk = lex->get_next();
+    int tk = lex->get_next();
     while (tk != t_end && tk != t_eof) {
         bool code = true;
         bool end = false;
@@ -124,7 +124,7 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
             case t_const: code = buildConst(block, false); break;
             
             case t_id: {
-                token idtoken = tk;
+                int idtoken = tk;
                 std::string value = lex->value;
                 tk = lex->get_next();
                 
@@ -178,7 +178,7 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
 void Parser::debugScanner() {
     std::cout << "Debugging scanner..." << std::endl;
     
-    token t;
+    int t;
     do {
         t = lex->get_next();
         lex->debug_token(t);
@@ -189,7 +189,7 @@ void Parser::debugScanner() {
 // Builds a data type from the token stream
 //
 std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
-    token tk = lex->get_next();
+    int tk = lex->get_next();
     std::shared_ptr<AstDataType> dataType = nullptr;
     
     switch (tk) {
@@ -239,7 +239,7 @@ std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
 // A helper function for lexical analysis
 //
 void Parser::consume_token(token expected, std::string msg) {
-    token t = lex->get_next();
+    int t = lex->get_next();
     if (t != expected) {
         syntax->addError(lex->line_number, msg);
     }

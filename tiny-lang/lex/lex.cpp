@@ -23,7 +23,7 @@ void Lex::unget(int t) {
 //
 // Get the next token in the stream
 //
-token Lex::get_next() {
+int Lex::get_next() {
     if (!token_stack.empty()) {
         auto t = token_stack.top();
         token_stack.pop();
@@ -259,7 +259,7 @@ bool Lex::is_hex() {
 //
 // A debug function for the lexical analyzer
 //
-void Lex::debug_token(token t) {
+void Lex::debug_token(int t) {
     switch (t) {
         case t_none: std::cout << "???" << std::endl; break;
         case t_eof: std::cout << "EOF" << std::endl; break;

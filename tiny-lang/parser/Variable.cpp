@@ -16,7 +16,7 @@
 // Builds a variable declaration
 // A variable declaration is composed of an Alloca and optionally, an assignment
 bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
-    token tk = lex->get_next();
+    int tk = lex->get_next();
     std::vector<std::string> toDeclare;
     toDeclare.push_back(lex->value);
     
@@ -104,7 +104,7 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
         
     // Otherwise, we have a regular variable
     } else {
-        std::shared_ptr<AstExpression> arg = buildExpression(block, dataType);
+        std::shared_ptr<AstExpression> arg = buildExpression(block, dataType, t_semicolon);
         if (!arg) return false;
     
         for (std::string name : toDeclare) {
@@ -131,7 +131,7 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
 bool Parser::buildVariableAssign(std::shared_ptr<AstBlock> block, std::string value) {
     std::shared_ptr<AstDataType> dataType = block->getDataType(value);
     
-    std::shared_ptr<AstExpression> expr = buildExpression(block, dataType);
+    std::shared_ptr<AstExpression> expr = buildExpression(block, dataType, t_semicolon);
     if (!expr) return false;
     
     std::shared_ptr<AstExprStatement> stmt = std::make_shared<AstExprStatement>();

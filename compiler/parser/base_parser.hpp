@@ -10,6 +10,7 @@
 
 #include <ast/ast.hpp>
 #include <parser/ErrorManager.hpp>
+#include <parser/base_lex.hpp>
 
 struct ExprContext {
     std::stack<std::shared_ptr<AstExpression>> output;
@@ -29,6 +30,18 @@ public:
     
     std::shared_ptr<AstTree> getTree() { return tree; }
     
+    // These should be overriden by the language parser for the universal parser to work
+    virtual bool is_constant(int tk) { return false; }
+    virtual bool is_id(int tk) { return false; }
+    virtual bool is_operator(int tk) { return false; }
+    virtual bool is_sub_expr_start(int tk) { return false; }
+    virtual bool is_sub_expr_end(int tk) { return false; }
+    virtual int get_sub_expr_end() { return 0; }
+    virtual bool is_list_delim(int tk) { return false; }
+    virtual bool build_operator(int tk, std::shared_ptr<ExprContext> ctx) { return false; }
+    virtual bool build_identifier(std::shared_ptr<AstBlock> block, int tk, std::shared_ptr<ExprContext> ctx) { return false; }
+    virtual std::shared_ptr<AstExpression> build_constant(int tk) { return nullptr; }
+    
     // Expression parsers
     std::shared_ptr<AstExpression> checkExpression(std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> varType);
     bool applyHigherPred(std::shared_ptr<ExprContext> ctx);
@@ -38,20 +51,10 @@ public:
                         std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
                         int stopToken,
                         bool isConst = false, bool buildList = false);
-    
-    // These should be overriden by the language parser for the universal parser to work
-    virtual bool is_constant(int tk) { return false; }
-    virtual bool is_id(int tk) { return false; }
-    virtual bool is_operator(int tk) { return false; }
-    virtual bool is_sub_expr_start(int tk) { return false; }
-    virtual bool is_sub_expr_end(int tk) { return false; }
-    virtual bool is_list_delim(int tk) { return false; }
-    virtual bool build_operator(int tk, std::shared_ptr<ExprContext> ctx) { return false; }
-    virtual bool build_identifier(std::shared_ptr<AstBlock> block, int tk, std::shared_ptr<ExprContext> ctx) { return false; }
-    virtual std::shared_ptr<AstExpression> build_constant(int tk) { return nullptr; }
 protected:
     std::string input = "";
     std::shared_ptr<AstTree> tree;
     std::shared_ptr<ErrorManager> syntax;
+    std::unique_ptr<BaseLex> lex;
 };
 

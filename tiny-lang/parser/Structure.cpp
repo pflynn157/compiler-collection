@@ -23,7 +23,7 @@ bool Parser::buildStruct() {
     
     // Builds the struct items
     std::shared_ptr<AstStruct> str = std::make_shared<AstStruct>(name);
-    token tk = lex->get_next();
+    int tk = lex->get_next();
     
     while (tk != t_end && tk != t_eof) {
         if (!buildStructMember(str, tk)) return false;
@@ -35,7 +35,7 @@ bool Parser::buildStruct() {
     return true;
 }
 
-bool Parser::buildStructMember(std::shared_ptr<AstStruct> str, token tk) {
+bool Parser::buildStructMember(std::shared_ptr<AstStruct> str, int tk) {
     std::string valName = lex->value;
     
     if (tk != t_id) {
@@ -97,13 +97,13 @@ bool Parser::buildStructDec(std::shared_ptr<AstBlock> block) {
     block->addStatement(dec);
     
     // Final syntax check
-    token tk = lex->get_next();
+    int tk = lex->get_next();
     if (tk == t_semicolon) {
         return true;
     } else if (tk == t_assign) {
         dec->no_init = true;
         std::shared_ptr<AstExprStatement> empty = std::make_shared<AstExprStatement>();
-        std::shared_ptr<AstExpression> arg = buildExpression(block, AstBuilder::buildStructType(structName));
+        std::shared_ptr<AstExpression> arg = buildExpression(block, AstBuilder::buildStructType(structName), t_semicolon);
         if (!arg) return false;
         
         std::shared_ptr<AstID> id = std::make_shared<AstID>(name);

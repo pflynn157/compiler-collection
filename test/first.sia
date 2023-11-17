@@ -1,5 +1,9 @@
 
 func main() of int is
+    scalar x : int := 20.
+    scalar y : int := x.
+    print 44, 33.
+    print "Hello!".
     return 0.
 end
 

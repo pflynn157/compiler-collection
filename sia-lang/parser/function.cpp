@@ -71,7 +71,7 @@ void Parser::parse_function() {
 //
 void Parser::parse_return(std::shared_ptr<AstBlock> block) {
     auto ret = std::make_shared<AstReturnStmt>();
-    ret->expression = parse_expression(block);
+    ret->expression = buildExpression(block, nullptr, t_period);
     block->addStatement(ret);
 }
 
@@ -85,7 +85,7 @@ void Parser::parse_function_call(std::shared_ptr<AstBlock> block, std::string na
     }
 
     auto fc = std::make_shared<AstFuncCallStmt>(name);
-    fc->expression = parse_expression(block, t_period, true);
+    fc->expression = buildExpression(block, nullptr, t_period, false, true);
     block->addStatement(fc);
 }
 

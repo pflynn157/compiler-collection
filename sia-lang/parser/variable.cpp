@@ -24,7 +24,7 @@ void Parser::parse_scalar(std::shared_ptr<AstBlock> block) {
     // -- Expression statement
     consume_token(t_assign, "Expected initial value in scalar assignment.");
     
-    auto rval = parse_expression(block);
+    auto rval = buildExpression(block, data_type, t_period);
     auto lval = std::make_shared<AstID>(name);
     auto assign = std::make_shared<AstAssignOp>(lval, rval);
     auto stmt = std::make_shared<AstExprStatement>();

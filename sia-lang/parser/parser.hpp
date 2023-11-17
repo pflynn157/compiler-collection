@@ -29,13 +29,16 @@ public:
     void parse_function_call(std::shared_ptr<AstBlock> block, std::string name);
     
     // expression.cpp
-    std::shared_ptr<AstExpression> parse_expression(std::shared_ptr<AstBlock> block, token stop = t_period, bool is_list = false);
+    bool is_constant(int tk) override;
+    bool is_id(int tk) override;
+    bool is_list_delim(int tk) override;
+    std::shared_ptr<AstExpression> build_constant(int tk) override;
+    bool build_identifier(std::shared_ptr<AstBlock> block, int tk, std::shared_ptr<ExprContext> ctx) override;
     
     // variable.cpp
     void parse_scalar(std::shared_ptr<AstBlock> block);
     
 private:
-    std::unique_ptr<Lex> lex;
     std::string module_name = "";
 };
 

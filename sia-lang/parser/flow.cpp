@@ -15,9 +15,10 @@ void Parser::parse_iter(std::shared_ptr<AstBlock> block) {
     consume_token(t_of, "Expected \"of\" in iter loop.");
     
     // Bound expressions
-    std::shared_ptr<AstExpression> start = parse_expression(block, t_colon);
-    std::shared_ptr<AstExpression> end = parse_expression(block, t_by);
-    std::shared_ptr<AstExpression> step = parse_expression(block, t_do);
+    auto dtype = AstBuilder::buildInt32Type();
+    std::shared_ptr<AstExpression> start = buildExpression(block, dtype, t_colon);
+    std::shared_ptr<AstExpression> end = buildExpression(block, dtype, t_by);
+    std::shared_ptr<AstExpression> step = buildExpression(block, dtype, t_do);
     
     // Build the AST node
     auto iter = std::make_shared<AstForStmt>();
@@ -25,7 +26,7 @@ void Parser::parse_iter(std::shared_ptr<AstBlock> block) {
     iter->start = start;
     iter->end = end;
     iter->step = step;
-    iter->data_type = AstBuilder::buildInt32Type();
+    iter->data_type = dtype;
     block->addStatement(iter);
     
     // Build the loop block

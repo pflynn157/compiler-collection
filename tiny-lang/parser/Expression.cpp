@@ -12,13 +12,13 @@
 #include <lex/lex.hpp>
 
 // Builds a constant expression value
-std::shared_ptr<AstExpression> Parser::buildConstExpr(Token tk) {
-    switch (tk.type) {
+std::shared_ptr<AstExpression> Parser::buildConstExpr(token tk) {
+    switch (tk) {
         case t_true: return std::make_shared<AstI32>(1);
         case t_false: return std::make_shared<AstI32>(0);
-        case t_char_literal: return std::make_shared<AstChar>(tk.i8_val);
-        case t_int_literal: return std::make_shared<AstI32>(tk.i32_val);
-        case t_string_literal: return std::make_shared<AstString>(tk.id_val);
+        case t_char_literal: return std::make_shared<AstChar>((char)lex->i_value);
+        case t_int_literal: return std::make_shared<AstI32>(lex->i_value);
+        case t_string_literal: return std::make_shared<AstString>(lex->value);
         
         default: {}
     }
@@ -26,8 +26,8 @@ std::shared_ptr<AstExpression> Parser::buildConstExpr(Token tk) {
     return nullptr;
 }
 
-bool Parser::buildOperator(Token tk, std::shared_ptr<ExprContext> ctx) {
-    switch (tk.type) {
+bool Parser::buildOperator(token tk, std::shared_ptr<ExprContext> ctx) {
+    switch (tk) {
         case t_assign:
         case t_plus: 
         case t_minus:
@@ -49,7 +49,7 @@ bool Parser::buildOperator(Token tk, std::shared_ptr<ExprContext> ctx) {
             std::shared_ptr<AstBinaryOp> op = std::make_shared<AstBinaryOp>();
             std::shared_ptr<AstUnaryOp> op1 = std::make_shared<AstUnaryOp>();
             bool useUnary = false;
-            switch (tk.type) {
+            switch (tk) {
                 case t_assign: op = std::make_shared<AstAssignOp>(); break;
                 case t_plus: op = std::make_shared<AstAddOp>(); break;
                 case t_mul: op = std::make_shared<AstMulOp>(); break;
@@ -97,35 +97,35 @@ bool Parser::buildOperator(Token tk, std::shared_ptr<ExprContext> ctx) {
     return true;        
 }
 
-bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, Token tk, std::shared_ptr<ExprContext> ctx) {
+bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, token tk, std::shared_ptr<ExprContext> ctx) {
     ctx->lastWasOp = false;
     int currentLine = 0;
 
-    std::string name = tk.id_val;
+    std::string name = lex->value;
     if (ctx->varType && ctx->varType->type == V_AstType::Void) {
         ctx->varType = block->getDataType(name);
         if (ctx->varType && ctx->varType->type == V_AstType::Ptr)
             ctx->varType = std::static_pointer_cast<AstPointerType>(ctx->varType)->base_type;
     }
     
-    tk = scanner->getNext();
-    if (tk.type == t_lbracket) {
+    tk = lex->get_next();
+    if (tk == t_lbracket) {
         std::shared_ptr<AstExpression> index = buildExpression(block, AstBuilder::buildInt32Type(), t_rbracket);
         if (index == nullptr) {
-            syntax->addError(0, "Invalid array reference.");
+            syntax->addError(lex->line_number, "Invalid array reference.");
             return false;
         }
         
         std::shared_ptr<AstArrayAccess> acc = std::make_shared<AstArrayAccess>(name);
         acc->index = index;
         ctx->output.push(acc);
-    } else if (tk.type == t_lparen) {
+    } else if (tk == t_lparen) {
         if (currentLine != 0) {
-            syntax->addWarning(0, "Function call on newline- possible logic error.");
+            syntax->addWarning(lex->line_number, "Function call on newline- possible logic error.");
         }
         
         if (!block->isFunc(name)) {
-            syntax->addError(0, "Unknown function call.");
+            syntax->addError(lex->line_number, "Unknown function call.");
             return false;
         }
     
@@ -134,16 +134,13 @@ bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, Token tk, std::shared_
         fc->args = args;
         
         ctx->output.push(fc);
-    } else if (tk.type == t_dot) {
+    } else if (tk == t_dot) {
         // TODO: Search for structures here
-
-        Token idToken = scanner->getNext();
-        if (idToken.type != t_id) {
-            syntax->addError(0, "Expected identifier.");
-            return false;
-        }
         
-        std::shared_ptr<AstStructAccess> val = std::make_shared<AstStructAccess>(name, idToken.id_val);
+        consume_token(t_id, "Expected identifier");
+        std::string id_val = lex->value;
+        
+        std::shared_ptr<AstStructAccess> val = std::make_shared<AstStructAccess>(name, id_val);
         ctx->output.push(val);
     } else {
         int constVal = block->isConstant(name);
@@ -160,19 +157,19 @@ bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, Token tk, std::shared_
                 std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
                 ctx->output.push(id);
             } else {
-                syntax->addError(0, "Unknown variable: " + name);
+                syntax->addError(lex->line_number, "Unknown variable: " + name);
                 return false;
             }
         }
         
-        scanner->rewind(tk);
+        lex->unget(tk);
     }
     return true;
 }
 
 // Our new expression builder
 std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
-                                                        TokenType stopToken, bool isConst, bool buildList) {
+                                                        token stopToken, bool isConst, bool buildList) {
     std::shared_ptr<ExprContext> ctx = std::make_shared<ExprContext>();
     if (currentType) ctx->varType = currentType;
     else ctx->varType = AstBuilder::buildVoidType();
@@ -180,9 +177,9 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
     std::shared_ptr<AstExprList> list = std::make_shared<AstExprList>();
     bool isList = buildList;
     
-    Token tk = scanner->getNext();
-    while (tk.type != t_eof && tk.type != stopToken) {
-        switch (tk.type) {
+    token tk = lex->get_next();
+    while (tk != t_eof && tk != stopToken) {
+        switch (tk) {
             case t_true:
             case t_false:
             case t_char_literal:
@@ -241,7 +238,7 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
             } break;
             
             default: {
-                syntax->addError(0, "Invalid Token in expression.");
+                syntax->addError(lex->line_number, "Invalid Token in expression.");
                 return nullptr;
             }
         }
@@ -258,11 +255,11 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
             }
         }
         
-        tk = scanner->getNext();
+        tk = lex->get_next();
     }
     
-    if (tk.type == t_eof) {
-        syntax->addError(0, "Invalid expression-> missing \';\'.");
+    if (tk == t_eof) {
+        syntax->addError(lex->line_number, "Invalid expression-> missing \';\'.");
         return nullptr;
     }
     

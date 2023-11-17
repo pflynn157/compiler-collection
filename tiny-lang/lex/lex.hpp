@@ -1,16 +1,13 @@
-//
-// This software is licensed under BSD0 (public domain).
-// Therefore, this software belongs to humanity.
-// See COPYING for more info.
-//
 #pragma once
 
-#include <fstream>
 #include <string>
+#include <fstream>
 #include <stack>
 
-// Represents a token
-enum TokenType {
+//
+// Represents token data
+//
+enum token {
     t_eof,
     t_none,
     
@@ -49,50 +46,27 @@ enum TokenType {
     t_float_literal,
 };
 
-struct Token {
-    TokenType type;
-    std::string id_val;
-    char i8_val;
-    int i32_val;
-    double float_val = 0;
+//
+// The lexical analyzer
+//
+struct Lex {
+    explicit Lex(std::string input);
+    void unget(token t);
+    token get_next();
+    void debug_token(token t);
     
-    Token();
-    void print();
-};
-
-// The main lexical analysis class
-class Scanner {
-public:
-    explicit Scanner(std::string input);
-    ~Scanner();
-    
-    void rewind(Token token);
-    Token getNext();
-    
-    std::string getRawBuffer();
-    int getLine() { return currentLine; }
-    
-    bool isEof() { return reader.eof(); }
-    bool isError() { return error; }
+    std::string value = "";
+    int i_value = 0;
+    int line_number = 0;
 private:
     std::ifstream reader;
-    bool error = false;
-    std::stack<Token> token_stack;
-    
-    // Control variables for the scanner
-    std::string rawBuffer = "";
     std::string buffer = "";
-    bool inQuote = false;
-    int currentLine = 1;
-    bool skipNextLineCount = false;
+    std::stack<token> token_stack;
     
-    // Functions
-    bool isSymbol(char c);
-    TokenType getKeyword();
-    TokenType getSymbol(char c);
-    bool isInt();
-    bool isHex();
-    bool isFloat();
+    // Internal functions
+    bool is_symbol(char c);
+    token get_symbol(char c);
+    bool is_integer();
+    bool is_hex();
 };
-
 

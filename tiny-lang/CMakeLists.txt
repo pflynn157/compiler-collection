@@ -13,7 +13,6 @@ set(SRC
     parser/Variable.cpp
     
     lex/lex.cpp
-    lex/lex_debug.cpp
     
     midend/midend.cpp
 )

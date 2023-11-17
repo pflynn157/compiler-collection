@@ -94,13 +94,7 @@ bool Parser::buildWhile(std::shared_ptr<AstBlock> block) {
 bool Parser::buildLoopCtrl(std::shared_ptr<AstBlock> block, bool isBreak) {
     if (isBreak) block->addStatement(std::make_shared<AstBreak>());
     else block->addStatement(std::make_shared<AstContinue>());
-    
-    Token tk = scanner->getNext();
-    if (tk.type != t_semicolon) {
-        syntax->addError(0, "Expected \';\' after break or continue.");
-        return false;
-    }
-    
+    consume_token(t_semicolon, "Expected \';\' after break or continue.");
     return true;
 }
 

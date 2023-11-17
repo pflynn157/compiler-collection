@@ -31,13 +31,13 @@ public:
 protected:
     // Function.cpp
     bool getFunctionArgs(std::shared_ptr<AstBlock> block, std::vector<Var> &args);
-    bool buildFunction(Token startToken, std::string className = "");
-    bool buildFunctionCallStmt(std::shared_ptr<AstBlock> block, Token idToken);
+    bool buildFunction(token startToken, std::string className = "");
+    bool buildFunctionCallStmt(std::shared_ptr<AstBlock> block, std::string fc_name);
     bool buildReturn(std::shared_ptr<AstBlock> block);
     
     // Variable.cpp
     bool buildVariableDec(std::shared_ptr<AstBlock> block);
-    bool buildVariableAssign(std::shared_ptr<AstBlock> block, Token idToken);
+    bool buildVariableAssign(std::shared_ptr<AstBlock> block, std::string var_name);
     bool buildConst(std::shared_ptr<AstBlock> block, bool isGlobal);
     
     // Flow.cpp
@@ -47,23 +47,24 @@ protected:
     
     // Structure.cpp
     bool buildStruct();
-    bool buildStructMember(std::shared_ptr<AstStruct> str, Token tk);
+    bool buildStructMember(std::shared_ptr<AstStruct> str, token tk);
     bool buildStructDec(std::shared_ptr<AstBlock> block);
     
     // Expression.cpp
-    std::shared_ptr<AstExpression> buildConstExpr(Token tk);
-    bool buildOperator(Token tk, std::shared_ptr<ExprContext> ctx);
-    bool buildIDExpr(std::shared_ptr<AstBlock> block, Token tk, std::shared_ptr<ExprContext> ctx);
+    std::shared_ptr<AstExpression> buildConstExpr(token tk);
+    bool buildOperator(token tk, std::shared_ptr<ExprContext> ctx);
+    bool buildIDExpr(std::shared_ptr<AstBlock> block, token tk, std::shared_ptr<ExprContext> ctx);
     std::shared_ptr<AstExpression> buildExpression(
                         std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
-                        TokenType stopToken = t_semicolon,
+                        token stopToken = t_semicolon,
                         bool isConst = false, bool buildList = false);
     
     // Parser.cpp
     bool buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent = nullptr);
     std::shared_ptr<AstExpression> checkCondExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstExpression> toCheck);
     std::shared_ptr<AstDataType> buildDataType(bool checkBrackets = true);
+    void consume_token(token expected, std::string msg);
 private:
-    std::unique_ptr<Scanner> scanner;
+    std::unique_ptr<Lex> lex;
 };
 

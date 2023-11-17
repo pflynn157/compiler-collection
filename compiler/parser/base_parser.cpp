@@ -3,6 +3,8 @@
 // Therefore, this software belongs to humanity.
 // See COPYING for more info.
 //
+#include <ast/ast_builder.hpp>
+
 #include "base_parser.hpp"
 
 //
@@ -112,5 +114,26 @@ bool BaseParser::applyAssoc(std::shared_ptr<ExprContext> ctx) {
     }
     
     return true;
+}
+
+//
+// Runs post-processing on operators after they are built
+//
+void BaseParser::post_process_operator(std::shared_ptr<ExprContext> ctx,
+                                       std::shared_ptr<AstBinaryOp> op, std::shared_ptr<AstUnaryOp> op1,
+                                       bool is_unary) {
+    if (ctx->opStack.size() > 0 && is_unary == false) {
+        std::shared_ptr<AstOp> top = ctx->opStack.top();
+            if (top->is_binary) {
+            std::shared_ptr<AstBinaryOp> op2 = std::static_pointer_cast<AstBinaryOp>(top);
+            if (op->precedence > op2->precedence) {
+                if (!applyHigherPred(ctx)) return;
+            }
+        }
+    }
+    
+    if (is_unary) ctx->opStack.push(op1);
+    else ctx->opStack.push(op);
+    ctx->lastWasOp = true;
 }
 

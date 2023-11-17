@@ -16,8 +16,8 @@ Lex::Lex(std::string input) {
 //
 // Ungets the token from the stream
 //
-void Lex::unget(token t) {
-    token_stack.push(t);
+void Lex::unget(int t) {
+    token_stack.push((token)t);
 }
 
 //

@@ -51,7 +51,7 @@ enum token {
 //
 struct Lex {
     explicit Lex(std::string input);
-    void unget(token t);
+    void unget(int t);
     token get_next();
     void debug_token(token t);
     

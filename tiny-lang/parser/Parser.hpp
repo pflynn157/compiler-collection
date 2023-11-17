@@ -52,23 +52,22 @@ protected:
     
     // Expression.cpp
     // Override
-    bool is_constant(token tk);
-    bool is_id(token tk);
-    bool is_operator(token tk);
-    bool is_sub_expr_start(token tk);
-    bool is_sub_expr_end(token tk);
-    bool is_list_delim(token tk);
+    bool is_constant(int tk) override;
+    bool is_id(int tk) override;
+    bool is_operator(int tk) override;
+    bool is_sub_expr_start(int tk) override;
+    bool is_sub_expr_end(int tk) override;
+    bool is_list_delim(int tk) override;
+    bool build_operator(int tk, std::shared_ptr<ExprContext> ctx) override;
     
     // TODO: Move to library
-    void post_process_operator(std::shared_ptr<ExprContext> ctx, std::shared_ptr<AstBinaryOp> op, std::shared_ptr<AstUnaryOp> op1, bool is_unary);
     std::shared_ptr<AstExpression> buildExpression(
                         std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
                         token stopToken = t_semicolon,
                         bool isConst = false, bool buildList = false);
     
-    std::shared_ptr<AstExpression> buildConstExpr(token tk);
-    bool buildOperator(token tk, std::shared_ptr<ExprContext> ctx);
-    bool buildIDExpr(std::shared_ptr<AstBlock> block, token tk, std::shared_ptr<ExprContext> ctx);
+    std::shared_ptr<AstExpression> build_constant(int tk) override;
+    bool build_identifier(std::shared_ptr<AstBlock> block, int tk, std::shared_ptr<ExprContext> ctx) override;
     
     // Parser.cpp
     bool buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent = nullptr);

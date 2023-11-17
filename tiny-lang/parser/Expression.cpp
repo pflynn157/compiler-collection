@@ -12,7 +12,7 @@
 #include <lex/lex.hpp>
 
 // Builds a constant expression value
-std::shared_ptr<AstExpression> Parser::buildConstExpr(token tk) {
+std::shared_ptr<AstExpression> Parser::build_constant(int tk) {
     switch (tk) {
         case t_true: return std::make_shared<AstI32>(1);
         case t_false: return std::make_shared<AstI32>(0);
@@ -26,23 +26,7 @@ std::shared_ptr<AstExpression> Parser::buildConstExpr(token tk) {
     return nullptr;
 }
 
-void Parser::post_process_operator(std::shared_ptr<ExprContext> ctx, std::shared_ptr<AstBinaryOp> op, std::shared_ptr<AstUnaryOp> op1, bool is_unary) {
-    if (ctx->opStack.size() > 0 && is_unary == false) {
-        std::shared_ptr<AstOp> top = ctx->opStack.top();
-            if (top->is_binary) {
-            std::shared_ptr<AstBinaryOp> op2 = std::static_pointer_cast<AstBinaryOp>(top);
-            if (op->precedence > op2->precedence) {
-                if (!applyHigherPred(ctx)) return;
-            }
-        }
-    }
-    
-    if (is_unary) ctx->opStack.push(op1);
-    else ctx->opStack.push(op);
-    ctx->lastWasOp = true;
-}
-
-bool Parser::buildOperator(token tk, std::shared_ptr<ExprContext> ctx) {
+bool Parser::build_operator(int tk, std::shared_ptr<ExprContext> ctx) {
     switch (tk) {
         case t_assign:
         case t_plus: 
@@ -101,7 +85,7 @@ bool Parser::buildOperator(token tk, std::shared_ptr<ExprContext> ctx) {
     return true;        
 }
 
-bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, token tk, std::shared_ptr<ExprContext> ctx) {
+bool Parser::build_identifier(std::shared_ptr<AstBlock> block, int tk, std::shared_ptr<ExprContext> ctx) {
     ctx->lastWasOp = false;
     int currentLine = 0;
 
@@ -173,7 +157,7 @@ bool Parser::buildIDExpr(std::shared_ptr<AstBlock> block, token tk, std::shared_
 
 // Potential helper function
 // TODO: Overload all of the "is" functions
-bool Parser::is_constant(token tk) {
+bool Parser::is_constant(int tk) {
     switch (tk) {
         case t_true:
         case t_false:
@@ -186,12 +170,12 @@ bool Parser::is_constant(token tk) {
     return false;
 }
 
-bool Parser::is_id(token tk) {
+bool Parser::is_id(int tk) {
     if (tk == t_id) return true;
     return false;
 }
 
-bool Parser::is_operator(token tk) {
+bool Parser::is_operator(int tk) {
     switch (tk) {
         case t_assign:
         case t_plus: 
@@ -216,17 +200,17 @@ bool Parser::is_operator(token tk) {
     return false;
 }
 
-bool Parser::is_sub_expr_start(token tk) {
+bool Parser::is_sub_expr_start(int tk) {
     if (tk == t_lparen) return true;
     return false;
 }
 
-bool Parser::is_sub_expr_end(token tk) {
+bool Parser::is_sub_expr_end(int tk) {
     if (tk == t_rparen) return true;
     return false;
 }
 
-bool Parser::is_list_delim(token tk) {
+bool Parser::is_list_delim(int tk) {
     if (tk == t_comma) return true;
     return false;
 }
@@ -246,12 +230,12 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
     while (tk != t_eof && tk != stopToken) {
         if  (is_constant(tk)) {
             ctx->lastWasOp = false;
-            std::shared_ptr<AstExpression> expr = buildConstExpr(tk);
+            std::shared_ptr<AstExpression> expr = build_constant(tk);
             ctx->output.push(expr);
         } else if (is_id(tk)) {
-            if (!buildIDExpr(block, tk, ctx)) return nullptr;
+            if (!build_identifier(block, tk, ctx)) return nullptr;
         } else if (is_operator(tk)) {
-            if (!buildOperator(tk, ctx)) {
+            if (!build_operator(tk, ctx)) {
                 return nullptr;
             }
         } else if (is_sub_expr_start(tk)) {

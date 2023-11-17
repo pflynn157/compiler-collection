@@ -12,7 +12,7 @@
 
 void test_lex(std::string input) {
     std::unique_ptr<Lex> lex = std::make_unique<Lex>(input);
-    token t = lex->get_next();
+    int t = lex->get_next();
     while (t != t_eof) {
         lex->debug_token(t);
         t = lex->get_next();
@@ -57,7 +57,7 @@ void link(CFlags cflags) {
 #endif
 
 int main(int argc, char **argv) {
-    std::string input = "../first.sia";
+    std::string input = "../test/first.sia";
     std::string name = std::filesystem::path(input).stem();
     
     std::function<void(std::string)> f_test_lex = test_lex;

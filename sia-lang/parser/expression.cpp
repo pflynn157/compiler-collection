@@ -10,7 +10,7 @@ std::shared_ptr<AstExpression> Parser::parse_expression(std::shared_ptr<AstBlock
     auto ctx = std::make_shared<ExprContext>();
     std::vector<std::shared_ptr<AstExpression>> list;
     
-    token t = lex->get_next();
+    int t = lex->get_next();
     while (t != t_eof && t != stop) {
         switch (t) {
             // Integer literals

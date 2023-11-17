@@ -5,7 +5,7 @@
 //
 void Parser::parse_arguments(std::vector<Var> &args) {
     consume_token(t_lparen, "Expected \'(\' after function name.");
-    token t = lex->get_next();
+    int t = lex->get_next();
     while (t != t_rparen) {
         // Parse
         if (t != t_id) {

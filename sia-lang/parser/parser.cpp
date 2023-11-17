@@ -49,7 +49,7 @@ Parser::Parser(std::string input) : BaseParser(input) {
 // The main parse loop
 //
 bool Parser::parse() {
-    token t = lex->get_next();
+    int t = lex->get_next();
     while (t != t_eof) {
         switch (t) {
             // Modules- for the name space
@@ -88,7 +88,7 @@ bool Parser::parse() {
 // The loop to parse any block of statements
 //
 void Parser::parse_block(std::shared_ptr<AstBlock> block) {
-    token t = lex->get_next();
+    int t = lex->get_next();
     while (t != t_eof && t != t_end) {
         switch (t) {
             // Statements in separate functions
@@ -99,7 +99,7 @@ void Parser::parse_block(std::shared_ptr<AstBlock> block) {
             // Statements beginning with an identifier
             case t_id: {
                 std::string name = lex->value;
-                token next = lex->get_next();
+                int next = lex->get_next();
                 lex->unget(next);
                 
                 // TODO: Check assign
@@ -155,7 +155,7 @@ void Parser::parse_block(std::shared_ptr<AstBlock> block) {
 // A helper function for getting and verifying a token
 //
 void Parser::consume_token(token t, std::string message) {
-    token next = lex->get_next();
+    int next = lex->get_next();
     if (t != next) {
         syntax->addError(lex->line_number, message);
     }
@@ -178,7 +178,7 @@ std::string Parser::generate_name(std::string base) {
 // A helper function for parsing data types
 //
 std::shared_ptr<AstDataType> Parser::get_data_type() {
-    token t = lex->get_next();
+    int t = lex->get_next();
     switch (t) {
         case t_void: return AstBuilder::buildVoidType();
         case t_int: return AstBuilder::buildInt32Type();

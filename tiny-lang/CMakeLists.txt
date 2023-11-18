@@ -31,7 +31,7 @@ add_executable(tlc main.cpp)
 target_link_libraries(tlc tlcparser compiler)
 
 add_executable(tlci main_intr.cpp)
-target_link_libraries(tlci tlcparser compiler_base)
+target_link_libraries(tlci tlcparser compiler_base compiler_intr)
 
 # Enable dev linking mode
 if (DEV_LINK_MODE)

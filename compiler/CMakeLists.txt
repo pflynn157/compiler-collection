@@ -31,9 +31,14 @@ set(JAVA_SRC
     java/JavaUtils.cpp
 )
 
+set(INTR_SRC
+    intr/interpreter.cpp
+)
+
 add_library(compiler_base STATIC ${SRC})
 add_library(compiler STATIC ${COMPILER_SRC})
 add_library(coffee-maker STATIC ${JAVA_SRC})
+add_library(compiler_intr STATIC ${INTR_SRC})
 
 llvm_map_components_to_libnames(llvm_libs support core irreader target asmparser
     X86AsmParser

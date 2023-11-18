@@ -11,6 +11,7 @@
 
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
+#include <intr/interpreter.hpp>
 
 int main(int argc, char **argv) {
     if (argc == 1) {
@@ -48,8 +49,9 @@ int main(int argc, char **argv) {
         return 0;
     }
     
-    std::cout << "RUN" << std::endl;
+    auto intr = std::make_unique<AstInterpreter>(tree);
+    int code = intr->run();
 
-    return 0;
+    return code;
 }
 

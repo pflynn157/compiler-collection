@@ -14,7 +14,6 @@ set(SRC
     lex/lex.cpp
     
     midend/midend.cpp
-    midend/parallel_midend.cpp
     
     parser/expression.cpp
     parser/flow.cpp

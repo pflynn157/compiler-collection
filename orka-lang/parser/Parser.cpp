@@ -94,6 +94,45 @@ Parser::Parser(std::string input) : BaseParser(input) {
     int64ArrayStruct->addItem(Var(AstBuilder::buildPointerType(AstBuilder::buildInt64Type()), "ptr"), nullptr);
     int64ArrayStruct->addItem(Var(AstBuilder::buildInt32Type(), "size"), std::make_shared<AstInt>(0));
     tree->addStruct(int64ArrayStruct);
+    
+    //
+    // OpenMP functions
+    //
+    // Add built-in functions
+    auto fc1 = std::make_shared<AstExternFunction>("printf");
+    fc1->data_type = AstBuilder::buildVoidType();
+    fc1->varargs = true;
+    fc1->addArgument(Var(AstBuilder::buildStringType(), "fmt"));
+    tree->block->addStatement(fc1);
+    tree->block->funcs.push_back("printf");
+    
+    // void __kmpc_fork_call(int *global_id, int *bound_id, int *func)
+    tree->block->funcs.push_back("__kmpc_fork_call");
+    auto omp_fc1 = std::make_shared<AstExternFunction>("__kmpc_fork_call");
+    omp_fc1->addArgument(Var(AstBuilder::buildInt32PointerType(), "global_id"));
+    omp_fc1->addArgument(Var(AstBuilder::buildInt32PointerType(), "bound_id"));
+    omp_fc1->varargs = true;
+    omp_fc1->data_type = AstBuilder::buildVoidType();
+    tree->addGlobalStatement(omp_fc1);
+    
+    // void __kmpc_for_static_init_4(0, *global_id, 34, &last, &lower, &upper, &stride, 1, 1);
+    tree->block->funcs.push_back("__kmpc_for_static_init_4");
+    auto omp_fc2 = std::make_shared<AstExternFunction>("__kmpc_for_static_init_4");
+    omp_fc2->addArgument(Var(AstBuilder::buildInt32PointerType(), "global_id"));
+    omp_fc2->addArgument(Var(AstBuilder::buildInt32PointerType(), "bound_id"));
+    omp_fc2->addArgument(Var(AstBuilder::buildInt32Type(), "schedule"));
+    omp_fc2->varargs = true;
+    omp_fc2->data_type = AstBuilder::buildVoidType();
+    tree->addGlobalStatement(omp_fc2);
+    
+    // void __kmpc_for_static_fini(0, *global_id);
+    tree->block->funcs.push_back("__kmpc_for_static_fini");
+    auto omp_fc3 = std::make_shared<AstExternFunction>("__kmpc_for_static_fini");
+    omp_fc3->addArgument(Var(AstBuilder::buildInt32PointerType(), "global_id"));
+    omp_fc3->addArgument(Var(AstBuilder::buildInt32PointerType(), "bound_id"));
+    omp_fc3->varargs = true;
+    omp_fc3->data_type = AstBuilder::buildVoidType();
+    tree->addGlobalStatement(omp_fc3);
 }
 
 Parser::~Parser() {

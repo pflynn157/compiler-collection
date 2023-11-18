@@ -12,6 +12,7 @@
 #include <parser/Parser.hpp>
 #include <ast/ast.hpp>
 #include <midend/midend.hpp>
+#include <midend/parallel_midend.hpp>
 
 #include <llvm/Compiler.hpp>
 
@@ -34,9 +35,17 @@ std::shared_ptr<AstTree> getAstTree(std::string input, bool testLex, bool printA
     
     tree = frontend->getTree();
     
-    std::unique_ptr<Midend> midend = std::make_unique<Midend>(tree);
-    midend->run();
-    tree = midend->tree;
+    // Run the general midend
+    auto midend2 = std::make_unique<Midend>(tree);
+    midend2->run();
+    tree = midend2->tree;
+    
+    // Run the parallel processing midend
+    auto midend1 = std::make_unique<ParallelMidend>(tree);
+    midend1->run();
+    tree = midend1->tree;
+     
+    
     
     if (printAst) {
         tree->print();
@@ -68,9 +77,14 @@ void assemble(CFlags cflags) {
 
 void link(CFlags cflags) {
     std::string cmd = "ld ";
+    cmd += "/usr/lib/x86_64-linux-gnu/crt1.o ";
+    cmd += "/usr/lib/x86_64-linux-gnu/crti.o ";
+    cmd += "/usr/lib/x86_64-linux-gnu/crtn.o ";
     cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
-    cmd += " -L" + std::string(LINK_STDLIB_LOCATION) + " -lstdlib ";
-    cmd += " -L" + std::string(LINK_CORELIB_LOCATION) + " -lcorelib ";
+    //cmd += " -L" + std::string(LINK_STDLIB_LOCATION) + " -lstdlib ";
+    //cmd += " -L" + std::string(LINK_CORELIB_LOCATION) + " -lcorelib ";
+    cmd += " -dynamic-linker /lib64/ld-linux-x86-64.so.2 ";
+    cmd += "-lc -lomp5";
     //cmd += " -L" + std::string(LINK_STDLIB_LOCATION) + " -lstdlib ";
     system(cmd.c_str());
     //printf("LINK: %s\n", cmd.c_str());

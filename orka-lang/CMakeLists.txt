@@ -23,6 +23,7 @@ set(SRC
     lex/lex.cpp
     
     midend/midend.cpp
+    midend/parallel_midend.cpp
 )
 
 # Build the LLVM-based compiler

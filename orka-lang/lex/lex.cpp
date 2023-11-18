@@ -202,6 +202,7 @@ bool Lex::is_symbol(char c) {
 		case '<': return true;
 		case '=': return true;
 		case '!': return true;
+		case '@': return true;
         
         default: return false;
     }
@@ -286,6 +287,7 @@ token Lex::get_symbol(char c) {
 				reader.unget();
 			}
 		} break;
+		case '@': return t_annot;
         default: return t_none;
     }
     return t_none;
@@ -400,6 +402,7 @@ void Lex::debug_token(int t) {
 		case t_arrow: std::cout << "->" << std::endl; break;
 		case t_range: std::cout << ".." << std::endl; break;
 		case t_scope: std::cout << "::" << std::endl; break;
+		case t_annot: std::cout << "@" << std::endl; break;
         
         case t_id: std::cout << "ID(" << value << ")" << std::endl; break;
         case t_string_literal: std::cout << "STR(" << value << ")" << std::endl; break;

@@ -76,6 +76,7 @@ protected:
     std::shared_ptr<AstExpression> checkCondExpression(std::shared_ptr<AstBlock> block, std::shared_ptr<AstExpression> toCheck);
     std::shared_ptr<AstDataType> buildDataType(bool checkBrackets = true);
     std::string getArrayType(std::shared_ptr<AstDataType> dataType);
+    void consume_token(token t, std::string message);
 private:
     std::map<std::string, AstEnum> enums;
     

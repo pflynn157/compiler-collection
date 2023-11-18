@@ -83,6 +83,7 @@ enum token {
 	t_arrow,
 	t_range,
 	t_scope,
+	t_annot,
     
     t_id,
     t_int_literal,

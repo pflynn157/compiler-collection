@@ -235,6 +235,38 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
             case t_break: code = buildLoopCtrl(block, true); break;
             case t_continue: code = buildLoopCtrl(block, false); break;
             
+            // Annotated sub-block
+            // TODO: Put in function
+            case t_annot: {
+                consume_token(t_id, "Expected block name.");
+                auto name = lex->value;
+                
+                auto annot_block = std::make_shared<AstBlockStmt>(name);
+                block->addStatement(annot_block);
+                
+                int t = lex->get_next();
+                while (t != t_eof && t != t_is) {
+                    if (t != t_id) {
+                        syntax->addError(lex->line_number, "Expected name.");
+                        return false;
+                    }
+                    
+                    annot_block->clauses.push_back(lex->value);
+                    t = lex->get_next();
+                }
+                
+                if (t == t_eof) {
+                    syntax->addError(lex->line_number, "Unexpected EOF in annotated block.");
+                    return false;
+                } else if (t != t_is) {
+                    syntax->addError(lex->line_number, "Expected \"is\" in annotated block.");
+                    return false;
+                }
+                
+                annot_block->block->mergeSymbols(block);
+                buildBlock(annot_block->block);
+            } break;
+            
             default: {
                 syntax->addError(lex->line_number, "Invalid token in block.");
                 return false;
@@ -332,5 +364,15 @@ std::string Parser::getArrayType(std::shared_ptr<AstDataType> dataType) {
     }
     
     return "__int32_array";
+}
+
+//
+// A helper function for getting and verifying a token
+//
+void Parser::consume_token(token t, std::string message) {
+    int next = lex->get_next();
+    if (t != next) {
+        syntax->addError(lex->line_number, message);
+    }
 }
 

@@ -73,5 +73,6 @@ symbols = [
     ("t_arrow", "->"),
     ("t_range", ".."),
     ("t_scope", "::"),
+    ("t_annot", "@"),
 ]
 

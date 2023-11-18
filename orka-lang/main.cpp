@@ -82,9 +82,10 @@ void link(CFlags cflags) {
     cmd += "/usr/lib/x86_64-linux-gnu/crtn.o ";
     cmd += "/tmp/" + cflags.name + ".o -o " + cflags.name;
     //cmd += " -L" + std::string(LINK_STDLIB_LOCATION) + " -lstdlib ";
-    //cmd += " -L" + std::string(LINK_CORELIB_LOCATION) + " -lcorelib ";
+    cmd += " -L" + std::string(LINK_CORELIB_LOCATION) + " -lcorelib ";
     cmd += " -dynamic-linker /lib64/ld-linux-x86-64.so.2 ";
     cmd += "-lc -lomp5";
+    //cmd += "-lomp5 ";
     //cmd += " -L" + std::string(LINK_STDLIB_LOCATION) + " -lstdlib ";
     system(cmd.c_str());
     //printf("LINK: %s\n", cmd.c_str());

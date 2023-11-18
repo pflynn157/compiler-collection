@@ -1,15 +1,18 @@
 #include <stdint.h>
-
-extern void syscall_str4(int code, int fd, const char *buf, int size);
-
-extern int strlen(const char *line);
+#include <string.h>
+#include <stdio.h>
 
 void println(const char *line)
 {
-    int size = strlen(line);
-    
-    syscall_str4(1, 1, line, size);
-    syscall_str4(1, 1, "\n", 1);
+    puts(line);
+}
+
+void printDouble(double n) {
+    printf("%.2lf\n", n);
+}
+
+void printFloat(float n) {
+    printf("%.2f\n", n);
 }
 
 // TODO: Move this elsewhere
@@ -21,6 +24,6 @@ typedef struct
 
 void printCharArray(CharArray *array)
 {
-    syscall_str4(1, 1, array->array, array->size);
+    //syscall_str4(1, 1, array->array, array->size);
 }
 

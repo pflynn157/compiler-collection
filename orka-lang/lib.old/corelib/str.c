@@ -1,6 +1,17 @@
 #include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
+
+uint8_t *malloc(int64_t size);
+
+int strlen(const char *line)
+{
+    int index = 0;
+    char c = line[index];
+    while (c) {
+        ++index;
+        c = line[index];
+    }
+    return index;
+}
 
 int stringcmp(const char *str1, const char *str2)
 {

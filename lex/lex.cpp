@@ -36,11 +36,14 @@ int Lex::get_next() {
     
     while (!reader.eof()) {
         char c = reader.get();
+        if (!reader.eof()) raw_buffer += c;
         
         if (c == '#') {
             c = reader.get();
+            raw_buffer += c;
             while (c != '\n' && !reader.eof()) {
                 c = reader.get();
+                raw_buffer += c;
             }
             ++line_number;
         }
@@ -49,9 +52,11 @@ int Lex::get_next() {
             value = "";
             
             c = reader.get();
+            raw_buffer += c;
             while (c != '\"' && !reader.eof()) {
                 value += c;
-                c = reader.get();     
+                c = reader.get();
+                raw_buffer += c;    
             }
             
             return t_string_literal;
@@ -59,10 +64,13 @@ int Lex::get_next() {
         
         if (c == '\'') {
             c = reader.get();
+            raw_buffer += c;
             if (c == '\\') {
                 c = reader.get();
+                raw_buffer += c;
                 if (c == 'n') {
                     c = '\n';
+                    raw_buffer += c;
                 }
             }
             
@@ -99,6 +107,10 @@ int Lex::get_next() {
                 t = t_int_literal;
                 value = buffer;
                 i_value = std::stoi(buffer, 0, 16);
+            } else if (is_float()) {
+                t = t_float_literal;
+                value = buffer;
+                f_value = std::stod(buffer);
             } else {
                 t = t_id;
                 value = buffer;
@@ -112,6 +124,12 @@ int Lex::get_next() {
     }
     
     return t_eof;
+}
+
+std::string Lex::get_raw_buffer() {
+    std::string ret = raw_buffer;
+    raw_buffer = "";
+    return ret;
 }
 
 bool Lex::is_symbol(char c) {
@@ -145,6 +163,20 @@ bool Lex::is_hex() {
     for (int i = 2; i<buffer.length(); i++) {
         if (!isxdigit(buffer[i])) return false;
     }
+    return true;
+}
+
+bool Lex::is_float() {
+    bool foundDot = false;
+    for (char c : buffer) {
+        if (c == '.') {
+            if (foundDot) return false;
+            foundDot = true;
+        } else if (!isdigit(c)) {
+            return false;
+        }
+    }
+    if (!foundDot) return false;
     return true;
 }
 

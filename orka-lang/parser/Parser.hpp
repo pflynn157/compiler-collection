@@ -31,13 +31,13 @@ public:
 protected:
     // Function.cpp
     bool getFunctionArgs(std::shared_ptr<AstBlock> block, std::vector<Var> &args);
-    bool buildFunction(Token startToken, std::string className = "");
-    bool buildFunctionCallStmt(std::shared_ptr<AstBlock> block, Token idToken);
+    bool buildFunction(int startToken, std::string className = "");
+    bool buildFunctionCallStmt(std::shared_ptr<AstBlock> block, std::string value);
     bool buildReturn(std::shared_ptr<AstBlock> block);
     
     // Variable.cpp
     bool buildVariableDec(std::shared_ptr<AstBlock> block);
-    bool buildVariableAssign(std::shared_ptr<AstBlock> block, Token idToken);
+    bool buildVariableAssign(std::shared_ptr<AstBlock> block, std::string value);
     bool buildConst(std::shared_ptr<AstBlock> block, bool isGlobal);
     
     // Flow.cpp
@@ -51,19 +51,23 @@ protected:
     // Structure.cpp
     bool buildEnum();
     bool buildStruct();
-    bool buildStructMember(std::shared_ptr<AstStruct> str, Token tk);
+    bool buildStructMember(std::shared_ptr<AstStruct> str, int tk);
     bool buildStructDec(std::shared_ptr<AstBlock> block);
     bool buildClass();
     bool buildClassDec(std::shared_ptr<AstBlock> block);
     
     // Expression.cpp
-    std::shared_ptr<AstExpression> buildConstExpr(Token tk);
-    bool buildOperator(Token tk, std::shared_ptr<ExprContext> ctx);
-    bool buildIDExpr(std::shared_ptr<AstBlock> block, Token tk, std::shared_ptr<ExprContext> ctx);
-    std::shared_ptr<AstExpression> buildExpression(
-                        std::shared_ptr<AstBlock> block, std::shared_ptr<AstDataType> currentType,
-                        TokenType stopToken = t_semicolon,
-                        bool isConst = false, bool buildList = false);
+    bool is_constant(int tk) override;
+    bool is_id(int tk) override;
+    bool is_operator(int tk) override;
+    bool is_sub_expr_start(int tk) override;
+    bool is_sub_expr_end(int tk) override;
+    bool is_list_delim(int tk) override;
+    int get_sub_expr_end() override;
+    
+    bool build_operator(int tk, std::shared_ptr<ExprContext> ctx) override;
+    std::shared_ptr<AstExpression> build_constant(int tk) override;
+    bool build_identifier(std::shared_ptr<AstBlock> block, int tk, std::shared_ptr<ExprContext> ctx) override;
     
     // Parser.cpp
     bool buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent = nullptr);
@@ -71,7 +75,6 @@ protected:
     std::shared_ptr<AstDataType> buildDataType(bool checkBrackets = true);
     std::string getArrayType(std::shared_ptr<AstDataType> dataType);
 private:
-    std::unique_ptr<Scanner> scanner;
     std::map<std::string, AstEnum> enums;
     
     std::shared_ptr<AstClass> currentClass = nullptr;

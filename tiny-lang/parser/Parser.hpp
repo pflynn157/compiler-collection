@@ -59,10 +59,8 @@ protected:
     bool is_sub_expr_end(int tk) override;
     bool is_list_delim(int tk) override;
     int get_sub_expr_end() override;
+    
     bool build_operator(int tk, std::shared_ptr<ExprContext> ctx) override;
-    
-    // TODO: Move to library
-    
     std::shared_ptr<AstExpression> build_constant(int tk) override;
     bool build_identifier(std::shared_ptr<AstBlock> block, int tk, std::shared_ptr<ExprContext> ctx) override;
     

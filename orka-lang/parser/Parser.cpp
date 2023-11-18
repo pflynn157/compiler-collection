@@ -13,7 +13,7 @@
 #include <lex/lex.hpp>
 
 Parser::Parser(std::string input) : BaseParser(input) {
-    scanner = std::make_unique<Scanner>(input);
+    lex = std::make_unique<Lex>(input);
     
     // Add the built-in functions
     //string malloc(string)
@@ -100,12 +100,12 @@ Parser::~Parser() {
 }
 
 bool Parser::parse() {
-    Token tk;
+    int tk;
     do {
-        tk = scanner->getNext();
+        tk = lex->get_next();
         bool code = true;
         
-        switch (tk.type) {
+        switch (tk) {
             case t_extern:
             case t_func: {
                 code = buildFunction(tk);
@@ -119,14 +119,13 @@ bool Parser::parse() {
             case t_eof: break;
             
             default: {
-                syntax->addError(0, "Invalid token in global scope.");
-                tk.print();
+                syntax->addError(lex->line_number, "Invalid token in global scope.");
                 code = false;
             }
         }
         
         if (!code) break;
-    } while (tk.type != t_eof);
+    } while (tk != t_eof);
     
     // Check for errors, and print if so
     if (syntax->errorsPresent()) {
@@ -140,30 +139,30 @@ bool Parser::parse() {
 
 // Builds a statement block
 bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode> parent) {
-    Token tk = scanner->getNext();
-    while (tk.type != t_end && tk.type != t_eof) {
+    int tk = lex->get_next();
+    while (tk != t_end && tk != t_eof) {
         bool code = true;
         bool end = false;
         
-        switch (tk.type) {
+        switch (tk) {
             case t_var: code = buildVariableDec(block); break;
             case t_struct: code = buildStructDec(block); break;
             case t_class: code = buildClassDec(block); break;
             case t_const: code = buildConst(block, false); break;
             
             case t_id: {
-                Token idtoken = tk;
-                tk = scanner->getNext();
+                int idtoken = tk;
+                std::string value = lex->value;
+                tk = lex->get_next();
                 
-                if (tk.type == t_assign || tk.type == t_lbracket || tk.type == t_dot) {
-                    scanner->rewind(tk);
-                    scanner->rewind(idtoken);
-                    code = buildVariableAssign(block, idtoken);
-                } else if (tk.type == t_lparen) {
-                    code = buildFunctionCallStmt(block, idtoken);
+                if (tk == t_assign || tk == t_lbracket || tk == t_dot) {
+                    lex->unget(tk);
+                    lex->unget(idtoken);
+                    code = buildVariableAssign(block, value);
+                } else if (tk == t_lparen) {
+                    code = buildFunctionCallStmt(block, value);
                 } else {
-                    syntax->addError(0, "Invalid use of identifier.");
-                    //token.print();
+                    syntax->addError(lex->line_number, "Invalid use of identifier.");
                     return false;
                 }
             } break;
@@ -192,15 +191,14 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
             case t_continue: code = buildLoopCtrl(block, false); break;
             
             default: {
-                syntax->addError(0, "Invalid token in block.");
-                tk.print();
+                syntax->addError(lex->line_number, "Invalid token in block.");
                 return false;
             }
         }
         
         if (end) break;
         if (!code) return false;
-        tk = scanner->getNext();
+        tk = lex->get_next();
     }
     
     return true;
@@ -210,21 +208,21 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
 void Parser::debugScanner() {
     std::cout << "Debugging scanner..." << std::endl;
     
-    Token t;
+    int t;
     do {
-        t = scanner->getNext();
-        t.print();
-    } while (t.type != t_eof);
+        t = lex->get_next();
+        lex->debug_token(t);
+    } while (t != t_eof);
 }
 
 //
 // Builds a data type from the token stream
 //
 std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
-    Token tk = scanner->getNext();
+    int tk = lex->get_next();
     std::shared_ptr<AstDataType> dataType = nullptr;
     
-    switch (tk.type) {
+    switch (tk) {
         case t_bool: dataType = AstBuilder::buildBoolType(); break;
         case t_char: dataType = AstBuilder::buildCharType(); break;
         case t_i8: dataType = AstBuilder::buildInt8Type(); break;
@@ -242,14 +240,14 @@ std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
         case t_id: {
             bool isStruct = false;
             for (auto s : tree->structs) {
-                if (s->name == tk.id_val) {
+                if (s->name == lex->value) {
                     isStruct = true;
                     break;
                 }
             }
                 
             if (isStruct) {
-                dataType = AstBuilder::buildStructType(tk.id_val);
+                dataType = AstBuilder::buildStructType(lex->value);
             }
         } break;
         
@@ -257,11 +255,11 @@ std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
     }
 
     if (checkBrackets) {
-        tk = scanner->getNext();
-        if (tk.type == t_lbracket) {
-            tk = scanner->getNext();
-            if (tk.type != t_rbracket) {
-                syntax->addError(0, "Invalid pointer type.");
+        tk = lex->get_next();
+        if (tk == t_lbracket) {
+            tk = lex->get_next();
+            if (tk != t_rbracket) {
+                syntax->addError(lex->line_number, "Invalid pointer type.");
                 return nullptr;
             }
             
@@ -269,7 +267,7 @@ std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
             // TODO: Get this properly
             dataType = AstBuilder::buildStructType(getArrayType(dataType));
         } else {
-            scanner->rewind(tk);
+            lex->unget(tk);
         }
     }
     

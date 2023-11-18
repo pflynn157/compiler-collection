@@ -15,20 +15,20 @@
 
 // Parses and builds an enumeration
 bool Parser::buildEnum() {
-    Token token = scanner->getNext();
-    std::string name = token.id_val;
+    int token = lex->get_next();
+    std::string name = lex->value;
     
-    if (token.type != t_id) {
-        syntax->addError(scanner->getLine(), "Expected enum name.");
+    if (token != t_id) {
+        syntax->addError(lex->line_number, "Expected enum name.");
         return false;
     }
     
     // See if we have a type for the enum. Default is int
-    token = scanner->getNext();
+    token = lex->get_next();
     std::shared_ptr<AstDataType> dataType = AstBuilder::buildInt32Type();
     bool useDefault = false;
     
-    switch (token.type) {
+    switch (token) {
         case t_bool: dataType = AstBuilder::buildBoolType(); break;
         case t_char: dataType = AstBuilder::buildCharType(); break;
         case t_i8: dataType = AstBuilder::buildInt8Type(); break;
@@ -44,16 +44,16 @@ bool Parser::buildEnum() {
         case t_is: useDefault = true; break;
         
         default: {
-            syntax->addError(scanner->getLine(), "Unknown token in enum declaration");
+            syntax->addError(lex->line_number, "Unknown token in enum declaration");
             return false;
         }
     }
     
     // Syntax check
     if (!useDefault) {
-        token = scanner->getNext();
-        if (token.type != t_is) {
-            syntax->addError(scanner->getLine(), "Expected \"is\"");
+        token = lex->get_next();
+        if (token != t_is) {
+            syntax->addError(lex->line_number, "Expected \"is\"");
             return false;
         }
     }
@@ -62,24 +62,22 @@ bool Parser::buildEnum() {
     std::map<std::string, std::shared_ptr<AstExpression>> values;
     int index = 0;
     
-    while (token.type != t_end && token.type != t_eof) {
-        token = scanner->getNext();
-        std::string valName = token.id_val;
+    while (token != t_end && token != t_eof) {
+        token = lex->get_next();
+        std::string valName = lex->value;
         
-        if (token.type != t_id) {
-            syntax->addError(scanner->getLine(), "Expected enum value.");
-            token.print();
+        if (token != t_id) {
+            syntax->addError(lex->line_number, "Expected enum value.");
             return false;
         }
         
-        token = scanner->getNext();
+        token = lex->get_next();
         std::shared_ptr<AstExpression> value = nullptr;
         
-        if (token.type == t_assign) {
+        if (token == t_assign) {
         
-        } else if (token.type != t_comma && token.type != t_end) {
-            syntax->addError(scanner->getLine(), "Unknown token in enum.");
-            token.print();
+        } else if (token != t_comma && token != t_end) {
+            syntax->addError(lex->line_number, "Unknown token in enum.");
             return false;
         }
         
@@ -103,27 +101,27 @@ bool Parser::buildEnum() {
 
 // Parses and builds a structure
 bool Parser::buildStruct() {
-    Token tk = scanner->getNext();
-    std::string name = tk.id_val;
+    int tk = lex->get_next();
+    std::string name = lex->value;
     
-    if (tk.type != t_id) {
-        syntax->addError(0, "Expected name for struct.");
+    if (tk != t_id) {
+        syntax->addError(lex->line_number, "Expected name for struct.");
         return false;
     }
     
     // Next token should be "is"
-    tk = scanner->getNext();
-    if (tk.type != t_is) {
-        syntax->addError(0, "Expected \"is\".");
+    tk = lex->get_next();
+    if (tk != t_is) {
+        syntax->addError(lex->line_number, "Expected \"is\".");
     }
     
     // Builds the struct items
     std::shared_ptr<AstStruct> str = std::make_shared<AstStruct>(name);
-    tk = scanner->getNext();
+    tk = lex->get_next();
     
-    while (tk.type != t_end && tk.type != t_eof) {
+    while (tk != t_end && tk != t_eof) {
         if (!buildStructMember(str, tk)) return false;
-        tk = scanner->getNext();
+        tk = lex->get_next();
     }
     
     tree->addStruct(str);
@@ -131,29 +129,27 @@ bool Parser::buildStruct() {
     return true;
 }
 
-bool Parser::buildStructMember(std::shared_ptr<AstStruct> str, Token tk) {
-    std::string valName = tk.id_val;
+bool Parser::buildStructMember(std::shared_ptr<AstStruct> str, int tk) {
+    std::string valName = lex->value;
     
-    if (tk.type != t_id) {
-        syntax->addError(0, "Expected id value.");
-        //token.print();
+    if (tk != t_id) {
+        syntax->addError(lex->line_number, "Expected id value.");
         return false;
     }
         
     // Get the data type
-    tk = scanner->getNext();
-    if (tk.type != t_colon) {
-        syntax->addError(0, "Expected \':\' in structure member.");
-        //token.print();
+    tk = lex->get_next();
+    if (tk != t_colon) {
+        syntax->addError(lex->line_number, "Expected \':\' in structure member.");
         return false;
     }
     
     std::shared_ptr<AstDataType> dataType = buildDataType();
         
     // If its an array, build that. Otherwise, build the default value
-    tk = scanner->getNext();
+    tk = lex->get_next();
         
-    if (tk.type == t_assign) {
+    if (tk == t_assign) {
         std::shared_ptr<AstExpression> expr = buildExpression(nullptr, dataType, t_semicolon, true);
         if (!expr) return false;
                 
@@ -162,8 +158,7 @@ bool Parser::buildStructMember(std::shared_ptr<AstStruct> str, Token tk) {
         v.type = dataType;
         str->addItem(v, expr);
     } else {
-        syntax->addError(0, "Expected default value.");
-        //token.print();
+        syntax->addError(lex->line_number, "Expected default value.");
         return false;
     }
         
@@ -171,25 +166,25 @@ bool Parser::buildStructMember(std::shared_ptr<AstStruct> str, Token tk) {
 }
 
 bool Parser::buildStructDec(std::shared_ptr<AstBlock> block) {
-    Token tk = scanner->getNext();
-    std::string name = tk.id_val;
+    int tk = lex->get_next();
+    std::string name = lex->value;
     
-    if (tk.type != t_id) {
-        syntax->addError(0, "Expected structure name.");
+    if (tk != t_id) {
+        syntax->addError(lex->line_number, "Expected structure name.");
         return false;
     }
     
-    tk = scanner->getNext();
-    if (tk.type != t_colon) {
-        syntax->addError(0, "Expected \':\'");
+    tk = lex->get_next();
+    if (tk != t_colon) {
+        syntax->addError(lex->line_number, "Expected \':\'");
         return false;
     }
     
-    tk = scanner->getNext();
-    std::string structName = tk.id_val;
+    tk = lex->get_next();
+    std::string structName = lex->value;
     
-    if (tk.type != t_id) {
-        syntax->addError(0, "Expected structure type.");
+    if (tk != t_id) {
+        syntax->addError(lex->line_number, "Expected structure type.");
         return false;
     }
     
@@ -204,7 +199,7 @@ bool Parser::buildStructDec(std::shared_ptr<AstBlock> block) {
     }
     
     if (str == nullptr) {
-        syntax->addError(0, "Unknown structure.");
+        syntax->addError(lex->line_number, "Unknown structure.");
         return false;
     }
     
@@ -214,13 +209,13 @@ bool Parser::buildStructDec(std::shared_ptr<AstBlock> block) {
     block->addStatement(dec);
     
     // Final syntax check
-    tk = scanner->getNext();
-    if (tk.type == t_semicolon) {
+    tk = lex->get_next();
+    if (tk == t_semicolon) {
         return true;
-    } else if (tk.type == t_assign) {
+    } else if (tk == t_assign) {
         dec->no_init = true;
         std::shared_ptr<AstExprStatement> empty = std::make_shared<AstExprStatement>();
-        std::shared_ptr<AstExpression> arg = buildExpression(block, AstBuilder::buildStructType(structName));
+        std::shared_ptr<AstExpression> arg = buildExpression(block, AstBuilder::buildStructType(structName), t_semicolon);
         if (!arg) return false;
         
         std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
@@ -240,32 +235,32 @@ bool Parser::buildStructDec(std::shared_ptr<AstBlock> block) {
 // Builds a class declaration
 //
 bool Parser::buildClass() {
-    Token token = scanner->getNext();
-    std::string name = token.id_val;
+    int token = lex->get_next();
+    std::string name = lex->value;
     std::string baseClass = "";
     
-    if (token.type != t_id) {
-        syntax->addError(scanner->getLine(), "Expected class name.");
+    if (token != t_id) {
+        syntax->addError(lex->line_number, "Expected class name.");
         return false;
     }
     
-    token = scanner->getNext();
-    if (token.type == t_extends) {
-        token = scanner->getNext();
-        if (token.type != t_id) {
-            syntax->addError(scanner->getLine(), "Expected extending class name.");
+    token = lex->get_next();
+    if (token == t_extends) {
+        token = lex->get_next();
+        if (token != t_id) {
+            syntax->addError(lex->line_number, "Expected extending class name.");
             return false;
         }
         
-        baseClass = token.id_val;
+        baseClass = lex->value;
         
-        token = scanner->getNext();
-        if (token.type != t_is) {
-            syntax->addError(scanner->getLine(), "Expected \"is\".");
+        token = lex->get_next();
+        if (token != t_is) {
+            syntax->addError(lex->line_number, "Expected \"is\".");
             return false;
         }
-    } else if (token.type != t_is) {
-        syntax->addError(scanner->getLine(), "Expected \"is\" or \"extends\".");
+    } else if (token != t_is) {
+        syntax->addError(lex->line_number, "Expected \"is\" or \"extends\".");
         return false;
     }
     
@@ -286,7 +281,7 @@ bool Parser::buildClass() {
         }
         
         if (baseStruct == nullptr) {
-            syntax->addError(scanner->getLine(), "Unknown base class.");
+            syntax->addError(lex->line_number, "Unknown base class.");
             return false;
         }
         
@@ -304,7 +299,7 @@ bool Parser::buildClass() {
         }
         
         if (baseAstClass == nullptr) {
-            syntax->addError(scanner->getLine(), "Unknown base class.");
+            syntax->addError(lex->line_number, "Unknown base class.");
             return false;
         }
         
@@ -327,27 +322,26 @@ bool Parser::buildClass() {
     }
     
     do {
-        token = scanner->getNext();
+        token = lex->get_next();
         bool code = true;
         
-        switch (token.type) {
+        switch (token) {
             case t_func: code = buildFunction(token, name); break;
             case t_var: {
-                token = scanner->getNext();
+                token = lex->get_next();
                 if (!buildStructMember(clazzStruct, token)) return false;
             } break; 
             
             case t_end: break;
             
             default: {
-                syntax->addError(scanner->getLine(), "Invalid token in class.");
-                token.print();
+                syntax->addError(lex->line_number, "Invalid token in class.");
                 code = false;
             }
         }
         
         if (!code) break;
-    } while (token.type != t_end);
+    } while (token != t_end);
     
     currentClass = clazz;
     tree->addClass(clazz);
@@ -359,25 +353,25 @@ bool Parser::buildClass() {
 // A class declaration is basically a structure declaration with a function call
 //
 bool Parser::buildClassDec(std::shared_ptr<AstBlock> block) {
-    Token token = scanner->getNext();
-    std::string name = token.id_val;
+    int token = lex->get_next();
+    std::string name = lex->value;
     
-    if (token.type != t_id) {
-        syntax->addError(scanner->getLine(), "Expected class name.");
+    if (token != t_id) {
+        syntax->addError(lex->line_number, "Expected class name.");
         return false;
     }
     
-    token = scanner->getNext();
-    if (token.type != t_colon) {
-        syntax->addError(scanner->getLine(), "Expected \":\"");
+    token = lex->get_next();
+    if (token != t_colon) {
+        syntax->addError(lex->line_number, "Expected \":\"");
         return false;
     }
     
-    token = scanner->getNext();
-    std::string className = token.id_val;
+    token = lex->get_next();
+    std::string className = lex->value;
     
-    if (token.type != t_id) {
-        syntax->addError(scanner->getLine(), "Expected class name.");
+    if (token != t_id) {
+        syntax->addError(lex->line_number, "Expected class name.");
         return false;
     }
     
@@ -393,7 +387,7 @@ bool Parser::buildClassDec(std::shared_ptr<AstBlock> block) {
     }
     
     if (str == nullptr) {
-        syntax->addError(scanner->getLine(), "Unknown class.");
+        syntax->addError(lex->line_number, "Unknown class.");
         return false;
     }
     
@@ -414,9 +408,9 @@ bool Parser::buildClassDec(std::shared_ptr<AstBlock> block) {
     fc->expression = args;
     
     // Do the final syntax check
-    token = scanner->getNext();
-    if (token.type != t_semicolon) {
-        syntax->addError(scanner->getLine(), "Expected terminator.");
+    token = lex->get_next();
+    if (token != t_semicolon) {
+        syntax->addError(lex->line_number, "Expected terminator.");
         return false;
     }
     

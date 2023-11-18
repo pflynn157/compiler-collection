@@ -7,6 +7,7 @@ struct BaseLex {
     
     std::string value = "";
     int i_value = 0;
+    double f_value = 0.0;
     int line_number = 0;
 };
 

@@ -13,21 +13,21 @@
 
 // Returns the function arguments
 bool Parser::getFunctionArgs(std::shared_ptr<AstBlock> block, std::vector<Var> &args) {
-    Token tk = scanner->getNext();
-    if (tk.type == t_lparen) {
-        tk = scanner->getNext();
-        while (tk.type != t_eof && tk.type != t_rparen) {
-            Token t1 = tk;
-            std::string name = t1.id_val;
-            Token t2 = scanner->getNext();
+    int tk = lex->get_next();
+    if (tk == t_lparen) {
+        tk = lex->get_next();
+        while (tk != t_eof && tk != t_rparen) {
+            int t1 = tk;
+            std::string name = lex->value;
+            int t2 = lex->get_next();
             Var v;
             
-            if (t1.type != t_id) {
+            if (t1 != t_id) {
                 syntax->addError(0, "Invalid function argument: Expected name.");
                 return false;
             }
             
-            if (t2.type != t_colon) {
+            if (t2 != t_colon) {
                 syntax->addError(0, "Invalid function argument: Expected \':\'.");
                 return false;
             }
@@ -35,37 +35,37 @@ bool Parser::getFunctionArgs(std::shared_ptr<AstBlock> block, std::vector<Var> &
             v.type = buildDataType();
             v.name = name;
             
-            tk = scanner->getNext();
-            if (tk.type == t_comma) {
-                tk = scanner->getNext();
+            tk = lex->get_next();
+            if (tk == t_comma) {
+                tk = lex->get_next();
             }
             
             args.push_back(v);
             block->addSymbol(v.name, v.type);
         }
     } else {
-        scanner->rewind(tk);
+        lex->unget(tk);
     }
     
     return true;
 }
 
 // Builds a function
-bool Parser::buildFunction(Token startToken, std::string className) {
-    Token tk;
+bool Parser::buildFunction(int startToken, std::string className) {
+    int tk;
     bool isExtern = false;
 
     // Handle extern function
-    if (startToken.type == t_extern) {
+    if (startToken == t_extern) {
         isExtern = true;
     }
 
     // Make sure we have a function name
-    tk = scanner->getNext();
-    std::string funcName = tk.id_val;
+    tk = lex->get_next();
+    std::string funcName = lex->value;
     
-    if (tk.type != t_id) {
-        syntax->addError(0, "Expected function name.");
+    if (tk != t_id) {
+        syntax->addError(lex->line_number, "Expected function name.");
         return false;
     }
     
@@ -85,20 +85,20 @@ bool Parser::buildFunction(Token startToken, std::string className) {
 
     // Check to see if there's any return type
     //std::string retName = "";       // TODO: Do we need this?
-    tk = scanner->getNext();
+    tk = lex->get_next();
     std::shared_ptr<AstDataType> dataType;
-    if (tk.type == t_arrow) {
+    if (tk == t_arrow) {
         dataType = buildDataType();
-        tk = scanner->getNext();
+        tk = lex->get_next();
     }
     else dataType = AstBuilder::buildVoidType();
     
     // Do syntax error check
-    if (tk.type == t_semicolon && !isExtern) {
-        syntax->addError(0, "Expected \';\' for extern function.");
+    if (tk == t_semicolon && !isExtern) {
+        syntax->addError(lex->line_number, "Expected \';\' for extern function.");
         return false;
-    } else if (tk.type == t_is && isExtern) {
-        syntax->addError(0, "Expected \'is\' keyword.");
+    } else if (tk == t_is && isExtern) {
+        syntax->addError(lex->line_number, "Expected \'is\' keyword.");
         return false;
     }
 
@@ -162,14 +162,14 @@ bool Parser::buildFunction(Token startToken, std::string className) {
 }
 
 // Builds a function call
-bool Parser::buildFunctionCallStmt(std::shared_ptr<AstBlock> block, Token idToken) {
+bool Parser::buildFunctionCallStmt(std::shared_ptr<AstBlock> block, std::string value) {
     // Make sure the function exists
-    if (!block->isFunc(idToken.id_val)) {
-        syntax->addError(0, "Unknown function.");
+    if (!block->isFunc(value)) {
+        syntax->addError(lex->line_number, "Unknown function.");
         return false;
     }
 
-    std::shared_ptr<AstFuncCallStmt> fc = std::make_shared<AstFuncCallStmt>(idToken.id_val);
+    std::shared_ptr<AstFuncCallStmt> fc = std::make_shared<AstFuncCallStmt>(value);
     block->addStatement(fc);
     
     std::shared_ptr<AstExpression> args = buildExpression(block, nullptr, t_semicolon, false, true);
@@ -184,7 +184,7 @@ bool Parser::buildReturn(std::shared_ptr<AstBlock> block) {
     std::shared_ptr<AstReturnStmt> stmt = std::make_shared<AstReturnStmt>();
     block->addStatement(stmt);
     
-    std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr);
+    std::shared_ptr<AstExpression> arg = buildExpression(block, nullptr, t_semicolon);
     if (!arg) return false;
     stmt->expression = arg;
     

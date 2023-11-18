@@ -4,6 +4,14 @@ add_subdirectory(lib)
 
 include_directories(.)
 
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/lex/lex.cpp
+           ${CMAKE_CURRENT_SOURCE_DIR}/lex/lex.hpp
+    COMMAND python3 ${CMAKE_SOURCE_DIR}/lex/lex.py ${CMAKE_SOURCE_DIR}/lex
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/lex/config.py
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lex
+)
+
 set(SRC
     parser/Expression.cpp
     parser/Flow.cpp
@@ -12,10 +20,7 @@ set(SRC
     parser/Structure.cpp
     parser/Variable.cpp
     
-    preproc/Preproc.cpp
-    
     lex/lex.cpp
-    lex/lex_debug.cpp
     
     midend/midend.cpp
 )

@@ -105,6 +105,7 @@ with open(base_path + "/lex.cpp", "r") as reader:
                             writer.write("\t\t\t} else ")
                         found_first = True
                         writer.write("\t\t\tif (c2 == \'" + symbol[1] + "\') {\n")
+                        writer.write("\t\t\t\traw_buffer += c2;\n")
                         writer.write("\t\t\t\treturn " + name + ";\n")
                         
                     # Final else statement

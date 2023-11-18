@@ -110,19 +110,19 @@ bool Parser::buildFor(std::shared_ptr<AstBlock> block) {
     block->addStatement(loop);
     
     // Get the index
-    Token token = scanner->getNext();
-    if (token.type != t_id) {
-        syntax->addError(scanner->getLine(), "Expected variable name for index.");
+    int token = lex->get_next();
+    if (token != t_id) {
+        syntax->addError(lex->line_number, "Expected variable name for index.");
         return false;
     }
     
-    std::string idx_name = token.id_val;
-    loop->index = std::make_shared<AstID>(token.id_val);
+    std::string idx_name = lex->value;
+    loop->index = std::make_shared<AstID>(idx_name);
     std::shared_ptr<AstDataType> dataType = AstBuilder::buildInt32Type();
     
-    token = scanner->getNext();
-    if (token.type != t_in) {
-        syntax->addError(scanner->getLine(), "Expected \"in\".");
+    token = lex->get_next();
+    if (token != t_in) {
+        syntax->addError(lex->line_number, "Expected \"in\".");
         return false;
     }
     
@@ -150,29 +150,29 @@ bool Parser::buildForAll(std::shared_ptr<AstBlock> block) {
     block->addStatement(loop);
     
     // Get the index
-    Token token = scanner->getNext();
-    if (token.type != t_id) {
-        syntax->addError(scanner->getLine(), "Expected variable name for index.");
+    int token = lex->get_next();
+    if (token != t_id) {
+        syntax->addError(lex->line_number, "Expected variable name for index.");
         return false;
     }
     
-    std::string idx_name = token.id_val;
+    std::string idx_name = lex->value;
     loop->index = std::make_shared<AstID>(idx_name);
     
-    token = scanner->getNext();
-    if (token.type != t_in) {
-        syntax->addError(scanner->getLine(), "Expected \"in\".");
+    token = lex->get_next();
+    if (token != t_in) {
+        syntax->addError(lex->line_number, "Expected \"in\".");
         return false;
     }
     
     // Get the array we are iterating through
-    token = scanner->getNext();
-    if (token.type != t_id) {
-        syntax->addError(scanner->getLine(), "Expected array for iteration value.");
+    token = lex->get_next();
+    if (token != t_id) {
+        syntax->addError(lex->line_number, "Expected array for iteration value.");
         return false;
     }
     
-    std::string array_name = token.id_val;
+    std::string array_name = lex->value;
     loop->array = std::make_shared<AstID>(array_name);
     
     auto ptrType = std::static_pointer_cast<AstStructType>(block->symbolTable[array_name]);
@@ -185,9 +185,9 @@ bool Parser::buildForAll(std::shared_ptr<AstBlock> block) {
     loop->data_type = dataType;
     
     // Make sure we end with the "do" keyword
-    token = scanner->getNext();
-    if (token.type != t_do) {
-        syntax->addError(scanner->getLine(), "Expected \"do\".");
+    token = lex->get_next();
+    if (token != t_do) {
+        syntax->addError(lex->line_number, "Expected \"do\".");
         return false;
     }
     
@@ -205,9 +205,9 @@ bool Parser::buildLoopCtrl(std::shared_ptr<AstBlock> block, bool isBreak) {
     if (isBreak) block->addStatement(std::make_shared<AstBreak>());
     else block->addStatement(std::make_shared<AstContinue>());
     
-    Token tk = scanner->getNext();
-    if (tk.type != t_semicolon) {
-        syntax->addError(0, "Expected \';\' after break or continue.");
+    int tk = lex->get_next();
+    if (tk != t_semicolon) {
+        syntax->addError(lex->line_number, "Expected \';\' after break or continue.");
         return false;
     }
     

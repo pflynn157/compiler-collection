@@ -16,40 +16,40 @@
 // Builds a variable declaration
 // A variable declaration is composed of an Alloca and optionally, an assignment
 bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
-    Token tk = scanner->getNext();
+    int tk = lex->get_next();
     std::vector<std::string> toDeclare;
-    toDeclare.push_back(tk.id_val);
+    toDeclare.push_back(lex->value);
     
-    if (tk.type != t_id) {
-        syntax->addError(0, "Expected variable name.");
+    if (tk != t_id) {
+        syntax->addError(lex->line_number, "Expected variable name.");
         return false;
     }
     
-    tk = scanner->getNext();
+    tk = lex->get_next();
     
-    while (tk.type != t_colon) {
-        if (tk.type == t_comma) {
-            tk = scanner->getNext();
+    while (tk != t_colon) {
+        if (tk == t_comma) {
+            tk = lex->get_next();
             
-            if (tk.type != t_id) {
-                syntax->addError(0, "Expected variable name.");
+            if (tk != t_id) {
+                syntax->addError(lex->line_number, "Expected variable name.");
                 return false;
             }
             
-            toDeclare.push_back(tk.id_val);
-        } else if (tk.type != t_colon) {
-            syntax->addError(0, "Invalt_id tk in variable declaration.");
+            toDeclare.push_back(lex->value);
+        } else if (tk != t_colon) {
+            syntax->addError(lex->line_number, "Invalt_id tk in variable declaration.");
             return false;
         }
         
-        tk = scanner->getNext();
+        tk = lex->get_next();
     }
     
     std::shared_ptr<AstDataType> dataType = buildDataType(false);
-    tk = scanner->getNext();
+    tk = lex->get_next();
     
     // We have an array
-    if (tk.type == t_lbracket) {
+    if (tk == t_lbracket) {
         std::shared_ptr<AstDataType> baseType = dataType;
         std::string dataType_name = getArrayType(dataType);
         dataType = AstBuilder::buildStructType(dataType_name);
@@ -57,14 +57,14 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
         
         std::shared_ptr<AstExpression> size_arg = buildExpression(block, AstBuilder::buildInt32Type(), t_rbracket);
         if (!size_arg) {
-            syntax->addError(0, "Invalid size argument in array declaration");
+            syntax->addError(lex->line_number, "Invalid size argument in array declaration");
             return false;
         }
         //empty->expression = arg; 
         
-        tk = scanner->getNext();
-        if (tk.type != t_semicolon) {
-            syntax->addError(0, "Error: Expected \';\'.");
+        tk = lex->get_next();
+        if (tk != t_semicolon) {
+            syntax->addError(lex->line_number, "Error: Expected \';\'.");
             return false;
         }
         
@@ -124,13 +124,13 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
         }
     
     // We're at the end of the declaration
-    } else if (tk.type == t_semicolon) {
-        syntax->addError(0, "Expected init expression.");
+    } else if (tk == t_semicolon) {
+        syntax->addError(lex->line_number, "Expected init expression.");
         return false;
         
     // Otherwise, we have a regular variable
     } else {
-        std::shared_ptr<AstExpression> arg = buildExpression(block, dataType);
+        std::shared_ptr<AstExpression> arg = buildExpression(block, dataType, t_semicolon);
         if (!arg) return false;
     
         for (std::string name : toDeclare) {
@@ -154,10 +154,10 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
 }
 
 // Builds a variable or an array assignment
-bool Parser::buildVariableAssign(std::shared_ptr<AstBlock> block, Token t_idToken) {
-    std::shared_ptr<AstDataType> dataType = block->getDataType(t_idToken.id_val);
+bool Parser::buildVariableAssign(std::shared_ptr<AstBlock> block, std::string value) {
+    std::shared_ptr<AstDataType> dataType = block->getDataType(value);
     
-    std::shared_ptr<AstExpression> expr = buildExpression(block, dataType);
+    std::shared_ptr<AstExpression> expr = buildExpression(block, dataType, t_semicolon);
     if (!expr) return false;
     
     std::shared_ptr<AstExprStatement> stmt = std::make_shared<AstExprStatement>();
@@ -170,19 +170,19 @@ bool Parser::buildVariableAssign(std::shared_ptr<AstBlock> block, Token t_idToke
 
 // Builds a constant variable
 bool Parser::buildConst(std::shared_ptr<AstBlock> block, bool isGlobal) {
-    Token tk = scanner->getNext();
-    std::string name = tk.id_val;
+    int tk = lex->get_next();
+    std::string name = lex->value;
     
     // Make sure we have a name for our constant
-    if (tk.type != t_id) {
-        syntax->addError(0, "Expected constant name.");
+    if (tk != t_id) {
+        syntax->addError(lex->line_number, "Expected constant name.");
         return false;
     }
     
     // Syntax check
-    tk = scanner->getNext();
-    if (tk.type != t_colon) {
-        syntax->addError(0, "Expected \':\' in constant expression.");
+    tk = lex->get_next();
+    if (tk != t_colon) {
+        syntax->addError(lex->line_number, "Expected \':\' in constant expression.");
         return false;
     }
     
@@ -190,9 +190,9 @@ bool Parser::buildConst(std::shared_ptr<AstBlock> block, bool isGlobal) {
     std::shared_ptr<AstDataType> dataType = buildDataType(false);
     
     // Final syntax check
-    tk = scanner->getNext();
-    if (tk.type != t_assign) {
-        syntax->addError(0, "Expected \'=\' after const assignment.");
+    tk = lex->get_next();
+    if (tk != t_assign) {
+        syntax->addError(lex->line_number, "Expected \'=\' after const assignment.");
         return false;
     }
     

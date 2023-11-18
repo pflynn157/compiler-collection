@@ -1,5 +1,6 @@
 func main -> i32 is
-    #print("Hi!");
-    return 5 + 3;
+    var x : i32 := 17;
+    print("Number: ", "%x", x);
+    return 0;
 end
 

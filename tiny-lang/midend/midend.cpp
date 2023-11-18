@@ -12,18 +12,37 @@ void Midend::process_function_call(std::shared_ptr<AstFuncCallStmt> call, std::s
         return;
     }
 
-    auto args = call->expression;
+    auto args = std::static_pointer_cast<AstExprList>(call->expression);
+    auto args2 = std::make_shared<AstExprList>();
     std::string fmt = "";
+    bool skip_next = false;
     
-    for (auto expr : std::static_pointer_cast<AstExprList>(args)->list) {
+    for (auto expr : args->list) {
+        if (skip_next) {
+            skip_next = false;
+            args2->add_expression(expr);
+            continue;
+        }
+        
         switch (expr->type) {
-            case V_AstType::CharL: fmt += "c"; break;
-            case V_AstType::IntL: fmt += "d"; break;
-            case V_AstType::StringL: fmt += "s"; break;
+            case V_AstType::CharL: fmt += "c"; args2->add_expression(expr); break;
+            case V_AstType::IntL: fmt += "d"; args2->add_expression(expr); break;
+            case V_AstType::StringL: {
+                auto s = std::static_pointer_cast<AstString>(expr);
+                if (s->value == "%x") {
+                    fmt += "x";
+                    skip_next = true;
+                } else {
+                    fmt += "s";
+                    args2->add_expression(expr);
+                }
+            } break;
             
             case V_AstType::ArrayAccess:
             case V_AstType::StructAccess:
             case V_AstType::ID: {
+                args2->add_expression(expr);
+                
                 std::shared_ptr<AstDataType> dtype;
                 if (expr->type == V_AstType::ArrayAccess) {
                     std::string name = std::static_pointer_cast<AstArrayAccess>(expr)->value;
@@ -69,9 +88,10 @@ void Midend::process_function_call(std::shared_ptr<AstFuncCallStmt> call, std::s
     }
     
     // Add the format
-    auto args2 = std::static_pointer_cast<AstExprList>(args);
+    //auto args2 = std::static_pointer_cast<AstExprList>(args);
     std::shared_ptr<AstString> fmt_str = std::make_shared<AstString>(fmt);
     args2->list.insert(args2->list.begin(), fmt_str);
+    call->expression = args2;
 }
 
 //

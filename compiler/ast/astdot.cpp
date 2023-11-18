@@ -459,11 +459,11 @@ std::string AstString::dot(std::string parent) {
     return output;
 }
 
-std::string AstI32::dot(std::string parent) {
+std::string AstInt::dot(std::string parent) {
     std::string name = "int" + std::to_string(idx);
     ++idx;
     
-    std::string output = name + "[label=\"" + std::to_string(getValue()) + "\"];\n";
+    std::string output = name + "[label=\"" + std::to_string(value) + "\"];\n";
     output += parent + " -> " + name + ";\n";
     return output;
 }

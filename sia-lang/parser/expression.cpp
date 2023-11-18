@@ -28,7 +28,7 @@ std::shared_ptr<AstExpression> Parser::build_constant(int tk) {
     switch (tk) {
         case t_int_literal: {
             int value = std::stoi(lex->value);
-            auto i = std::make_shared<AstI32>(value);
+            auto i = std::make_shared<AstInt>(value);
             return i;
         }
         

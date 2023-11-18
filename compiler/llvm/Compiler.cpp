@@ -150,24 +150,12 @@ void Compiler::compileStatement(std::shared_ptr<AstStatement> stmt) {
 Value *Compiler::compileValue(std::shared_ptr<AstExpression> expr, V_AstType dataType, bool isAssign) {
     if (expr == nullptr) return nullptr;
     switch (expr->type) {
-        case V_AstType::I8L: {
-            std::shared_ptr<AstI8> i8 = std::static_pointer_cast<AstI8>(expr);
-            return builder->getInt8(i8->value);
-        } break;
-        
-        case V_AstType::I16L: {
-            std::shared_ptr<AstI16> i16 = std::static_pointer_cast<AstI16>(expr);
-            return builder->getInt16(i16->value);
-        } break;
-        
-        case V_AstType::I32L: {
-            std::shared_ptr<AstI32> ival = std::static_pointer_cast<AstI32>(expr);
-            return builder->getInt32(ival->value);
-        } break;
-        
-        case V_AstType::I64L: {
-            std::shared_ptr<AstI64> i64 = std::static_pointer_cast<AstI64>(expr);
-            return builder->getInt64(i64->value);
+        case V_AstType::IntL: {
+            auto i = std::static_pointer_cast<AstInt>(expr);
+            if (i->size == 8) return builder->getInt8(i->value);
+            else if (i->size == 16) return builder->getInt16(i->value);
+            else if (i->size == 64) return builder->getInt64(i->value);
+            return builder->getInt32(i->value);
         } break;
         
         case V_AstType::FloatL: {

@@ -66,8 +66,8 @@ void ParallelMidend::process_block_statement(std::shared_ptr<AstBlockStmt> &stmt
         outlined_func->block->addStatement(ret);
         
         // Add a call
-        auto arg1 = std::make_shared<AstI32>(0);
-        auto arg2 = std::make_shared<AstI32>(0);        // no shared arguments
+        auto arg1 = std::make_shared<AstInt>(0);
+        auto arg2 = std::make_shared<AstInt>(0);        // no shared arguments
         auto arg3 = std::make_shared<AstFuncRef>("outlined");
         // calling arguments here
         auto args = std::make_shared<AstExprList>();
@@ -147,7 +147,7 @@ void ParallelMidend::build_omp_parallel_for(std::shared_ptr<AstFunction> func, s
     func->block->addSymbol(last_name, type);
     
     auto lastID = std::make_shared<AstID>(last_name);
-    auto lastAssign = std::make_shared<AstAssignOp>(lastID, std::make_shared<AstI32>(0));
+    auto lastAssign = std::make_shared<AstAssignOp>(lastID, std::make_shared<AstInt>(0));
     auto lastVA = std::make_shared<AstExprStatement>();
     lastVA->dataType = type;
     lastVA->expression = lastAssign;
@@ -161,7 +161,7 @@ void ParallelMidend::build_omp_parallel_for(std::shared_ptr<AstFunction> func, s
     index_vd_expr->expression = index_vd_assign;
     func->block->addStatement(index_vd_expr);
     
-    auto indexAssign = std::make_shared<AstAssignOp>(std::make_shared<AstID>(index_name), std::make_shared<AstI32>(0));
+    auto indexAssign = std::make_shared<AstAssignOp>(std::make_shared<AstID>(index_name), std::make_shared<AstInt>(0));
     auto va = std::make_shared<AstExprStatement>();
     va->dataType = type;
     va->expression = indexAssign;
@@ -169,15 +169,15 @@ void ParallelMidend::build_omp_parallel_for(std::shared_ptr<AstFunction> func, s
     
     // __kmpc_for_static_init_4(0, *global_id, 34, &last, &lower, &upper, &stride, 1, 1);
     auto callArgs1 = std::make_shared<AstExprList>();
-    callArgs1->add_expression(std::make_shared<AstI32>(0));
+    callArgs1->add_expression(std::make_shared<AstInt>(0));
     callArgs1->add_expression(std::make_shared<AstPtrTo>("global_id"));
-    callArgs1->add_expression(std::make_shared<AstI32>(34));
+    callArgs1->add_expression(std::make_shared<AstInt>(34));
     callArgs1->add_expression(std::make_shared<AstRef>(last_name));
     callArgs1->add_expression(std::make_shared<AstRef>(lower_name));
     callArgs1->add_expression(std::make_shared<AstRef>(upper_name));
     callArgs1->add_expression(std::make_shared<AstRef>(stride_name));
-    callArgs1->add_expression(std::make_shared<AstI32>(1));
-    callArgs1->add_expression(std::make_shared<AstI32>(1));
+    callArgs1->add_expression(std::make_shared<AstInt>(1));
+    callArgs1->add_expression(std::make_shared<AstInt>(1));
     
     auto call1 = std::make_shared<AstFuncCallStmt>("__kmpc_for_static_init_4");
     call1->expression = callArgs1;
@@ -230,14 +230,14 @@ void ParallelMidend::build_omp_parallel_for(std::shared_ptr<AstFunction> func, s
     va->dataType = type;
     auto inc_add = std::make_shared<AstAddOp>();
     inc_add->lval = std::make_shared<AstID>(index_name);
-    inc_add->rval = std::make_shared<AstI32>(1);
+    inc_add->rval = std::make_shared<AstInt>(1);
     auto inc_assign = std::make_shared<AstAssignOp>(std::make_shared<AstID>(index_name), inc_add);
     va->expression = inc_assign;
     block2->addStatement(va);
     
     // __kmpc_for_static_fini(0, *global_id);
     auto callArgs2 = std::make_shared<AstExprList>();
-    callArgs2->add_expression(std::make_shared<AstI32>(0));
+    callArgs2->add_expression(std::make_shared<AstInt>(0));
     callArgs2->add_expression(std::make_shared<AstPtrTo>("global_id"));
     
     auto call2 = std::make_shared<AstFuncCallStmt>("__kmpc_for_static_fini");

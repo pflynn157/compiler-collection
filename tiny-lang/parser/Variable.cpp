@@ -79,12 +79,12 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
             std::shared_ptr<AstExprList> list = std::make_shared<AstExprList>();
             callMalloc->args = list;
             
-            std::shared_ptr<AstI32> size;
+            std::shared_ptr<AstInt> size;
             std::shared_ptr<AstDataType> baseType = std::static_pointer_cast<AstPointerType>(dataType)->base_type;
-            if (baseType->type == V_AstType::Int32) size = std::make_shared<AstI32>(4);
-            else if (baseType->type == V_AstType::Int64) size = std::make_shared<AstI32>(8);
-            else if (baseType->type == V_AstType::String) size = std::make_shared<AstI32>(8);
-            else size = std::make_shared<AstI32>(1);
+            if (baseType->type == V_AstType::Int32) size = std::make_shared<AstInt>(4);
+            else if (baseType->type == V_AstType::Int64) size = std::make_shared<AstInt>(8);
+            else if (baseType->type == V_AstType::String) size = std::make_shared<AstInt>(8);
+            else size = std::make_shared<AstInt>(1);
             
             std::shared_ptr<AstMulOp> op = std::make_shared<AstMulOp>();
             op->lval = size;

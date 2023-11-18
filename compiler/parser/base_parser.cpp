@@ -22,24 +22,24 @@ std::shared_ptr<AstExpression> BaseParser::checkExpression(std::shared_ptr<AstEx
     if (!varType) return expr;
 
     switch (expr->type) {
-        case V_AstType::I32L: {
+        case V_AstType::IntL: {
             // Change to byte literals
             if (varType->type == V_AstType::Int8) {
-                std::shared_ptr<AstI32> i32 = std::static_pointer_cast<AstI32>(expr);
-                std::shared_ptr<AstI8> byte = std::make_shared<AstI8>(i32->getValue());
-                expr = byte;
+                std::shared_ptr<AstInt> i32 = std::static_pointer_cast<AstInt>(expr);
+                i32->size = 8;
+                expr = i32;
                 
             // Change to word literals
             } else if (varType->type == V_AstType::Int16) {
-                std::shared_ptr<AstI32> i32 = std::static_pointer_cast<AstI32>(expr);
-                std::shared_ptr<AstI16> i16 = std::make_shared<AstI16>(i32->getValue());
-                expr = i16;
+                std::shared_ptr<AstInt> i32 = std::static_pointer_cast<AstInt>(expr);
+                i32->size = 16;
+                expr = i32;
                 
             // Change to qword literals
             } else if (varType->type == V_AstType::Int64) {
-                std::shared_ptr<AstI32> i32 = std::static_pointer_cast<AstI32>(expr);
-                std::shared_ptr<AstI64> i64 = std::make_shared<AstI64>(i32->getValue());
-                expr = i64;
+                std::shared_ptr<AstInt> i32 = std::static_pointer_cast<AstInt>(expr);
+                i32->size = 64;
+                expr = i32;
             }
         } break;
             

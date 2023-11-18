@@ -74,25 +74,25 @@ Parser::Parser(std::string input) : BaseParser(input) {
     // Int8
     auto int8ArrayStruct = std::make_shared<AstStruct>("__int8_array");
     int8ArrayStruct->addItem(Var(AstBuilder::buildPointerType(AstBuilder::buildInt8Type()), "ptr"), nullptr);
-    int8ArrayStruct->addItem(Var(AstBuilder::buildInt32Type(), "size"), std::make_shared<AstI32>(0));
+    int8ArrayStruct->addItem(Var(AstBuilder::buildInt32Type(), "size"), std::make_shared<AstInt>(0));
     tree->addStruct(int8ArrayStruct);
     
     // Int16
     auto int16ArrayStruct = std::make_shared<AstStruct>("__int16_array");
     int16ArrayStruct->addItem(Var(AstBuilder::buildPointerType(AstBuilder::buildInt16Type()), "ptr"), nullptr);
-    int16ArrayStruct->addItem(Var(AstBuilder::buildInt32Type(), "size"), std::make_shared<AstI32>(0));
+    int16ArrayStruct->addItem(Var(AstBuilder::buildInt32Type(), "size"), std::make_shared<AstInt>(0));
     tree->addStruct(int16ArrayStruct);
     
     // Int32
     auto int32ArrayStruct = std::make_shared<AstStruct>("__int32_array");
     int32ArrayStruct->addItem(Var(AstBuilder::buildPointerType(AstBuilder::buildInt32Type()), "ptr"), nullptr);
-    int32ArrayStruct->addItem(Var(AstBuilder::buildInt32Type(), "size"), std::make_shared<AstI32>(0));
+    int32ArrayStruct->addItem(Var(AstBuilder::buildInt32Type(), "size"), std::make_shared<AstInt>(0));
     tree->addStruct(int32ArrayStruct);
     
     // Int64
     auto int64ArrayStruct = std::make_shared<AstStruct>("__int64_array");
     int64ArrayStruct->addItem(Var(AstBuilder::buildPointerType(AstBuilder::buildInt64Type()), "ptr"), nullptr);
-    int64ArrayStruct->addItem(Var(AstBuilder::buildInt32Type(), "size"), std::make_shared<AstI32>(0));
+    int64ArrayStruct->addItem(Var(AstBuilder::buildInt32Type(), "size"), std::make_shared<AstInt>(0));
     tree->addStruct(int64ArrayStruct);
 }
 

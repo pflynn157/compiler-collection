@@ -235,10 +235,7 @@ void AstMidend::it_process_expression(std::shared_ptr<AstExpression> &expr, std:
         
         // Literals and identifiers
         case V_AstType::CharL: break;
-        case V_AstType::I8L: break;
-        case V_AstType::I16L: break;
-        case V_AstType::I32L: break;
-        case V_AstType::I64L: break;
+        case V_AstType::IntL: break;
         case V_AstType::FloatL: break;
         case V_AstType::StringL: break;
         case V_AstType::ID: break;

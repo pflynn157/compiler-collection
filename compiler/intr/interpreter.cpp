@@ -44,7 +44,7 @@ int AstInterpreter::run_function(std::shared_ptr<AstFunction> func, std::shared_
     if (ctx->stack.empty()) return 0;
     
     auto expr = ctx->stack.top();
-    auto i = std::static_pointer_cast<AstI32>(expr);
+    auto i = std::static_pointer_cast<AstInt>(expr);
     return i->value;
 }
 
@@ -73,7 +73,7 @@ void AstInterpreter::run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr
 //
 void AstInterpreter::run_expression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> type) {
     switch (expr->type) {
-        case V_AstType::I32L: ctx->stack.push(expr); break;
+        case V_AstType::IntL: ctx->stack.push(expr); break;
         
         default: {}
     }

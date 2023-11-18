@@ -14,10 +14,10 @@
 // Builds a constant expression value
 std::shared_ptr<AstExpression> Parser::build_constant(int tk) {
     switch (tk) {
-        case t_true: return std::make_shared<AstI32>(1);
-        case t_false: return std::make_shared<AstI32>(0);
+        case t_true: return std::make_shared<AstInt>(1);
+        case t_false: return std::make_shared<AstInt>(0);
         case t_char_literal: return std::make_shared<AstChar>((char)lex->i_value);
-        case t_int_literal: return std::make_shared<AstI32>(lex->i_value);
+        case t_int_literal: return std::make_shared<AstInt>(lex->i_value);
         case t_string_literal: return std::make_shared<AstString>(lex->value);
         
         default: {}

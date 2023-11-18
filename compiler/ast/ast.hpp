@@ -71,10 +71,7 @@ enum class V_AstType {
     
     // Literals and identifiers
     CharL,
-    I8L,
-    I16L,
-    I32L,
-    I64L,
+    IntL,
     FloatL,
     StringL,
     ID,
@@ -564,59 +561,23 @@ struct AstChar : AstExpression {
     char value = 0;
 };
 
-// Represents a byte literal
-// TODO: Remove
-struct AstI8 : AstExpression {
-    explicit AstI8(uint8_t val) : AstExpression(V_AstType::I8L) {
-        this->value = val;
-    }
-    
-    uint8_t getValue() { return value; }
-    void print();
-    
-    uint8_t value = 0;
-};
-
-// Represents a word literal
-// TODO: Remove
-struct AstI16 : AstExpression {
-    explicit AstI16(uint16_t val) : AstExpression(V_AstType::I16L) {
-        this->value = val;
-    }
-    
-    uint16_t getValue() { return value; }
-    void print();
-
-    uint16_t value = 0;
-};
-
 // Represents an integer literal
-// TODO: Convert to uint64, rename AstInt
-struct AstI32 : AstExpression {
-    explicit AstI32(uint64_t val) : AstExpression(V_AstType::I32L) {
-        this->value = val;
+struct AstInt : AstExpression {
+    explicit AstInt(uint64_t value) : AstExpression(V_AstType::IntL) {
+        this->value = value;
+        this->size = 32;
     }
     
-    void setValue(uint64_t val) { this->value = val; }
+    explicit AstInt(uint64_t value, int size) : AstExpression(V_AstType::IntL) {
+        this->value = value;
+        this->size = size;
+    }
     
-    uint64_t getValue() { return value; }
+    uint64_t value = 0;
+    int size = 32;
+    
     void print();
     std::string dot(std::string parent) override;
-    
-    uint64_t value = 0;
-};
-
-// Represents a QWord literal
-// TODO: Remove
-struct AstI64 : AstExpression {
-    explicit AstI64(uint64_t val) : AstExpression(V_AstType::I64L) {
-        this->value = val;
-    }
-    
-    uint64_t getValue() { return value; }
-    void print();
-    
-    uint64_t value = 0;
 };
 
 // Represents a floating-point literal
@@ -946,7 +907,7 @@ struct AstRepeatStmt : public AstStatement {
 // Represents a for loop
 struct AstForStmt : public AstStatement {
     explicit AstForStmt() : AstStatement(V_AstType::For) {
-        step = std::make_shared<AstI32>(1);
+        step = std::make_shared<AstInt>(1);
         block = std::make_shared<AstBlock>();
     }
     

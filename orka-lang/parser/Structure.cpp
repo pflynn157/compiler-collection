@@ -84,7 +84,7 @@ bool Parser::buildEnum() {
         }
         
         if (value == nullptr) {
-            value = checkExpression(std::make_shared<AstI32>(index), dataType);
+            value = checkExpression(std::make_shared<AstInt>(index), dataType);
             ++index;
         }
         

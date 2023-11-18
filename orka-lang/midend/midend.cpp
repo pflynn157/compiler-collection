@@ -54,9 +54,9 @@ std::shared_ptr<AstExpression> Midend::process_binary_op(std::shared_ptr<AstBina
         expr->lval = fc;
         
         if (expr->type == V_AstType::NEQ)
-            expr->rval = std::make_shared<AstI32>(0);
+            expr->rval = std::make_shared<AstInt>(0);
         else
-            expr->rval = std::make_shared<AstI32>(1);
+            expr->rval = std::make_shared<AstInt>(1);
     } else if (expr->type == V_AstType::Add) {
         if (rval_str) {
             auto fc = std::make_shared<AstFuncCallExpr>("strcat_str");

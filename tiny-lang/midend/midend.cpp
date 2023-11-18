@@ -18,10 +18,7 @@ void Midend::process_function_call(std::shared_ptr<AstFuncCallStmt> call, std::s
     for (auto expr : std::static_pointer_cast<AstExprList>(args)->list) {
         switch (expr->type) {
             case V_AstType::CharL: fmt += "c"; break;
-            case V_AstType::I8L:
-            case V_AstType::I16L:
-            case V_AstType::I32L:
-            case V_AstType::I64L: fmt += "d"; break;
+            case V_AstType::IntL: fmt += "d"; break;
             case V_AstType::StringL: fmt += "s"; break;
             
             case V_AstType::ArrayAccess:
@@ -124,9 +121,9 @@ std::shared_ptr<AstExpression> Midend::process_binary_op(std::shared_ptr<AstBina
         expr->lval = fc;
         
         if (expr->type == V_AstType::NEQ)
-            expr->rval = std::make_shared<AstI32>(0);
+            expr->rval = std::make_shared<AstInt>(0);
         else
-            expr->rval = std::make_shared<AstI32>(1);
+            expr->rval = std::make_shared<AstInt>(1);
     } else if (expr->type == V_AstType::Add) {
         if (rval_str) {
             auto fc = std::make_shared<AstFuncCallExpr>("strcat_str");

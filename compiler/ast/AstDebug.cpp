@@ -437,20 +437,8 @@ void AstChar::print() {
     std::cout << "CHAR(" << value << ")";
 }
 
-void AstI8::print() {
-    std::cout << value;
-}
-
-void AstI16::print() {
-    std::cout << value;
-}
-
-void AstI32::print() {
-    std::cout << value;
-}
-
-void AstI64::print() {
-    std::cout << value;
+void AstInt::print() {
+    std::cout << "I" << size << "(" << value << ")";
 }
 
 void AstFloat::print() {

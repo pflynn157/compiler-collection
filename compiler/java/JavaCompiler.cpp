@@ -176,8 +176,8 @@ void Compiler::BuildExpr(std::shared_ptr<AstExpression> expr, std::shared_ptr<Ja
     if (expr == nullptr) return;
 
     switch (expr->type) {
-        case V_AstType::I32L: {
-            std::shared_ptr<AstI32> i = std::static_pointer_cast<AstI32>(expr);
+        case V_AstType::IntL: {
+            auto i = std::static_pointer_cast<AstInt>(expr);
             builder->CreateBIPush(function, i->value);
         } break;
     
@@ -254,7 +254,7 @@ std::string Compiler::GetTypeForExpr(std::shared_ptr<AstExpression> expr) {
     if (expr == nullptr) return "";
 
     switch (expr->type) {
-        case V_AstType::I32L: return "I";
+        case V_AstType::IntL: return "I";
         case V_AstType::StringL: return "Ljava/lang/String;";
         
         case V_AstType::ID: {

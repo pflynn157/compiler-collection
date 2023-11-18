@@ -20,11 +20,11 @@ std::shared_ptr<AstExpression> Parser::checkCondExpression(std::shared_ptr<AstBl
             eq->lval = id;
             
             switch (dataType->type) {
-                case V_AstType::Bool: eq->rval = std::make_shared<AstI32>(1); break;
-                case V_AstType::Int8: eq->rval = std::make_shared<AstI8>(1); break;
-                case V_AstType::Int16: eq->rval = std::make_shared<AstI16>(1); break;
-                case V_AstType::Int32: eq->rval = std::make_shared<AstI32>(1); break;
-                case V_AstType::Int64: eq->rval = std::make_shared<AstI64>(1); break;
+                case V_AstType::Bool: eq->rval = std::make_shared<AstInt>(1); break;
+                case V_AstType::Int8: eq->rval = std::make_shared<AstInt>(1, 8); break;
+                case V_AstType::Int16: eq->rval = std::make_shared<AstInt>(1, 16); break;
+                case V_AstType::Int32: eq->rval = std::make_shared<AstInt>(1); break;
+                case V_AstType::Int64: eq->rval = std::make_shared<AstInt>(1, 64); break;
                 
                 default: {}
             }
@@ -32,10 +32,10 @@ std::shared_ptr<AstExpression> Parser::checkCondExpression(std::shared_ptr<AstBl
             expr = eq;
         } break;
         
-        case V_AstType::I32L: {
+        case V_AstType::IntL: {
             std::shared_ptr<AstEQOp> eq = std::make_shared<AstEQOp>();
             eq->lval = expr;
-            eq->rval = std::make_shared<AstI32>(1);
+            eq->rval = std::make_shared<AstInt>(1);
             expr = eq;
         } break;
         

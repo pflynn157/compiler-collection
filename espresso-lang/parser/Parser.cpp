@@ -151,12 +151,12 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
         switch (token.type) {
             case True: {
                 lastWasOp = false;
-                output.push(std::make_shared<AstI32>(1));
+                output.push(std::make_shared<AstInt>(1));
             } break;
             
             case False: {
                 lastWasOp = false;
-                output.push(std::make_shared<AstI32>(0));
+                output.push(std::make_shared<AstInt>(0));
             } break;
             
             case CharL: {
@@ -167,7 +167,7 @@ std::shared_ptr<AstExpression> Parser::buildExpression(std::shared_ptr<AstBlock>
             
             case Int32: {
                 lastWasOp = false;
-                std::shared_ptr<AstI32> i32 = std::make_shared<AstI32>(token.i32_val);
+                std::shared_ptr<AstInt> i32 = std::make_shared<AstInt>(token.i32_val);
                 output.push(i32);
             } break;
             

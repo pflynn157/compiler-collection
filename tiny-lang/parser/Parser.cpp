@@ -23,14 +23,6 @@ Parser::Parser(std::string input) : BaseParser(input) {
     FT1->data_type = AstBuilder::buildStringType();
     tree->addGlobalStatement(FT1);
     
-    //println(string)
-    /*funcs.push_back("println");
-    std::shared_ptr<AstExternFunction> FT2 = std::make_shared<AstExternFunction>("println");
-    FT2->varargs = true;
-    FT2->addArgument(Var(AstBuilder::buildStringType(), "str"));
-    FT2->data_type = AstBuilder::buildVoidType();
-    tree->addGlobalStatement(FT2);*/
-    
     //print(string)
     tree->block->funcs.push_back("print");
     std::shared_ptr<AstExternFunction> FT3 = std::make_shared<AstExternFunction>("print");

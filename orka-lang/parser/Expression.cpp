@@ -17,7 +17,24 @@ std::shared_ptr<AstExpression> Parser::build_constant(int tk) {
         case t_true: return std::make_shared<AstInt>(1);
         case t_false: return std::make_shared<AstInt>(0);
         case t_char_literal: return std::make_shared<AstChar>((char)lex->i_value);
-        case t_int_literal: return std::make_shared<AstInt>(lex->i_value);
+        case t_int_literal: {
+            int value = lex->i_value;
+            int tk_next = lex->get_next();
+            if (tk_next == t_dot) {
+                tk_next = lex->get_next();
+                if (tk_next != t_int_literal) {
+                    syntax->addError(lex->line_number, "Invalid integer or float literal.");
+                    return nullptr;
+                }
+                
+                int value2 = lex->i_value;
+                std::string buffer = std::to_string(value) + "." + std::to_string(value2);
+                double f_value = std::stod(buffer);
+                return std::make_shared<AstFloat>(f_value);
+            }
+            lex->unget(tk_next);
+            return std::make_shared<AstInt>(value);
+        }
         case t_float_literal: return std::make_shared<AstFloat>(lex->f_value);
         case t_string_literal: return std::make_shared<AstString>(lex->value);
         
@@ -259,5 +276,39 @@ bool Parser::is_list_delim(int tk) {
 
 int Parser::get_sub_expr_end() {
     return t_rparen;
+}
+
+bool Parser::build_other_token(int tk, bool is_const, std::shared_ptr<ExprContext> ctx) {
+    switch (tk) {
+        case t_sizeof: {
+            ctx->lastWasOp = false;
+            
+            if (is_const) {
+                syntax->addError(lex->line_number, "Invalid constant value.");
+                return false;
+            }
+            
+            std::string name = lex->value;
+            
+            int token1 = lex->get_next();
+            int token2 = lex->get_next();
+            std::string token2_value = lex->value;
+            int token3 = lex->get_next();
+            
+            if (token1 != t_lparen || token2 != t_id || token3 != t_rparen) {
+                syntax->addError(lex->line_number, "Invalid token in sizeof.");
+                return false;
+            }
+            
+            std::shared_ptr<AstStructAccess> val = std::make_shared<AstStructAccess>(token2_value, "size");
+            ctx->output.push(val);
+            
+            return true;
+        }
+        
+        default: {}
+    }
+    
+    return false;
 }
 

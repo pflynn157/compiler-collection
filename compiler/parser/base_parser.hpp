@@ -41,6 +41,7 @@ public:
     virtual bool build_operator(int tk, std::shared_ptr<ExprContext> ctx) { return false; }
     virtual bool build_identifier(std::shared_ptr<AstBlock> block, int tk, std::shared_ptr<ExprContext> ctx) { return false; }
     virtual std::shared_ptr<AstExpression> build_constant(int tk) { return nullptr; }
+    virtual bool build_other_token(int tk, bool is_const, std::shared_ptr<ExprContext> ctx) { return false; }
     
     // Expression parsers
     std::shared_ptr<AstExpression> checkExpression(std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> varType);

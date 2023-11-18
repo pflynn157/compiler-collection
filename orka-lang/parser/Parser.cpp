@@ -106,6 +106,8 @@ bool Parser::parse() {
         bool code = true;
         
         switch (tk) {
+            case t_import: code = build_import(); break;
+        
             case t_extern:
             case t_func: {
                 code = buildFunction(tk);
@@ -134,6 +136,49 @@ bool Parser::parse() {
     }
     
     syntax->printWarnings();
+    return true;
+}
+
+// Builds an import statement
+bool Parser::build_import() {
+    int token = lex->get_next();
+    std::string path = "";
+
+    while (token != t_semicolon) {
+        switch (token) {
+            case t_id: path += lex->value; break;
+            case t_dot: path += "/"; break;
+            
+            default: {
+                syntax->addError(lex->line_number, "Invalid token in import statement.");
+                return false;
+            }
+        }
+        
+        token = lex->get_next();
+    }
+
+    // Load the include path
+    // TODO: We need better path support
+#ifdef DEV_LINK_MODE
+    path = std::string(ORKA_HEADER_LOCATION) + "/" + path + ".oh";
+#else
+    path = "/usr/local/include/orka/" + path + ".oh";
+#endif
+
+    // Invoke another parser to load the path
+    auto parser = std::make_unique<Parser>(path);
+    parser->parse();
+    auto tree2 = parser->tree;
+    
+    tree->block->mergeSymbols(tree2->block);
+    for (auto const& stmt : tree2->block->block) {
+        tree->block->addStatement(stmt);
+    }
+    
+    for (auto const &s : tree2->structs) tree->addStruct(s);
+    for (auto const &c : tree2->classes) tree->addClass(c);
+
     return true;
 }
 

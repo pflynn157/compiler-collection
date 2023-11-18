@@ -1,17 +1,5 @@
-#import std.io;
-
-func main(args:str[]) -> int is
-    var str1 : str := "Hello!";
-    var str2 : str := " How are you?";
-    
-    println(str1);
-    println(str2);
-    
-    var str3 : str := str1 + str2;
-    println(str3);
-    
-    var str4 : str := str1 + '!';
-    println(str4);
-    
+func main -> int is
+    var x1 : float := 3.14;
+    var x2 : float := 30.23;
     return 0;
 end

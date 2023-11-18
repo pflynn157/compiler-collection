@@ -177,8 +177,11 @@ std::shared_ptr<AstExpression> BaseParser::buildExpression(std::shared_ptr<AstBl
             while (ctx->opStack.size() > 0) ctx->opStack.pop();
             isList = true;
         } else {
-            syntax->addError(lex->line_number, "Invalid Token in expression.");
-            return nullptr;
+            if (!build_other_token(tk, isConst, ctx)) {
+                syntax->addError(lex->line_number, "Invalid Token in expression.");
+                lex->debug_token(tk);
+                return nullptr;
+            }
         }
         
         if (!ctx->lastWasOp && ctx->opStack.size() > 0) {

@@ -54,9 +54,18 @@ int Lex::get_next() {
             c = reader.get();
             raw_buffer += c;
             while (c != '\"' && !reader.eof()) {
-                value += c;
-                c = reader.get();
-                raw_buffer += c;    
+                if (c == '\\') {
+                    c = reader.get();
+                    if (c == 'n') {
+                        value += '\n';
+                    } else {
+                        value += '\\';
+                        value += c;
+                    }
+                } else {
+                    value += c;
+                }
+                c = reader.get();   
             }
             
             return t_string_literal;
@@ -64,13 +73,10 @@ int Lex::get_next() {
         
         if (c == '\'') {
             c = reader.get();
-            raw_buffer += c;
             if (c == '\\') {
                 c = reader.get();
-                raw_buffer += c;
                 if (c == 'n') {
                     c = '\n';
-                    raw_buffer += c;
                 }
             }
             

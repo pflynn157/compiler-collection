@@ -89,9 +89,25 @@ void AstInterpreter::run_expression(std::shared_ptr<IntrContext> ctx, std::share
 // Runs an integer-based expression
 void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr) {
     switch (expr->type) {
+        // Constants
         case V_AstType::IntL: {
             auto i = std::static_pointer_cast<AstInt>(expr);
             ctx->istack.push(i->value);
+        } break;
+        
+        // Operators
+        case V_AstType::Add:
+        {
+            auto op = std::static_pointer_cast<AstBinaryOp>(expr);
+            run_iexpression(ctx, op->lval);
+            run_iexpression(ctx, op->rval);
+            
+            uint64_t rval = ctx->istack.top();
+            ctx->istack.pop();
+            uint64_t lval = ctx->istack.top();
+            ctx->istack.pop();
+            
+            if (expr->type == V_AstType::Add) ctx->istack.push(lval + rval);
         } break;
         
         default: {}

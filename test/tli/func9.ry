@@ -1,7 +1,6 @@
 
 func get_string() -> string is
-    var s2 : string := "Hello!";
-    return s2;
+    return "Hi!";
 end
 
 func main -> i32 is

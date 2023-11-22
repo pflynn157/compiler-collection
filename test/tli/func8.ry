@@ -1,0 +1,10 @@
+
+func get_string() -> string is
+    return "Hi!";
+end
+
+func main -> i32 is
+    print(get_string());
+    return 0;
+end
+

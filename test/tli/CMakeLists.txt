@@ -4,6 +4,7 @@ set(CORE_TEST_SRC
     imath1 imath2
     iprint1
     func1 func2 func3 func4 func5 func6 func7
+    func8 func9 func10
     string1
     string_func1
 )

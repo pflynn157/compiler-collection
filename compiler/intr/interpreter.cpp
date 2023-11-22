@@ -1,5 +1,8 @@
 #include <iostream>
 
+#include <ast/ast.hpp>
+#include <ast/ast_builder.hpp>
+
 #include "interpreter.hpp"
 
 //
@@ -58,6 +61,16 @@ void AstInterpreter::run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr
             case V_AstType::Return: {
                 if (!stmt->hasExpression()) break;
                 run_expression(ctx, stmt->expression, ctx->func_type);
+            } break;
+            
+            // Function calls
+            case V_AstType::FuncCallStmt: {
+                auto fc = std::static_pointer_cast<AstFuncCallStmt>(stmt);
+                if (fc->name == "print") {
+                    run_print(ctx, std::static_pointer_cast<AstExprList>(fc->expression));
+                } else {
+                
+                }
             } break;
             
             default: {}
@@ -128,6 +141,62 @@ void AstInterpreter::run_sexpression(std::shared_ptr<IntrContext> ctx, std::shar
 // Runs the builtin print call
 //
 void AstInterpreter::run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExprList> args) {
+    for (auto const &arg : args->list) {
+        switch (arg->type) {
+            // Print an integer literal
+            case V_AstType::IntL: {
+                auto i = std::static_pointer_cast<AstInt>(arg);
+                std::cout << i->value;
+            } break;
+            
+            // Print a binary operation
+            case V_AstType::Add:
+            {
+                auto data_type = interpret_type(arg);
+                if (data_type == nullptr) {
+                    std::cout << "[ERR:<UNK_TYPE>]";
+                    break;
+                }
+                
+                run_expression(ctx, arg, data_type);
+                if (data_type->type == V_AstType::Int32) {
+                    std::cout << ctx->istack.top();
+                    ctx->istack.pop();
+                }
+                // TODO: Other types here
+            } break;
+            
+            default: {}
+        }
+    }
+    
+    std::cout << std::endl;
+}
 
+//
+// Needed in some places where types are not explicity known
+// Note: We only return either Int32, String, or Float32, since these generalize
+// to one of the three overall types are expression works with.
+//
+// Generally, we decide on types based on the lval
+//
+std::shared_ptr<AstDataType> AstInterpreter::interpret_type(std::shared_ptr<AstExpression> expr) {
+    switch (expr->type) {
+        case V_AstType::IntL: return AstBuilder::buildInt32Type();
+        
+        case V_AstType::Add:
+        {
+            auto op = std::static_pointer_cast<AstBinaryOp>(expr);
+            auto d_type = interpret_type(op->lval);
+            if (d_type) return d_type;
+            d_type = interpret_type(op->rval);
+            if (d_type) return d_type;
+            return nullptr;
+        }
+        
+        default: {}
+    }
+    
+    return nullptr;
 }
 

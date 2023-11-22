@@ -40,6 +40,7 @@ struct AstInterpreter {
     void run_fexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);
     void run_sexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);
     void run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExprList> args);
+    std::shared_ptr<AstDataType> interpret_type(std::shared_ptr<AstExpression> expr);
     
 protected:
     std::shared_ptr<AstTree> tree;

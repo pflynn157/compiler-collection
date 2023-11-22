@@ -41,11 +41,8 @@ int AstInterpreter::run_function(std::shared_ptr<AstFunction> func, std::shared_
     run_block(ctx, func->block);
     
     // At the end, check the stack
-    if (ctx->stack.empty()) return 0;
-    
-    auto expr = ctx->stack.top();
-    auto i = std::static_pointer_cast<AstInt>(expr);
-    return i->value;
+    if (ctx->istack.empty()) return 0;
+    return ctx->istack.top();
 }
 
 //
@@ -72,11 +69,43 @@ void AstInterpreter::run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr
 // Evaluates an expression
 //
 void AstInterpreter::run_expression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> type) {
-    switch (expr->type) {
-        case V_AstType::IntL: ctx->stack.push(expr); break;
+    switch (type->type) {
+        case V_AstType::Bool:
+        case V_AstType::Int8:
+        case V_AstType::Int16:
+        case V_AstType::Int32:
+        case V_AstType::Int64: run_iexpression(ctx, expr); break;
+        
+        case V_AstType::Float32:
+        case V_AstType::Float64: run_fexpression(ctx, expr); break;
+        
+        case V_AstType::Char:
+        case V_AstType::String: run_sexpression(ctx, expr); break;
         
         default: {}
     }
+}
+
+// Runs an integer-based expression
+void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr) {
+    switch (expr->type) {
+        case V_AstType::IntL: {
+            auto i = std::static_pointer_cast<AstInt>(expr);
+            ctx->istack.push(i->value);
+        } break;
+        
+        default: {}
+    }
+}
+
+// Runs a floating point expression
+void AstInterpreter::run_fexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr) {
+
+}
+
+// Runs a string expression
+void AstInterpreter::run_sexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr) {
+
 }
 
 //

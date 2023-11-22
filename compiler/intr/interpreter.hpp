@@ -4,6 +4,7 @@
 #include <memory>
 #include <map>
 #include <stack>
+#include <cstdint>
 
 #include <ast/ast.hpp>
 
@@ -17,9 +18,12 @@
 struct IntrContext {
     std::map<std::string, std::shared_ptr<AstExpression>> var_map;
     std::map<std::string, std::shared_ptr<AstDataType>> type_map;
-    std::stack<std::shared_ptr<AstExpression>> stack;
-    
     std::shared_ptr<AstDataType> func_type;
+    
+    // For expression evaluation
+    std::stack<uint64_t> istack;
+    std::stack<double> fstack;
+    std::stack<std::string> sstack;
 };
 
 //
@@ -32,6 +36,9 @@ struct AstInterpreter {
     int run_function(std::shared_ptr<AstFunction> func, std::shared_ptr<AstExprList> args);
     void run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstBlock> block);
     void run_expression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> type);
+    void run_iexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);
+    void run_fexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);
+    void run_sexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);
     void run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExprList> args);
     
 protected:

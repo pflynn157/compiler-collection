@@ -57,6 +57,20 @@ void AstInterpreter::run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr
     // Run the block
     for (auto const &stmt : block->block) {
         switch (stmt->type) {
+            // Expression statements
+            case V_AstType::ExprStmt: {
+                auto stmt2 = std::static_pointer_cast<AstExprStatement>(stmt);
+                run_expression(ctx, stmt2->expression, stmt2->dataType);
+            } break;
+        
+            // Variable declarations
+            case V_AstType::VarDec: {
+                auto vd = std::static_pointer_cast<AstVarDec>(stmt);
+                // TODO: Check type
+                ctx->ivar_map[vd->name] = 0;
+                ctx->type_map[vd->name] = vd->data_type;
+            } break;
+        
             // Return statements
             case V_AstType::Return: {
                 if (!stmt->hasExpression()) break;
@@ -95,7 +109,8 @@ void AstInterpreter::run_expression(std::shared_ptr<IntrContext> ctx, std::share
         case V_AstType::Char:
         case V_AstType::String: run_sexpression(ctx, expr); break;
         
-        default: {}
+        default: {
+        }
     }
 }
 
@@ -106,6 +121,24 @@ void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shar
         case V_AstType::IntL: {
             auto i = std::static_pointer_cast<AstInt>(expr);
             ctx->istack.push(i->value);
+        } break;
+        
+        // Assign operator
+        case V_AstType::Assign: {
+            auto op = std::static_pointer_cast<AstAssignOp>(expr);
+            run_iexpression(ctx, op->rval);
+            
+            switch (op->lval->type) {
+                // Simple variables
+                case V_AstType::ID: {
+                    auto id = std::static_pointer_cast<AstID>(op->lval);
+                    ctx->ivar_map[id->value] = ctx->istack.top();
+                    ctx->istack.pop();
+                } break;
+                
+                // Unknown lval
+                default: {}
+            }
         } break;
         
         // Operators
@@ -171,6 +204,13 @@ void AstInterpreter::run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr
             case V_AstType::IntL: {
                 auto i = std::static_pointer_cast<AstInt>(arg);
                 std::cout << i->value;
+            } break;
+            
+            // Identifier
+            case V_AstType::ID: {
+                auto id = std::static_pointer_cast<AstID>(arg);
+                // TODO: Type check
+                std::cout << ctx->ivar_map[id->value];
             } break;
             
             // Print a binary operation

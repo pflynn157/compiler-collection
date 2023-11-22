@@ -16,9 +16,11 @@
 // * stack -> Holds values from expression evaluation
 //
 struct IntrContext {
-    std::map<std::string, std::shared_ptr<AstExpression>> var_map;
     std::map<std::string, std::shared_ptr<AstDataType>> type_map;
     std::shared_ptr<AstDataType> func_type;
+    
+    // For variable storage
+    std::map<std::string, int> ivar_map;
     
     // For expression evaluation
     std::stack<uint64_t> istack;

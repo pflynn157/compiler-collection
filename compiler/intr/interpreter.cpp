@@ -121,22 +121,9 @@ void AstInterpreter::run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr
 // Evaluates an expression
 //
 void AstInterpreter::run_expression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> type) {
-    switch (type->type) {
-        case V_AstType::Bool:
-        case V_AstType::Int8:
-        case V_AstType::Int16:
-        case V_AstType::Int32:
-        case V_AstType::Int64: run_iexpression(ctx, expr); break;
-        
-        case V_AstType::Float32:
-        case V_AstType::Float64: run_fexpression(ctx, expr); break;
-        
-        case V_AstType::Char:
-        case V_AstType::String: run_sexpression(ctx, expr); break;
-        
-        default: {
-        }
-    }
+    if (is_int_type(type)) run_iexpression(ctx, expr);
+    else if (is_float_type(type)) run_fexpression(ctx, expr);
+    else if (is_string_type(type)) run_sexpression(ctx, expr);
 }
 
 // Runs an integer-based expression
@@ -216,7 +203,58 @@ void AstInterpreter::run_fexpression(std::shared_ptr<IntrContext> ctx, std::shar
 
 // Runs a string expression
 void AstInterpreter::run_sexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr) {
-
+    switch (expr->type) {
+        // Constants
+        case V_AstType::IntL: {
+            auto i = std::static_pointer_cast<AstInt>(expr);
+            ctx->sstack.push(std::to_string(i->value));
+        } break;
+        
+        case V_AstType::StringL: {
+            auto s = std::static_pointer_cast<AstString>(expr);
+            ctx->sstack.push(s->value);
+        } break;
+        
+        // Variables
+        case V_AstType::ID: {
+            auto id = std::static_pointer_cast<AstID>(expr);
+            ctx->sstack.push(ctx->svar_map[id->value]);
+        } break;
+        
+        // Assign operator
+        case V_AstType::Assign: {
+            auto op = std::static_pointer_cast<AstAssignOp>(expr);
+            run_sexpression(ctx, op->rval);
+            
+            switch (op->lval->type) {
+                // Simple variables
+                case V_AstType::ID: {
+                    auto id = std::static_pointer_cast<AstID>(op->lval);
+                    ctx->svar_map[id->value] = ctx->sstack.top();
+                    ctx->sstack.pop();
+                } break;
+                
+                // Unknown lval
+                default: {}
+            }
+        } break;
+        
+        // Operators
+        /*case V_AstType::Add:
+        {
+            auto op = std::static_pointer_cast<AstBinaryOp>(expr);
+            run_iexpression(ctx, op->lval);
+            run_iexpression(ctx, op->rval);
+            
+            uint64_t rval = ctx->istack.top();
+            ctx->istack.pop();
+            uint64_t lval = ctx->istack.top();
+            ctx->istack.pop();
+            
+        } break;*/
+        
+        default: {}
+    }
 }
 
 //
@@ -240,8 +278,14 @@ void AstInterpreter::run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr
             // Identifier
             case V_AstType::ID: {
                 auto id = std::static_pointer_cast<AstID>(arg);
-                // TODO: Type check
-                std::cout << ctx->ivar_map[id->value];
+                auto data_type = ctx->type_map[id->value];
+                if (is_int_type(data_type)) {
+                    std::cout << ctx->ivar_map[id->value];
+                } else if (is_float_type(data_type)) {
+                
+                } else if (is_string_type(data_type)) {
+                    std::cout << ctx->svar_map[id->value];
+                }
             } break;
             
             // Print a binary operation
@@ -316,5 +360,44 @@ std::shared_ptr<AstDataType> AstInterpreter::interpret_type(std::shared_ptr<Intr
     }
     
     return nullptr;
+}
+
+//
+// Helper functions for determining the three general type
+//
+bool AstInterpreter::is_int_type(std::shared_ptr<AstDataType> data_type) {
+    switch (data_type->type) {
+        case V_AstType::Bool:
+        case V_AstType::Int8:
+        case V_AstType::Int16:
+        case V_AstType::Int32:
+        case V_AstType::Int64: return true;
+        
+        default: {}
+    }
+    
+    return false;
+}
+
+bool AstInterpreter::is_float_type(std::shared_ptr<AstDataType> data_type) {
+    switch (data_type->type) {
+        case V_AstType::Float32:
+        case V_AstType::Float64: return true;
+        
+        default: {}
+    }
+    
+    return false;
+}
+
+bool AstInterpreter::is_string_type(std::shared_ptr<AstDataType> data_type) {
+    switch (data_type->type) {
+        case V_AstType::Char:
+        case V_AstType::String: return true;
+        
+        default: {}
+    }
+    
+    return false;
 }
 

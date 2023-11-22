@@ -21,6 +21,7 @@ struct IntrContext {
     
     // For variable storage
     std::map<std::string, int> ivar_map;
+    std::map<std::string, std::string> svar_map;
     
     // For expression evaluation
     std::stack<uint64_t> istack;
@@ -43,6 +44,9 @@ struct AstInterpreter {
     void run_sexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);
     void run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExprList> args);
     std::shared_ptr<AstDataType> interpret_type(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);
+    bool is_int_type(std::shared_ptr<AstDataType> data_type);
+    bool is_float_type(std::shared_ptr<AstDataType> data_type);
+    bool is_string_type(std::shared_ptr<AstDataType> data_type);
     
 protected:
     std::shared_ptr<AstTree> tree;

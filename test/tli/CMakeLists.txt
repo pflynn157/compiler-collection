@@ -4,6 +4,7 @@ set(CORE_TEST_SRC
     imath1 imath2
     iprint1
     func1
+    string1
 )
 
 foreach(ITEM ${CORE_TEST_SRC})

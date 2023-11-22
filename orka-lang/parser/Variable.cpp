@@ -170,31 +170,18 @@ bool Parser::buildVariableAssign(std::shared_ptr<AstBlock> block, std::string va
 
 // Builds a constant variable
 bool Parser::buildConst(std::shared_ptr<AstBlock> block, bool isGlobal) {
-    int tk = lex->get_next();
+    // Make sure we have a name for our constant
+    consume_token(t_id, "Expected constant name.");
     std::string name = lex->value;
     
-    // Make sure we have a name for our constant
-    if (tk != t_id) {
-        syntax->addError(lex->line_number, "Expected constant name.");
-        return false;
-    }
-    
     // Syntax check
-    tk = lex->get_next();
-    if (tk != t_colon) {
-        syntax->addError(lex->line_number, "Expected \':\' in constant expression.");
-        return false;
-    }
+    consume_token(t_colon, "Expected \':\' in constant expression.");
     
     // Get the data type
     std::shared_ptr<AstDataType> dataType = buildDataType(false);
     
     // Final syntax check
-    tk = lex->get_next();
-    if (tk != t_assign) {
-        syntax->addError(lex->line_number, "Expected \'=\' after const assignment.");
-        return false;
-    }
+    consume_token(t_assign, "Expected \'=\' after const assignment.");
     
     // Build the expression. We create a dummy statement for this
     std::shared_ptr<AstExpression> expr = buildExpression(nullptr, dataType, t_semicolon, true);

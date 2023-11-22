@@ -1,11 +1,6 @@
 
-func main(args:str[]) -> int is
+func main() -> int is
     var numbers : int[10];
-    printf("hello: %d\n", sizeof(numbers));
-    
-    forall s in args do
-        println(s);
-    end
     
     return 0;
 end

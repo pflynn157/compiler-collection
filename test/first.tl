@@ -1,12 +1,11 @@
 
-func printout(s:string) is
-    print(s);
+func get_number() -> i32 is
+    return 10;
 end
 
 func main -> i32 is
-    var s : string := "Hello!";
-    printout(s);
-    printout("How are you?");
+    var x : i32 := get_number();
+    print(x);
     return 0;
 end
 

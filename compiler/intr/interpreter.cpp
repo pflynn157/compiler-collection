@@ -67,6 +67,33 @@ int AstInterpreter::run_function(std::shared_ptr<AstFunction> func, std::vector<
     return ctx->istack.top();
 }
 
+void AstInterpreter::call_function(std::shared_ptr<IntrContext> ctx, std::string name, std::shared_ptr<AstExprList> args) {
+    auto func = function_map[name];
+    std::vector<uint64_t> addrs;
+    
+    // TODO: Check type
+    for (int i = 0; i<args->list.size(); i++) {
+        auto arg = args->list[i];
+        auto data_type = func->args[i].type;
+        if (is_int_type(data_type)) {
+            run_iexpression(ctx, arg);
+            uint64_t value = ctx->istack.top();
+            ctx->istack.pop();
+            addrs.push_back(value);
+        } else if (is_float_type(data_type)) {
+        
+        } else if (is_string_type(data_type)) {
+            run_sexpression(ctx, arg);
+            std::string value = ctx->sstack.top();
+            ctx->sstack.pop();
+            addrs.push_back((uint64_t)&value);
+        }
+    }
+    
+    // Run it
+    run_function(func, addrs);
+}
+
 //
 // Runs a block of statements
 //
@@ -102,31 +129,8 @@ void AstInterpreter::run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr
                 if (fc->name == "print") {
                     run_print(ctx, std::static_pointer_cast<AstExprList>(fc->expression));
                 } else {
-                    auto func = function_map[fc->name];
                     auto args = std::static_pointer_cast<AstExprList>(fc->expression);
-                    std::vector<uint64_t> addrs;
-                    
-                    // TODO: Check type
-                    for (int i = 0; i<args->list.size(); i++) {
-                        auto arg = args->list[i];
-                        auto data_type = func->args[i].type;
-                        if (is_int_type(data_type)) {
-                            run_iexpression(ctx, arg);
-                            uint64_t value = ctx->istack.top();
-                            ctx->istack.pop();
-                            addrs.push_back(value);
-                        } else if (is_float_type(data_type)) {
-                        
-                        } else if (is_string_type(data_type)) {
-                            run_sexpression(ctx, arg);
-                            std::string value = ctx->sstack.top();
-                            ctx->sstack.pop();
-                            addrs.push_back((uint64_t)&value);
-                        }
-                    }
-                    
-                    // Run it
-                    run_function(func, addrs);
+                    call_function(ctx, fc->name, args);
                 }
             } break;
             

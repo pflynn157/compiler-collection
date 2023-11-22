@@ -12,9 +12,9 @@ func main() -> int is
     for i in 0 .. sizeof(numbers) step 1 do
         numbers[i] := i + 1;
     end
+    print_numbers(numbers);
     
-    var x : int := 20;
-    
+    numbers := 2;
     print_numbers(numbers);
     
     return 0;

@@ -16,7 +16,7 @@ end
 
 func main -> i32 is
     var c : char := 'A';
-    var str : char[10];
+    array str : char[10];
     
     var i : i32 := 0;
     while i < 10 do

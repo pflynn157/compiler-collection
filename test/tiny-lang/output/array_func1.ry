@@ -14,7 +14,7 @@ func printArray(numbers:i32[], size:i32) is
 end
 
 func main -> i32 is
-    var numbers : i32[10];
+    array numbers : i32[10];
     numbers[2] := 242;
     
     printArray(numbers, 10);

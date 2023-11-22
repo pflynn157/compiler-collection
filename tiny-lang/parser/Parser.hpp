@@ -37,6 +37,7 @@ protected:
     
     // Variable.cpp
     bool buildVariableDec(std::shared_ptr<AstBlock> block);
+    bool build_array_dec(std::shared_ptr<AstBlock> block);
     bool buildVariableAssign(std::shared_ptr<AstBlock> block, std::string var_name);
     bool buildConst(std::shared_ptr<AstBlock> block, bool isGlobal);
     

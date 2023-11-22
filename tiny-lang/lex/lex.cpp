@@ -36,11 +36,14 @@ int Lex::get_next() {
     
     while (!reader.eof()) {
         char c = reader.get();
+        if (!reader.eof()) raw_buffer += c;
         
         if (c == '#') {
             c = reader.get();
+            raw_buffer += c;
             while (c != '\n' && !reader.eof()) {
                 c = reader.get();
+                raw_buffer += c;
             }
             ++line_number;
         }
@@ -49,9 +52,20 @@ int Lex::get_next() {
             value = "";
             
             c = reader.get();
+            raw_buffer += c;
             while (c != '\"' && !reader.eof()) {
-                value += c;
-                c = reader.get();     
+                if (c == '\\') {
+                    c = reader.get();
+                    if (c == 'n') {
+                        value += '\n';
+                    } else {
+                        value += '\\';
+                        value += c;
+                    }
+                } else {
+                    value += c;
+                }
+                c = reader.get();   
             }
             
             return t_string_literal;
@@ -96,6 +110,7 @@ int Lex::get_next() {
 			else if (buffer == "end") t = t_end;
 			else if (buffer == "return") t = t_return;
 			else if (buffer == "var") t = t_var;
+			else if (buffer == "array") t = t_array;
 			else if (buffer == "const") t = t_const;
 			else if (buffer == "bool") t = t_bool;
 			else if (buffer == "char") t = t_char;
@@ -130,6 +145,10 @@ int Lex::get_next() {
                 t = t_int_literal;
                 value = buffer;
                 i_value = std::stoi(buffer, 0, 16);
+            } else if (is_float()) {
+                t = t_float_literal;
+                value = buffer;
+                f_value = std::stod(buffer);
             } else {
                 t = t_id;
                 value = buffer;
@@ -143,6 +162,12 @@ int Lex::get_next() {
     }
     
     return t_eof;
+}
+
+std::string Lex::get_raw_buffer() {
+    std::string ret = raw_buffer;
+    raw_buffer = "";
+    return ret;
 }
 
 bool Lex::is_symbol(char c) {
@@ -186,6 +211,7 @@ token Lex::get_symbol(char c) {
 		case '-': {
 			char c2 = reader.get();
 			if (c2 == '>') {
+				raw_buffer += c2;
 				return t_arrow;
 			} else {
 				reader.unget();
@@ -201,6 +227,7 @@ token Lex::get_symbol(char c) {
 		case ':': {
 			char c2 = reader.get();
 			if (c2 == '=') {
+				raw_buffer += c2;
 				return t_assign;
 			} else {
 				reader.unget();
@@ -210,6 +237,7 @@ token Lex::get_symbol(char c) {
 		case '>': {
 			char c2 = reader.get();
 			if (c2 == '=') {
+				raw_buffer += c2;
 				return t_gte;
 			} else {
 				reader.unget();
@@ -219,6 +247,7 @@ token Lex::get_symbol(char c) {
 		case '<': {
 			char c2 = reader.get();
 			if (c2 == '=') {
+				raw_buffer += c2;
 				return t_lte;
 			} else {
 				reader.unget();
@@ -229,6 +258,7 @@ token Lex::get_symbol(char c) {
 		case '!': {
 			char c2 = reader.get();
 			if (c2 == '=') {
+				raw_buffer += c2;
 				return t_neq;
 			} else {
 				reader.unget();
@@ -256,6 +286,20 @@ bool Lex::is_hex() {
     return true;
 }
 
+bool Lex::is_float() {
+    bool foundDot = false;
+    for (char c : buffer) {
+        if (c == '.') {
+            if (foundDot) return false;
+            foundDot = true;
+        } else if (!isdigit(c)) {
+            return false;
+        }
+    }
+    if (!foundDot) return false;
+    return true;
+}
+
 //
 // A debug function for the lexical analyzer
 //
@@ -270,6 +314,7 @@ void Lex::debug_token(int t) {
 		case t_end: std::cout << "end" << std::endl; break;
 		case t_return: std::cout << "return" << std::endl; break;
 		case t_var: std::cout << "var" << std::endl; break;
+		case t_array: std::cout << "array" << std::endl; break;
 		case t_const: std::cout << "const" << std::endl; break;
 		case t_bool: std::cout << "bool" << std::endl; break;
 		case t_char: std::cout << "char" << std::endl; break;

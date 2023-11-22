@@ -15,7 +15,7 @@
 #RET 0
 
 func main -> i32 is
-    var numbers : i64[10];
+    array numbers : i64[10];
     var x : i64 := 0;
     
     var i : i32 := 0;

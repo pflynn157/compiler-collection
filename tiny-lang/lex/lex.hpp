@@ -19,6 +19,7 @@ enum token {
 	t_end,
 	t_return,
 	t_var,
+	t_array,
 	t_const,
 	t_bool,
 	t_char,
@@ -87,9 +88,11 @@ struct Lex : BaseLex {
     int get_next() override;
     void debug_token(int t) override;
     
+    std::string get_raw_buffer();
 private:
     std::ifstream reader;
     std::string buffer = "";
+    std::string raw_buffer = "";
     std::stack<token> token_stack;
     
     // Internal functions
@@ -97,5 +100,6 @@ private:
     token get_symbol(char c);
     bool is_integer();
     bool is_hex();
+    bool is_float();
 };
 

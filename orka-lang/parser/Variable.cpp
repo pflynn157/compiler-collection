@@ -14,7 +14,6 @@
 #include <lex/lex.hpp>
 
 // Builds a variable declaration
-// A variable declaration is composed of an Alloca and optionally, an assignment
 bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
     int tk = lex->get_next();
     std::vector<std::string> toDeclare;

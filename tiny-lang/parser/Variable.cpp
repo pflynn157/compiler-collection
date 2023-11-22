@@ -14,7 +14,6 @@
 #include <lex/lex.hpp>
 
 // Builds a variable declaration
-// A variable declaration is composed of an Alloca and optionally, an assignment
 bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
     int tk = lex->get_next();
     std::vector<std::string> toDeclare;
@@ -48,78 +47,90 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
     std::shared_ptr<AstDataType> dataType = buildDataType(false);
     tk = lex->get_next();
     
-    // We have an array
-    if (tk == t_lbracket) {
-        dataType = AstBuilder::buildPointerType(dataType);
-        std::shared_ptr<AstVarDec> empty = std::make_shared<AstVarDec>("", dataType);
-        std::shared_ptr<AstExpression> arg = buildExpression(block, AstBuilder::buildInt32Type(), t_rbracket);
-        if (!arg) return false;
-        empty->expression = arg; 
-        
-        consume_token(t_semicolon, "Error: Expected \';\'.");
-        
-        for (std::string name : toDeclare) {
-            std::shared_ptr<AstVarDec> vd = std::make_shared<AstVarDec>(name, dataType);
-            block->addStatement(vd);
-            vd->expression = empty->expression;
-            
-            // Create an assignment to a malloc call
-            std::shared_ptr<AstExprStatement> va = std::make_shared<AstExprStatement>();
-            va->setDataType(dataType);
-            block->addStatement(va);
-            
-            std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
-            std::shared_ptr<AstFuncCallExpr> callMalloc = std::make_shared<AstFuncCallExpr>("malloc");
-            std::shared_ptr<AstAssignOp> assign = std::make_shared<AstAssignOp>(id, callMalloc);
-            
-            va->expression = assign;
-            
-            // In order to get a proper malloc, we need to multiply the argument by
-            // the size of the type. Get the arguments, and do that
-            std::shared_ptr<AstExprList> list = std::make_shared<AstExprList>();
-            callMalloc->args = list;
-            
-            std::shared_ptr<AstInt> size;
-            std::shared_ptr<AstDataType> baseType = std::static_pointer_cast<AstPointerType>(dataType)->base_type;
-            if (baseType->type == V_AstType::Int32) size = std::make_shared<AstInt>(4);
-            else if (baseType->type == V_AstType::Int64) size = std::make_shared<AstInt>(8);
-            else if (baseType->type == V_AstType::String) size = std::make_shared<AstInt>(8);
-            else size = std::make_shared<AstInt>(1);
-            
-            std::shared_ptr<AstMulOp> op = std::make_shared<AstMulOp>();
-            op->lval = size;
-            op->rval = vd->expression;
-            list->add_expression(op);
-            
-            block->addSymbol(name, dataType);
-        }
-    
     // We're at the end of the declaration
-    } else if (tk == t_semicolon) {
+    if (tk == t_semicolon) {
         syntax->addError(lex->line_number, "Expected init expression.");
         return false;
-        
-    // Otherwise, we have a regular variable
-    } else {
-        std::shared_ptr<AstExpression> arg = buildExpression(block, dataType, t_semicolon);
-        if (!arg) return false;
-    
-        for (std::string name : toDeclare) {
-            std::shared_ptr<AstVarDec> vd = std::make_shared<AstVarDec>(name, dataType);
-            block->addStatement(vd);
-            
-            std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
-            std::shared_ptr<AstAssignOp> assign = std::make_shared<AstAssignOp>(id, arg);
-            
-            std::shared_ptr<AstExprStatement> va = std::make_shared<AstExprStatement>();
-            va->setDataType(dataType);
-            va->expression = assign;
-            block->addStatement(va);
-            
-            // Add the variable to the blocks symbol table
-            block->addSymbol(name, dataType);
-        }
     }
+    
+    std::shared_ptr<AstExpression> arg = buildExpression(block, dataType, t_semicolon);
+    if (!arg) return false;
+
+    for (std::string name : toDeclare) {
+        std::shared_ptr<AstVarDec> vd = std::make_shared<AstVarDec>(name, dataType);
+        block->addStatement(vd);
+        
+        std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
+        std::shared_ptr<AstAssignOp> assign = std::make_shared<AstAssignOp>(id, arg);
+        
+        std::shared_ptr<AstExprStatement> va = std::make_shared<AstExprStatement>();
+        va->setDataType(dataType);
+        va->expression = assign;
+        block->addStatement(va);
+        
+        // Add the variable to the blocks symbol table
+        block->addSymbol(name, dataType);
+    }
+    
+    return true;
+}
+
+//
+// Builds an array declaration
+//
+bool Parser::build_array_dec(std::shared_ptr<AstBlock> block) {
+    // Get the array name
+    consume_token(t_id, "Expected array name.");
+    std::string name = lex->value;
+    
+    // Get the colon
+    consume_token(t_colon, "Expected \':\'.");
+    
+    // Build the data type
+    std::shared_ptr<AstDataType> base_type = buildDataType(false);
+    
+    // Get the bracket
+    consume_token(t_lbracket, "Expected opening \'[\'.");
+    
+    auto dataType = AstBuilder::buildPointerType(base_type);
+    std::shared_ptr<AstExpression> arg = buildExpression(block, AstBuilder::buildInt32Type(), t_rbracket);
+    if (!arg) return false;
+    
+    consume_token(t_semicolon, "Error: Expected \';\'.");
+    
+    std::shared_ptr<AstVarDec> vd = std::make_shared<AstVarDec>(name, dataType);
+    block->addStatement(vd);
+    vd->expression = arg;
+    
+    // Create an assignment to a malloc call
+    std::shared_ptr<AstExprStatement> va = std::make_shared<AstExprStatement>();
+    va->setDataType(dataType);
+    block->addStatement(va);
+    
+    std::shared_ptr<AstID> id = std::make_shared<AstID>(name);
+    std::shared_ptr<AstFuncCallExpr> callMalloc = std::make_shared<AstFuncCallExpr>("malloc");
+    std::shared_ptr<AstAssignOp> assign = std::make_shared<AstAssignOp>(id, callMalloc);
+    
+    va->expression = assign;
+    
+    // In order to get a proper malloc, we need to multiply the argument by
+    // the size of the type. Get the arguments, and do that
+    std::shared_ptr<AstExprList> list = std::make_shared<AstExprList>();
+    callMalloc->args = list;
+    
+    std::shared_ptr<AstInt> size;
+    std::shared_ptr<AstDataType> baseType = std::static_pointer_cast<AstPointerType>(dataType)->base_type;
+    if (baseType->type == V_AstType::Int32) size = std::make_shared<AstInt>(4);
+    else if (baseType->type == V_AstType::Int64) size = std::make_shared<AstInt>(8);
+    else if (baseType->type == V_AstType::String) size = std::make_shared<AstInt>(8);
+    else size = std::make_shared<AstInt>(1);
+    
+    std::shared_ptr<AstMulOp> op = std::make_shared<AstMulOp>();
+    op->lval = size;
+    op->rval = vd->expression;
+    list->add_expression(op);
+    
+    block->addSymbol(name, dataType);
     
     return true;
 }

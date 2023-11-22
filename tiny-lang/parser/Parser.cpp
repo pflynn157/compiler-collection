@@ -112,6 +112,7 @@ bool Parser::buildBlock(std::shared_ptr<AstBlock> block, std::shared_ptr<AstNode
         
         switch (tk) {
             case t_var: code = buildVariableDec(block); break;
+            case t_array: code = build_array_dec(block); break;
             case t_struct: code = buildStructDec(block); break;
             case t_const: code = buildConst(block, false); break;
             

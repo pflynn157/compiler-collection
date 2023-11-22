@@ -1,6 +1,6 @@
 
 func main -> i32 is
-    var numbers : i32[10];
+    array numbers : i32[10];
     var i : i32 := 0;
     
     while i < 10 do

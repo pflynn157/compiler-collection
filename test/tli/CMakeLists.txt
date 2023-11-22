@@ -1,6 +1,7 @@
 set(CORE_TEST_SRC
     test1 test2 test3
     print_add1
+    imath1
 )
 
 foreach(ITEM ${CORE_TEST_SRC})

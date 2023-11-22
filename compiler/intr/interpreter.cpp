@@ -110,6 +110,15 @@ void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shar
         
         // Operators
         case V_AstType::Add:
+        case V_AstType::Sub:
+        case V_AstType::Mul:
+        case V_AstType::Div:
+        case V_AstType::Mod:
+        case V_AstType::And:
+        case V_AstType::Or:
+        case V_AstType::Xor:
+        case V_AstType::Lsh:
+        case V_AstType::Rsh:
         {
             auto op = std::static_pointer_cast<AstBinaryOp>(expr);
             run_iexpression(ctx, op->lval);
@@ -121,6 +130,15 @@ void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shar
             ctx->istack.pop();
             
             if (expr->type == V_AstType::Add) ctx->istack.push(lval + rval);
+            else if (expr->type == V_AstType::Sub) ctx->istack.push(lval - rval);
+            else if (expr->type == V_AstType::Mul) ctx->istack.push(lval * rval);
+            else if (expr->type == V_AstType::Div) ctx->istack.push(lval / rval);
+            else if (expr->type == V_AstType::Mod) ctx->istack.push(lval % rval);
+            else if (expr->type == V_AstType::And) ctx->istack.push(lval & rval);
+            else if (expr->type == V_AstType::Or)  ctx->istack.push(lval | rval);
+            else if (expr->type == V_AstType::Xor) ctx->istack.push(lval ^ rval);
+            else if (expr->type == V_AstType::Lsh) ctx->istack.push(lval << rval);
+            else if (expr->type == V_AstType::Rsh) ctx->istack.push(lval >> rval);
         } break;
         
         default: {}
@@ -157,6 +175,15 @@ void AstInterpreter::run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr
             
             // Print a binary operation
             case V_AstType::Add:
+            case V_AstType::Sub:
+            case V_AstType::Mul:
+            case V_AstType::Div:
+            case V_AstType::Mod:
+            case V_AstType::And:
+            case V_AstType::Or:
+            case V_AstType::Xor:
+            case V_AstType::Lsh:
+            case V_AstType::Rsh:
             {
                 auto data_type = interpret_type(arg);
                 if (data_type == nullptr) {
@@ -191,6 +218,15 @@ std::shared_ptr<AstDataType> AstInterpreter::interpret_type(std::shared_ptr<AstE
         case V_AstType::IntL: return AstBuilder::buildInt32Type();
         
         case V_AstType::Add:
+        case V_AstType::Sub:
+        case V_AstType::Mul:
+        case V_AstType::Div:
+        case V_AstType::Mod:
+        case V_AstType::And:
+        case V_AstType::Or:
+        case V_AstType::Xor:
+        case V_AstType::Lsh:
+        case V_AstType::Rsh:
         {
             auto op = std::static_pointer_cast<AstBinaryOp>(expr);
             auto d_type = interpret_type(op->lval);

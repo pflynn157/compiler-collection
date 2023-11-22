@@ -1,7 +1,7 @@
 import std.io;
 
 func main -> int is
-    var numbers : uint[5];
+    array numbers : uint[5];
     numbers[2] := 243;
     
     var x : uint := numbers[2];

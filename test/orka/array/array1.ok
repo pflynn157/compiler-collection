@@ -1,7 +1,7 @@
 import std.io;
 
 func main -> int is
-    var numbers : int[10];
+    array numbers : int[10];
     numbers[2] := 242;
     
     printf("%d\n", numbers[2]);

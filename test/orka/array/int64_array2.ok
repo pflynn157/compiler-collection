@@ -1,7 +1,7 @@
 import std.io;
 
 func main -> int is
-    var numbers : int64[10];
+    array numbers : int64[10];
     var x : int64 := 0;
     
     for i in 0 .. 10 step 1 do

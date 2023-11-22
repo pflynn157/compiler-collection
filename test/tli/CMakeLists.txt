@@ -3,6 +3,7 @@ set(CORE_TEST_SRC
     print_add1
     imath1
     iprint1
+    func1
 )
 
 foreach(ITEM ${CORE_TEST_SRC})

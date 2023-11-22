@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdarg>
 
 #include <ast/ast.hpp>
 #include <ast/ast_builder.hpp>
@@ -32,15 +33,26 @@ int AstInterpreter::run() {
         return 1;
     }
     
-    return run_function(function_map["main"], std::make_shared<AstExprList>());
+    return run_function(function_map["main"], std::vector<uint64_t>());
 }
 
 //
 // For running functions
 //
-int AstInterpreter::run_function(std::shared_ptr<AstFunction> func, std::shared_ptr<AstExprList> args) {
+int AstInterpreter::run_function(std::shared_ptr<AstFunction> func, std::vector<uint64_t> args) {   
     auto ctx = std::make_shared<IntrContext>();
     ctx->func_type = func->data_type;
+    
+    // Merge arguments into the symbol table
+    for (int i = 0; i<func->args.size(); i++) {
+        auto arg = func->args[i];
+        ctx->type_map[arg.name] = arg.type;
+        
+        // TODO: Check type
+        ctx->ivar_map[arg.name] = args[i];
+    }
+    
+    // Run the block
     run_block(ctx, func->block);
     
     // At the end, check the stack
@@ -83,7 +95,20 @@ void AstInterpreter::run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr
                 if (fc->name == "print") {
                     run_print(ctx, std::static_pointer_cast<AstExprList>(fc->expression));
                 } else {
-                
+                    auto func = function_map[fc->name];
+                    auto args = std::static_pointer_cast<AstExprList>(fc->expression);
+                    std::vector<uint64_t> addrs;
+                    
+                    // TODO: Check type
+                    for (auto arg : args->list) {
+                        run_iexpression(ctx, arg);
+                        uint64_t value = ctx->istack.top();
+                        ctx->istack.pop();
+                        addrs.push_back(value);
+                    }
+                    
+                    // Run it
+                    run_function(func, addrs);
                 }
             } break;
             
@@ -121,6 +146,12 @@ void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shar
         case V_AstType::IntL: {
             auto i = std::static_pointer_cast<AstInt>(expr);
             ctx->istack.push(i->value);
+        } break;
+        
+        // Variables
+        case V_AstType::ID: {
+            auto id = std::static_pointer_cast<AstID>(expr);
+            ctx->istack.push(ctx->ivar_map[id->value]);
         } break;
         
         // Assign operator
@@ -225,7 +256,7 @@ void AstInterpreter::run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr
             case V_AstType::Lsh:
             case V_AstType::Rsh:
             {
-                auto data_type = interpret_type(arg);
+                auto data_type = interpret_type(ctx, arg);
                 if (data_type == nullptr) {
                     std::cout << "[ERR:<UNK_TYPE>]";
                     break;
@@ -253,9 +284,14 @@ void AstInterpreter::run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr
 //
 // Generally, we decide on types based on the lval
 //
-std::shared_ptr<AstDataType> AstInterpreter::interpret_type(std::shared_ptr<AstExpression> expr) {
+std::shared_ptr<AstDataType> AstInterpreter::interpret_type(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr) {
     switch (expr->type) {
         case V_AstType::IntL: return AstBuilder::buildInt32Type();
+        
+        case V_AstType::ID: {
+            auto id = std::static_pointer_cast<AstID>(expr);
+            return ctx->type_map[id->value];
+        }
         
         case V_AstType::Add:
         case V_AstType::Sub:
@@ -269,9 +305,9 @@ std::shared_ptr<AstDataType> AstInterpreter::interpret_type(std::shared_ptr<AstE
         case V_AstType::Rsh:
         {
             auto op = std::static_pointer_cast<AstBinaryOp>(expr);
-            auto d_type = interpret_type(op->lval);
+            auto d_type = interpret_type(ctx, op->lval);
             if (d_type) return d_type;
-            d_type = interpret_type(op->rval);
+            d_type = interpret_type(ctx, op->rval);
             if (d_type) return d_type;
             return nullptr;
         }

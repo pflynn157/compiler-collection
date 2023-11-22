@@ -4,9 +4,8 @@ func get_number(x:i32, y:i32) -> i32 is
 end
 
 func main -> i32 is
-    var n1 : i32 := 20;
-    var n2 : i32 := 30;
-    print(get_number(n1 * 3, n2 * 2));
+    var x : i32 := get_number(10, 20);
+    print(x);
     return 0;
 end
 

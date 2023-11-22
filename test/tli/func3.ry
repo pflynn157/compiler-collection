@@ -1,0 +1,12 @@
+
+func get_number() -> i32 is
+    var x : i32 := 20;
+    return x;
+end
+
+func main -> i32 is
+    var x : i32 := get_number();
+    print(x);
+    return 0;
+end
+

@@ -36,8 +36,8 @@ struct AstInterpreter {
     explicit AstInterpreter(std::shared_ptr<AstTree> tree);
     int run();
     
-    int run_function(std::shared_ptr<AstFunction> func, std::vector<uint64_t> args);
-    void call_function(std::shared_ptr<IntrContext> ctx, std::string name, std::shared_ptr<AstExprList> args);
+    uint64_t run_function(std::shared_ptr<AstFunction> func, std::vector<uint64_t> args);
+    uint64_t call_function(std::shared_ptr<IntrContext> ctx, std::string name, std::shared_ptr<AstExprList> args);
     void run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstBlock> block);
     void run_expression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> type);
     void run_iexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);

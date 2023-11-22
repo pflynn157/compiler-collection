@@ -3,7 +3,7 @@ set(CORE_TEST_SRC
     print_add1
     imath1 imath2
     iprint1
-    func1
+    func1 func2 func3 func4 func5 func6 func7
     string1
     string_func1
 )

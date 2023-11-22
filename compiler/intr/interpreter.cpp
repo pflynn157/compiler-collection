@@ -39,7 +39,7 @@ int AstInterpreter::run() {
 //
 // For running functions
 //
-int AstInterpreter::run_function(std::shared_ptr<AstFunction> func, std::vector<uint64_t> args) {   
+uint64_t AstInterpreter::run_function(std::shared_ptr<AstFunction> func, std::vector<uint64_t> args) {   
     auto ctx = std::make_shared<IntrContext>();
     ctx->func_type = func->data_type;
     
@@ -67,7 +67,7 @@ int AstInterpreter::run_function(std::shared_ptr<AstFunction> func, std::vector<
     return ctx->istack.top();
 }
 
-void AstInterpreter::call_function(std::shared_ptr<IntrContext> ctx, std::string name, std::shared_ptr<AstExprList> args) {
+uint64_t AstInterpreter::call_function(std::shared_ptr<IntrContext> ctx, std::string name, std::shared_ptr<AstExprList> args) {
     auto func = function_map[name];
     std::vector<uint64_t> addrs;
     
@@ -91,7 +91,7 @@ void AstInterpreter::call_function(std::shared_ptr<IntrContext> ctx, std::string
     }
     
     // Run it
-    run_function(func, addrs);
+    return run_function(func, addrs);
 }
 
 //
@@ -161,6 +161,13 @@ void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shar
         case V_AstType::ID: {
             auto id = std::static_pointer_cast<AstID>(expr);
             ctx->istack.push(ctx->ivar_map[id->value]);
+        } break;
+        
+        // Function call expression
+        case V_AstType::FuncCallExpr: {
+            auto fc = std::static_pointer_cast<AstFuncCallExpr>(expr);
+            uint64_t value = call_function(ctx, fc->name, std::static_pointer_cast<AstExprList>(fc->args));
+            ctx->istack.push(value);
         } break;
         
         // Assign operator
@@ -308,6 +315,14 @@ void AstInterpreter::run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr
                 } else if (is_string_type(data_type)) {
                     std::cout << ctx->svar_map[id->value];
                 }
+            } break;
+            
+            // Function call expression
+            // TODO: Type checking
+            case V_AstType::FuncCallExpr: {
+                auto fc = std::static_pointer_cast<AstFuncCallExpr>(arg);
+                uint64_t value = call_function(ctx, fc->name, std::static_pointer_cast<AstExprList>(fc->args));
+                std::cout << value;
             } break;
             
             // Print a binary operation

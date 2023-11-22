@@ -92,7 +92,7 @@ bool Parser::buildVariableDec(std::shared_ptr<AstBlock> block) {
             list->add_expression(mul_op);
             
             // Create the malloc call
-            std::shared_ptr<AstFuncCallExpr> call_malloc = std::make_shared<AstFuncCallExpr>("malloc");
+            std::shared_ptr<AstFuncCallExpr> call_malloc = std::make_shared<AstFuncCallExpr>("gc_alloc");
             call_malloc->args = list;
             
             std::shared_ptr<AstStructAccess> lval_alloc = std::make_shared<AstStructAccess>(name, "ptr");

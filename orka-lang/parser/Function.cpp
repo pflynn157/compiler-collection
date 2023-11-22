@@ -64,6 +64,8 @@ bool Parser::buildFunction(int startToken, std::string className) {
     tk = lex->get_next();
     std::string funcName = lex->value;
     
+    if (funcName == "main" && className == "") funcName = "__main";
+    
     if (tk != t_id) {
         syntax->addError(lex->line_number, "Expected function name.");
         return false;

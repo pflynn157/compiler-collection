@@ -34,7 +34,10 @@ void Compiler::compileStructDeclaration(std::shared_ptr<AstStatement> stmt) {
     std::vector<Value *> args;
     args.push_back(builder->getInt32(str->size));
     
-    Function *callee = mod->getFunction("malloc");
+    std::string malloc_call = "malloc";
+    if (cflags.use_memgc) malloc_call = "gc_alloc";
+    
+    Function *callee = mod->getFunction(malloc_call);
     if (!callee) std::cerr << "Unable to allocate structure." << std::endl;
     Value *ptr = builder->CreateCall(callee, args);
     builder->CreateStore(ptr, var);

@@ -35,6 +35,7 @@ if (DEV_LINK_MODE)
         -DLINK_CORELIB_LOCATION="${CMAKE_BINARY_DIR}/orka-lang/lib/corelib"
         -DLINK_STDLIB_LOCATION="${CMAKE_BINARY_DIR}/orka-lang/lib/stdlib"
         -DORKA_HEADER_LOCATION="${CMAKE_SOURCE_DIR}/orka-lang/lib/stdlib/include"
+        -DLINK_MEMGC_LOCATION="${CMAKE_BINARY_DIR}/runtime/gc"
     )
 endif()
 

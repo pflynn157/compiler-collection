@@ -1,0 +1,15 @@
+
+func main -> int is
+    #@parallel is
+    #    printf("Hello!\n");
+    #end
+    
+    @parallel is
+        for i in 0 .. 10 step 1 do
+            printf("%d\n", i);
+        end
+    end
+    
+    return 0;
+end
+

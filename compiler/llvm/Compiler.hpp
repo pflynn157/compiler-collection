@@ -20,6 +20,7 @@ using namespace llvm;
 
 struct CFlags {
     std::string name;
+    bool use_memgc = false;
 };
 
 class Compiler {

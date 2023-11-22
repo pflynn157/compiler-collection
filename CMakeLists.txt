@@ -3,7 +3,8 @@ project(ooto_lang)
 
 find_package(LLVM REQUIRED CONFIG)
 
-add_compile_options(-std=c++17 -g)
+set(CMAKE_CXX_STANDARD 17)
+add_compile_options(-g)
 
 include_directories(compiler)
 include_directories(compiler/java)
@@ -26,6 +27,7 @@ endif()
 # Build supporting projects
 add_subdirectory(as)
 add_subdirectory(compiler)
+add_subdirectory(runtime)
 
 # Build the core compiler
 add_subdirectory(tiny-lang)

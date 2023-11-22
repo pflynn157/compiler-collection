@@ -1,13 +1,10 @@
 
-func main -> int is
-    #@parallel is
-    #    printf("Hello!\n");
-    #end
+func main(args:str[]) -> int is
+    var numbers : int[10];
+    printf("hello: %d\n", sizeof(numbers));
     
-    @parallel is
-        for i in 0 .. 10 step 1 do
-            printf("%d\n", i);
-        end
+    forall s in args do
+        println(s);
     end
     
     return 0;

@@ -133,6 +133,29 @@ Parser::Parser(std::string input) : BaseParser(input) {
     omp_fc3->varargs = true;
     omp_fc3->data_type = AstBuilder::buildVoidType();
     tree->addGlobalStatement(omp_fc3);
+    
+    //
+    // Add the declarations for the MemGC library
+    //
+    
+    // void gc_init()
+    tree->block->funcs.push_back("gc_init");
+    auto gc_func1 = std::make_shared<AstExternFunction>("gc_init");
+    gc_func1->data_type = AstBuilder::buildVoidType();
+    tree->addGlobalStatement(gc_func1);
+    
+    // void gc_destroy()
+    tree->block->funcs.push_back("gc_destroy");
+    auto gc_func2 = std::make_shared<AstExternFunction>("gc_destroy");
+    gc_func2->data_type = AstBuilder::buildVoidType();
+    tree->addGlobalStatement(gc_func2);
+    
+    // void *gc_alloc(int size)
+    tree->block->funcs.push_back("gc_alloc");
+    auto gc_func3 = std::make_shared<AstExternFunction>("gc_alloc");
+    gc_func3->addArgument(Var(AstBuilder::buildInt32Type(), "size"));
+    gc_func3->data_type = AstBuilder::buildStringType();
+    tree->addGlobalStatement(gc_func3);
 }
 
 Parser::~Parser() {
@@ -395,6 +418,7 @@ std::string Parser::getArrayType(std::shared_ptr<AstDataType> dataType) {
         case V_AstType::Char:
         case V_AstType::Int8: return "__int8_array";
         case V_AstType::Int16: return "__int16_array";
+        //case V_AstType::String:
         case V_AstType::Int64: return "__int64_array";
         case V_AstType::Float32: return "__f32_array";
         case V_AstType::Float64: return "__f64_array";

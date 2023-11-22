@@ -110,6 +110,7 @@ int Lex::get_next() {
 			else if (buffer == "end") t = t_end;
 			else if (buffer == "return") t = t_return;
 			else if (buffer == "var") t = t_var;
+			else if (buffer == "array") t = t_array;
 			else if (buffer == "const") t = t_const;
 			else if (buffer == "bool") t = t_bool;
 			else if (buffer == "char") t = t_char;
@@ -338,6 +339,7 @@ void Lex::debug_token(int t) {
 		case t_end: std::cout << "end" << std::endl; break;
 		case t_return: std::cout << "return" << std::endl; break;
 		case t_var: std::cout << "var" << std::endl; break;
+		case t_array: std::cout << "array" << std::endl; break;
 		case t_const: std::cout << "const" << std::endl; break;
 		case t_bool: std::cout << "bool" << std::endl; break;
 		case t_char: std::cout << "char" << std::endl; break;

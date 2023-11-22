@@ -19,6 +19,7 @@ enum token {
 	t_end,
 	t_return,
 	t_var,
+	t_array,
 	t_const,
 	t_bool,
 	t_char,

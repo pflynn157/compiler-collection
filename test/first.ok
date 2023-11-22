@@ -1,6 +1,19 @@
 
+func print_numbers(numbers:int[]) is
+    printf("[");
+    forall i in numbers do
+        printf("%d ", i);
+    end
+    printf("]\n");
+end
+
 func main() -> int is
-    var numbers : int[10];
+    array numbers : int[10];
+    for i in 0 .. sizeof(numbers) step 1 do
+        numbers[i] := i + 1;
+    end
+    
+    print_numbers(numbers);
     
     return 0;
 end

@@ -7,6 +7,7 @@ keywords = [
     ("t_end", "end"),
     ("t_return", "return"),
     ("t_var", "var"),
+    ("t_array", "array"),
     ("t_const", "const"),
     ("t_bool", "bool"),
     ("t_char", "char"),

@@ -49,7 +49,14 @@ int AstInterpreter::run_function(std::shared_ptr<AstFunction> func, std::vector<
         ctx->type_map[arg.name] = arg.type;
         
         // TODO: Check type
-        ctx->ivar_map[arg.name] = args[i];
+        if (is_int_type(arg.type)) {
+            ctx->ivar_map[arg.name] = args[i];
+        } else if (is_float_type(arg.type)) {
+        
+        } else if (is_string_type(arg.type)) {
+            std::string value = *(std::string*)(args[i]);
+            ctx->svar_map[arg.name] = value;
+        }
     }
     
     // Run the block
@@ -100,11 +107,22 @@ void AstInterpreter::run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr
                     std::vector<uint64_t> addrs;
                     
                     // TODO: Check type
-                    for (auto arg : args->list) {
-                        run_iexpression(ctx, arg);
-                        uint64_t value = ctx->istack.top();
-                        ctx->istack.pop();
-                        addrs.push_back(value);
+                    for (int i = 0; i<args->list.size(); i++) {
+                        auto arg = args->list[i];
+                        auto data_type = func->args[i].type;
+                        if (is_int_type(data_type)) {
+                            run_iexpression(ctx, arg);
+                            uint64_t value = ctx->istack.top();
+                            ctx->istack.pop();
+                            addrs.push_back(value);
+                        } else if (is_float_type(data_type)) {
+                        
+                        } else if (is_string_type(data_type)) {
+                            run_sexpression(ctx, arg);
+                            std::string value = ctx->sstack.top();
+                            ctx->sstack.pop();
+                            addrs.push_back((uint64_t)&value);
+                        }
                     }
                     
                     // Run it

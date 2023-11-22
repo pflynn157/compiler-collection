@@ -195,11 +195,6 @@ void AstReturnStmt::print() {
 void AstVarDec::print() {
     std::cout << "VAR_DEC " << name << " : ";
     data_type->print();
-    if (data_type->type == V_AstType::Ptr) {
-        std::cout << "[";
-        size->print();
-        std::cout << "]";
-    }
     std::cout << std::endl;
 }
 

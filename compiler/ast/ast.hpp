@@ -852,7 +852,6 @@ struct AstVarDec : AstStatement {
     std::string dot(std::string parent) override;
     
     std::string name = "";
-    std::shared_ptr<AstExpression> size = nullptr;
     std::shared_ptr<AstDataType> data_type;
     
     // Language-specific attributes

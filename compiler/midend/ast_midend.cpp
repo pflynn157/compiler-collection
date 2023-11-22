@@ -72,10 +72,6 @@ void AstMidend::it_process_statement(std::shared_ptr<AstStatement> stmt, std::sh
         case V_AstType::VarDec: {
             auto stmt2 = std::static_pointer_cast<AstVarDec>(stmt);
             process_var_decl(stmt2, block);
-            
-            // Internal processing
-            it_process_expression(stmt2->size, block);
-            // TODO: Types
         } break;
         
         case V_AstType::StructDec: {

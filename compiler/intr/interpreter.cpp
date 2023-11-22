@@ -143,6 +143,12 @@ void AstInterpreter::run_sexpression(std::shared_ptr<IntrContext> ctx, std::shar
 void AstInterpreter::run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExprList> args) {
     for (auto const &arg : args->list) {
         switch (arg->type) {
+            // Print a string literal
+            case V_AstType::StringL: {
+                auto s = std::static_pointer_cast<AstString>(arg);
+                std::cout << s->value;
+            } break;
+            
             // Print an integer literal
             case V_AstType::IntL: {
                 auto i = std::static_pointer_cast<AstInt>(arg);

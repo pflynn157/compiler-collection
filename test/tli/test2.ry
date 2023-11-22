@@ -1,5 +1,5 @@
 func main -> i32 is
-    print("Number: ", 22);
+    print("Hello!");
     return 0;
 end
 

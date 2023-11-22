@@ -163,13 +163,13 @@ bool Parser::build_array_dec(std::shared_ptr<AstBlock> block) {
 
 // Builds a variable or an array assignment
 bool Parser::buildVariableAssign(std::shared_ptr<AstBlock> block, std::string value) {
-    std::shared_ptr<AstDataType> dataType = block->getDataType(value);
+    std::shared_ptr<AstDataType> data_type = block->getDataType(value);
     
-    std::shared_ptr<AstExpression> expr = buildExpression(block, dataType, t_semicolon);
+    std::shared_ptr<AstExpression> expr = buildExpression(block, data_type, t_semicolon);
     if (!expr) return false;
     
     std::shared_ptr<AstExprStatement> stmt = std::make_shared<AstExprStatement>();
-    stmt->setDataType(dataType);
+    stmt->setDataType(data_type);
     stmt->expression = expr;
     block->addStatement(stmt);
     

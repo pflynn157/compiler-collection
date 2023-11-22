@@ -14,7 +14,7 @@ func main() -> int is
     end
     print_numbers(numbers);
     
-    numbers := 2;
+    numbers := [x *2 : forall x in numbers];
     print_numbers(numbers);
     
     return 0;

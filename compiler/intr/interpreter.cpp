@@ -81,12 +81,27 @@ void AstInterpreter::run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr
                 }
             } break;
             
-            // While loops
+            // Flow control statements
+            case V_AstType::If: run_cond(ctx, stmt); break;
             case V_AstType::While: run_while(ctx, stmt); break;
             
             default: {}
         }
     }
+}
+
+//
+// Runs a conditional statement
+//
+void AstInterpreter::run_cond(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstStatement> stmt) {
+    auto cond = std::static_pointer_cast<AstIfStmt>(stmt);
+    
+    run_iexpression(ctx, cond->expression);
+    bool result = (bool)ctx->istack.top();
+    ctx->istack.pop();
+    
+    if (result) run_block(ctx, cond->true_block);
+    else run_block(ctx, cond->false_block);
 }
 
 //

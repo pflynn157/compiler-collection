@@ -7,7 +7,7 @@ set(CORE_TEST_SRC
     func8 func9 func10
     string1
     string_func1
-    cond1
+    cond1 cond2
     while1
 )
 

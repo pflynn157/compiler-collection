@@ -44,6 +44,7 @@ struct AstInterpreter {
     
     // interpreter.cpp
     void run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstBlock> block);
+    void run_cond(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstStatement> stmt);
     void run_while(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstStatement> stmt);
     std::shared_ptr<AstDataType> interpret_type(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);
     bool is_int_type(std::shared_ptr<AstDataType> data_type);

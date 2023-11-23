@@ -37,18 +37,24 @@ struct AstInterpreter {
     explicit AstInterpreter(std::shared_ptr<AstTree> tree);
     int run();
     
+    // function.cpp
     std::variant<uint64_t, float, std::string> run_function(std::shared_ptr<AstFunction> func, std::vector<uint64_t> args);
     std::variant<uint64_t, float, std::string> call_function(std::shared_ptr<IntrContext> ctx, std::string name, std::shared_ptr<AstExprList> args);
-    void run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstBlock> block);
-    void run_expression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> type);
-    void run_iexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);
-    void run_fexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);
-    void run_sexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);
     void run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExprList> args);
+    
+    // interpreter.cpp
+    void run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstBlock> block);
+    void run_while(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstStatement> stmt);
     std::shared_ptr<AstDataType> interpret_type(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);
     bool is_int_type(std::shared_ptr<AstDataType> data_type);
     bool is_float_type(std::shared_ptr<AstDataType> data_type);
     bool is_string_type(std::shared_ptr<AstDataType> data_type);
+    
+    // expression.cpp
+    void run_expression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr, std::shared_ptr<AstDataType> type);
+    void run_iexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);
+    void run_fexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);
+    void run_sexpression(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExpression> expr);
     
 protected:
     std::shared_ptr<AstTree> tree;

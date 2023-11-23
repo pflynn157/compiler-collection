@@ -54,9 +54,14 @@ void AstInterpreter::run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr
             // Variable declarations
             case V_AstType::VarDec: {
                 auto vd = std::static_pointer_cast<AstVarDec>(stmt);
-                // TODO: Check type
-                ctx->ivar_map[vd->name] = 0;
                 ctx->type_map[vd->name] = vd->data_type;
+                if (is_int_type(vd->data_type)) {
+                    ctx->ivar_map[vd->name] = 0;
+                } else if (is_float_type(vd->data_type)) {
+                
+                } else if (is_string_type(vd->data_type)) {
+                    ctx->svar_map[vd->name] = "";
+                }
             } break;
         
             // Return statements
@@ -76,8 +81,26 @@ void AstInterpreter::run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr
                 }
             } break;
             
+            // While loops
+            case V_AstType::While: run_while(ctx, stmt); break;
+            
             default: {}
         }
+    }
+}
+
+//
+// Runs a while loop
+//
+void AstInterpreter::run_while(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstStatement> stmt) {
+    auto loop = std::static_pointer_cast<AstWhileStmt>(stmt);
+    
+    while (true) {
+        run_iexpression(ctx, loop->expression);
+        bool result = (bool)ctx->istack.top();
+        ctx->istack.pop();
+        if (result == false) break;
+        run_block(ctx, loop->block);
     }
 }
 

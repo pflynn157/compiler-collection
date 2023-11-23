@@ -8,6 +8,7 @@ set(CORE_TEST_SRC
     string1
     string_func1
     cond1
+    while1
 )
 
 foreach(ITEM ${CORE_TEST_SRC})

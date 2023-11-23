@@ -1,4 +1,4 @@
-project(tlc_frontend)
+project(riya)
 
 add_subdirectory(stdlib)
 
@@ -25,18 +25,18 @@ set(SRC
     midend/midend.cpp
 )
 
-add_library(tlcparser STATIC ${SRC})
+add_library(riya STATIC ${SRC})
 
-add_executable(tlc main.cpp)
-target_link_libraries(tlc tlcparser compiler)
+add_executable(riyac main.cpp)
+target_link_libraries(riyac riya compiler)
 
-add_executable(tlci main_intr.cpp)
-target_link_libraries(tlci tlcparser compiler_base compiler_intr)
+add_executable(riyai main_intr.cpp)
+target_link_libraries(riyai riya compiler_base compiler_intr)
 
 # Enable dev linking mode
 if (DEV_LINK_MODE)
-    target_compile_options(tlc PUBLIC
-        -DLINK_LOCATION="${CMAKE_BINARY_DIR}/tiny-lang/stdlib"
+    target_compile_options(riyac PUBLIC
+        -DLINK_LOCATION="${CMAKE_BINARY_DIR}/riya-lang/stdlib"
     )
 endif()
 

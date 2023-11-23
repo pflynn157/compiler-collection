@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(ooto_lang)
+project(laado_lang)
 
 find_package(LLVM REQUIRED CONFIG)
 
@@ -30,7 +30,7 @@ add_subdirectory(compiler)
 add_subdirectory(runtime)
 
 # Build the core compiler
-add_subdirectory(tiny-lang)
+add_subdirectory(riya-lang)
 add_subdirectory(orka-lang)
 add_subdirectory(espresso-lang)
 add_subdirectory(sia-lang)

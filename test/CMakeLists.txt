@@ -1,11 +1,11 @@
-add_subdirectory(tiny-lang/core)
-add_subdirectory(tiny-lang/output)
-add_subdirectory(tiny-lang/lex)
+add_subdirectory(riya/core)
+add_subdirectory(riya/output)
+add_subdirectory(riya/lex)
 
 add_subdirectory(espresso)
 add_subdirectory(orka)
 
-add_subdirectory(tli)
+add_subdirectory(riyai)
 
 if (DISABLE_OUTPUT_TEST)
     add_custom_target(test_llvm DEPENDS
@@ -27,6 +27,6 @@ add_custom_target(test DEPENDS
     test_llvm
     test_orka
     test_espresso
-    test_tli
+    test_riyai
 )
 

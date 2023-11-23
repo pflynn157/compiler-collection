@@ -34,7 +34,7 @@ set(CORE_TEST_SRC
 foreach(ITEM ${CORE_TEST_SRC})
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ITEM}.exe
-        COMMAND ${CMAKE_BINARY_DIR}/tiny-lang/tlc ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.exe
+        COMMAND ${CMAKE_BINARY_DIR}/riya-lang/riyac ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry -o ${ITEM}.exe
         COMMAND ./${ITEM}.exe
         COMMAND rm ${ITEM}.exe
         COMMAND echo "[PASS] ${ITEM}.ry"
@@ -50,5 +50,5 @@ add_custom_target(test_core
     DEPENDS ${TEST_OUTPUTS}
 )
 
-add_dependencies(test_core tlc)
+add_dependencies(test_core riyac)
 

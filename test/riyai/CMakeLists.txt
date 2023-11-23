@@ -20,7 +20,7 @@ set(CORE_TEST_SRC
 foreach(ITEM ${CORE_TEST_SRC})
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ITEM}_output.txt
-        COMMAND ${CMAKE_BINARY_DIR}/tiny-lang/tlci ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry > ${ITEM}_output.txt
+        COMMAND ${CMAKE_BINARY_DIR}/riya-lang/riyai ${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ry > ${ITEM}_output.txt
         COMMAND diff ${CMAKE_CURRENT_SOURCE_DIR}/out/${ITEM}.out ./${ITEM}_output.txt
         COMMAND rm ${ITEM}_output.txt
         COMMAND echo "[PASS][RY_INTR] ${ITEM}.ry"
@@ -32,9 +32,9 @@ foreach(ITEM ${CORE_TEST_SRC})
     )
 endforeach()
 
-add_custom_target(test_tli
+add_custom_target(test_riyai
     DEPENDS ${TEST_OUTPUTS}
 )
 
-add_dependencies(test_tli tlci)
+add_dependencies(test_riyai riyai)
 

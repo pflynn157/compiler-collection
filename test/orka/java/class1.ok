@@ -1,0 +1,15 @@
+
+class class1 is
+    func class1 is
+        println("Rectangle");
+    end
+
+    func sayHello is
+        println("Hello!");
+    end
+end
+
+func main is
+    class rect : class1;
+    rect.sayHello();
+end

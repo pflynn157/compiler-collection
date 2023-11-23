@@ -9,6 +9,7 @@ add_subdirectory(loop)
 add_subdirectory(str)
 add_subdirectory(struct)
 add_subdirectory(syntax)
+add_subdirectory(java)
 
 add_custom_target(test_orka DEPENDS
     test_orka_array
@@ -22,5 +23,6 @@ add_custom_target(test_orka DEPENDS
     test_orka_str
     test_orka_struct
     test_orka_syntax
+    test_orka_java
 )
 

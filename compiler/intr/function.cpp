@@ -132,6 +132,22 @@ void AstInterpreter::run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr
                 }
             } break;
             
+            // Array access
+            case V_AstType::ArrayAccess: {
+                auto acc = std::static_pointer_cast<AstArrayAccess>(arg);
+                run_iexpression(ctx, acc->index);
+                int idx = ctx->istack.top();
+                ctx->istack.pop();
+                
+                if (is_int_array(ctx, acc->value)) {
+                    std::cout << ctx->iarray_map[acc->value][idx];
+                } else if (is_float_array(ctx, acc->value)) {
+                
+                } else if (is_string_array(ctx, acc->value)) {
+                    std::cout << ctx->sarray_map[acc->value][idx];
+                }
+            } break;
+            
             // Function call expression
             // TODO: Type checking
             case V_AstType::FuncCallExpr: {

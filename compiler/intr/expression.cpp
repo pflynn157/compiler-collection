@@ -29,6 +29,14 @@ void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shar
             ctx->istack.push(ctx->ivar_map[id->value]);
         } break;
         
+        case V_AstType::ArrayAccess: {
+            auto acc = std::static_pointer_cast<AstArrayAccess>(expr);
+            run_iexpression(ctx, acc->index);
+            int idx = ctx->istack.top();
+            ctx->istack.pop();
+            ctx->istack.push(ctx->iarray_map[acc->value][idx]);
+        } break;
+        
         // Function call expression
         case V_AstType::FuncCallExpr: {
             auto fc = std::static_pointer_cast<AstFuncCallExpr>(expr);
@@ -60,6 +68,19 @@ void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shar
                         ctx->ivar_map[id->value] = ctx->istack.top();
                     }
                     ctx->istack.pop();
+                } break;
+                
+                // Array access
+                case V_AstType::ArrayAccess: {
+                    auto acc = std::static_pointer_cast<AstArrayAccess>(op->lval);
+                    int value = ctx->istack.top();
+                    ctx->istack.pop();
+                    
+                    run_iexpression(ctx, acc->index);
+                    int idx = ctx->istack.top();
+                    ctx->istack.pop();
+                    
+                    ctx->iarray_map[acc->value][idx] = value;
                 } break;
                 
                 // Unknown lval
@@ -141,6 +162,14 @@ void AstInterpreter::run_sexpression(std::shared_ptr<IntrContext> ctx, std::shar
             ctx->sstack.push(ctx->svar_map[id->value]);
         } break;
         
+        case V_AstType::ArrayAccess: {
+            auto acc = std::static_pointer_cast<AstArrayAccess>(expr);
+            run_iexpression(ctx, acc->index);
+            int idx = ctx->istack.top();
+            ctx->istack.pop();
+            ctx->sstack.push(ctx->sarray_map[acc->value][idx]);
+        } break;
+        
         // Function call expression
         case V_AstType::FuncCallExpr: {
             auto fc = std::static_pointer_cast<AstFuncCallExpr>(expr);
@@ -173,6 +202,19 @@ void AstInterpreter::run_sexpression(std::shared_ptr<IntrContext> ctx, std::shar
                         ctx->svar_map[id->value] = ctx->sstack.top();
                         ctx->sstack.pop();
                     }
+                } break;
+                
+                // Array access
+                case V_AstType::ArrayAccess: {
+                    auto acc = std::static_pointer_cast<AstArrayAccess>(op->lval);
+                    std::string value = ctx->sstack.top();
+                    ctx->sstack.pop();
+                    
+                    run_iexpression(ctx, acc->index);
+                    int idx = ctx->istack.top();
+                    ctx->istack.pop();
+                    
+                    ctx->sarray_map[acc->value][idx] = value;
                 } break;
                 
                 // Unknown lval

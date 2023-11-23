@@ -1,0 +1,14 @@
+
+func main -> i32 is
+    array x : i32[10];
+    print(x);
+    
+    x[2] := 20;
+    print(x);
+    
+    print(x[2]);
+    print(4 + x[2] + 2);
+    
+    return 0;
+end
+

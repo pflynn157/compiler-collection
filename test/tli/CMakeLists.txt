@@ -10,6 +10,8 @@ set(CORE_TEST_SRC
     cond1 cond2
     while1
     array1
+    int_array1 int_array2
+    str_array1
 )
 
 foreach(ITEM ${CORE_TEST_SRC})

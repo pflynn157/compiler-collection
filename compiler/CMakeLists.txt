@@ -34,6 +34,8 @@ set(JAVA_SRC
 
 set(INTR_SRC
     intr/interpreter.cpp
+    intr/function.cpp
+    intr/expression.cpp
 )
 
 add_library(compiler_base STATIC ${SRC})

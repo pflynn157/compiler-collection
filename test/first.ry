@@ -18,11 +18,11 @@ func main(args : string[]) is
     var y4 : i32 := x / 10;
     var y5 : i32 := x % 10;
     
-    print(x);
-    print(y1);
-    print(y2);
-    print(y3);
-    print(y4);
-    print(y5);
+    println(x);
+    #print(y1);
+    #print(y2);
+    #print(y3);
+    #print(y4);
+    #print(y5);
 end
 

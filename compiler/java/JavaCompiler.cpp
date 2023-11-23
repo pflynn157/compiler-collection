@@ -123,17 +123,20 @@ void Compiler::BuildVarDec(std::shared_ptr<AstStatement> stmt, std::shared_ptr<J
 
 // Builds a variable assignment
 void Compiler::BuildVarAssign(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function) {
-    std::shared_ptr<AstExprStatement> va = std::static_pointer_cast<AstExprStatement>(stmt);
-    
+    auto va = std::static_pointer_cast<AstExprStatement>(stmt);
     BuildExpr(va->expression, function, va->dataType);
     
-    switch (va->dataType->type) {
-        case V_AstType::Int32: {
-            int iPos = intMap[va->name];
-            builder->CreateIStore(function, iPos);
-        } break;
-        
-        default: {}
+    // TODO: Eventually get rid of this when we migrate from Espresso
+    if (va->expression->type != V_AstType::Assign) {
+        switch (va->dataType->type) {
+            case V_AstType::Int32: {
+                int iPos = intMap[va->name];
+                builder->CreateIStore(function, iPos);
+            } break;
+            
+            default: {}
+        }
+        return;
     }
 }
 
@@ -168,6 +171,8 @@ void Compiler::BuildFuncCallStatement(std::shared_ptr<AstStatement> stmt, std::s
     BuildExpr(fc->expression, function);
     
     signature = "(" + signature + ")V";
+    //fc->expression->print(); puts("");
+    //printf("NAME: %s | Sig: %s\n", fc->name.c_str(), signature.c_str());
     builder->CreateInvokeVirtual(function, fc->name, baseClass, signature);
 }
 
@@ -176,6 +181,13 @@ void Compiler::BuildExpr(std::shared_ptr<AstExpression> expr, std::shared_ptr<Ja
     if (expr == nullptr) return;
 
     switch (expr->type) {
+        case V_AstType::ExprList: {
+            auto list = std::static_pointer_cast<AstExprList>(expr);
+            for (auto const &item : list->list) {
+                BuildExpr(item, function, dataType);
+            }
+        } break;
+    
         case V_AstType::IntL: {
             auto i = std::static_pointer_cast<AstInt>(expr);
             builder->CreateBIPush(function, i->value);
@@ -203,6 +215,21 @@ void Compiler::BuildExpr(std::shared_ptr<AstExpression> expr, std::shared_ptr<Ja
                     }
                 }
             }*/
+        } break;
+        
+        case V_AstType::Assign: {
+            auto op = std::static_pointer_cast<AstBinaryOp>(expr);
+            BuildExpr(op->rval, function, dataType);
+            
+            auto id = std::static_pointer_cast<AstID>(op->lval);
+            switch (dataType->type) {
+                case V_AstType::Int32: {
+                    int iPos = intMap[id->value];
+                    builder->CreateIStore(function, iPos);
+                } break;
+                
+                default: {}
+            }
         } break;
         
         case V_AstType::Add: 
@@ -264,6 +291,11 @@ std::string Compiler::GetTypeForExpr(std::shared_ptr<AstExpression> expr) {
                 return "I";
             }
         } break;
+        
+        case V_AstType::ExprList: {
+            auto list = std::static_pointer_cast<AstExprList>(expr);
+            return GetTypeForExpr(list->list[0]);
+        };
         
         default: {}
     }

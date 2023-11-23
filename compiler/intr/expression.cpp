@@ -26,7 +26,11 @@ void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shar
         // Variables
         case V_AstType::ID: {
             auto id = std::static_pointer_cast<AstID>(expr);
-            ctx->istack.push(ctx->ivar_map[id->value]);
+            if (is_int_array(ctx, id->value)) {
+                ctx->sstack.push(id->value);
+            } else {
+                ctx->istack.push(ctx->ivar_map[id->value]);
+            }
         } break;
         
         case V_AstType::ArrayAccess: {
@@ -44,9 +48,21 @@ void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shar
                 auto args = std::static_pointer_cast<AstExprList>(fc->args);
                 auto mul = std::static_pointer_cast<AstMulOp>(args->list[0]);
                 run_iexpression(ctx, mul->rval);
+                int length = ctx->istack.top();
+                ctx->istack_array = std::vector<uint64_t>();
+                for (int i = 0; i<length; i++) {
+                    ctx->istack_array.push_back(0);
+                }
+                ctx->istack.pop();
             } else {
-                auto value = call_function(ctx, fc->name, std::static_pointer_cast<AstExprList>(fc->args));
-                ctx->istack.push(*std::get_if<uint64_t>(&value));
+                auto func = function_map[fc->name];
+                if (func && func->data_type->type == V_AstType::Ptr) {
+                    auto array = call_function(ctx, fc->name, std::static_pointer_cast<AstExprList>(fc->args));
+                    ctx->istack_array = *std::get_if<std::vector<uint64_t>>(&array);
+                } else {
+                    auto value = call_function(ctx, fc->name, std::static_pointer_cast<AstExprList>(fc->args));
+                    ctx->istack.push(*std::get_if<uint64_t>(&value));
+                }
             }
         } break;
         
@@ -60,14 +76,12 @@ void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shar
                 case V_AstType::ID: {
                     auto id = std::static_pointer_cast<AstID>(op->lval);
                     if (is_int_array(ctx, id->value)) {
-                        int length = ctx->istack.top();
-                        for (int i = 0; i<length; i++) {
-                            ctx->iarray_map[id->value].push_back(0);
-                        }
+                        ctx->iarray_map[id->value] = ctx->istack_array;
+                        ctx->istack_array.clear();
                     } else {
                         ctx->ivar_map[id->value] = ctx->istack.top();
+                        ctx->istack.pop();
                     }
-                    ctx->istack.pop();
                 } break;
                 
                 // Array access

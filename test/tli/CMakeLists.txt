@@ -14,7 +14,7 @@ set(CORE_TEST_SRC
     string1 string2 string3
     string_func1
     array_len
-    func_array1
+    func_array1 func_array2
 )
 
 foreach(ITEM ${CORE_TEST_SRC})

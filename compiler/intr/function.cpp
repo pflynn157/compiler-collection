@@ -47,6 +47,10 @@ vm_arg_list AstInterpreter::run_function(std::shared_ptr<AstFunction> func, std:
     
     // At the end, check the stack
     if (is_int_type(func->data_type)) {
+        if (func->data_type->type == V_AstType::Ptr) {
+            std::string name = ctx->sstack.top();
+            return ctx->iarray_map[name];
+        }
         if (ctx->istack.empty()) return (uint64_t)0;
         return ctx->istack.top();
     } else if (is_float_type(func->data_type)) {

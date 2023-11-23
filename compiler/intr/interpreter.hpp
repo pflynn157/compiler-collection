@@ -36,6 +36,7 @@ struct IntrContext {
     
     // For a few specific operations
     std::vector<uint64_t> istack_array;
+    std::vector<std::string> sstack_array;
 };
 
 //

@@ -1,5 +1,10 @@
 
-func get_array() -> string[] is
+func print_array(a:string[]) is
+    print(a);
+    print(length(a));
+end
+
+func main -> i32 is
     array x : string[6];
     print(x);
     
@@ -11,16 +16,8 @@ func get_array() -> string[] is
     x[5] := "!";
     
     print(x);
-    return x;
-end
-
-func main -> i32 is
-    array x : string[6];
-    x := get_array();
-    print(x);
-    print(length(x));
+    print_array(x);
     
     return 0;
 end
-
 

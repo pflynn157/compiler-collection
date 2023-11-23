@@ -57,6 +57,10 @@ vm_arg_list AstInterpreter::run_function(std::shared_ptr<AstFunction> func, std:
     
     } else if (is_string_type(func->data_type)) {
         std::string value = "";
+        if (func->data_type->type == V_AstType::Ptr) {
+            std::string name = ctx->sstack.top();
+            return ctx->sarray_map[name];
+        }
         if (!ctx->sstack.empty()) {
             value = ctx->sstack.top();
         }

@@ -1,5 +1,0 @@
-
-routine main(args : str[]) is
-    println("Hello!");
-end
-

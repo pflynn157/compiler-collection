@@ -11,8 +11,7 @@ Here is our current project list:
 * libjava -> A library for generating Java class files (no external libraries needed)
 * test -> The test system
 * riya-lang -> The first language, a mini educational language
-* espresso-lang -> An experimental language to test and demonstrate the libjava library
-* orka-lang-> A language based on Tiny-Lang, but with added features such as for loops, for-all loops, floating-point operations, and object oriented programming
+* orka-lang-> A language based on Riya, but with added features such as for loops, for-all loops, floating-point operations, and object oriented programming
 * lex -> A simple lexical analyzer generator (used by all languages except Espresso)
 * ast_interpreter -> A source level interpreter that can run the included AST
 

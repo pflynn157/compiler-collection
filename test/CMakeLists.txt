@@ -1,10 +1,7 @@
 add_subdirectory(riya/core)
 add_subdirectory(riya/output)
 add_subdirectory(riya/lex)
-
-add_subdirectory(espresso)
 add_subdirectory(orka)
-
 add_subdirectory(riyai)
 
 if (DISABLE_OUTPUT_TEST)
@@ -26,7 +23,6 @@ endif()
 add_custom_target(test DEPENDS
     test_llvm
     test_orka
-    test_espresso
     test_riyai
 )
 

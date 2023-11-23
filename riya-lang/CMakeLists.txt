@@ -33,9 +33,6 @@ target_link_libraries(riyac riya compiler)
 add_executable(riyai main_intr.cpp)
 target_link_libraries(riyai riya compiler_base compiler_intr)
 
-add_executable(riyajc main_java.cpp)
-target_link_libraries(riyajc riya compiler_base coffee-maker)
-
 # Enable dev linking mode
 if (DEV_LINK_MODE)
     target_compile_options(riyac PUBLIC

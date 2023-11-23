@@ -392,27 +392,33 @@ bool Parser::buildClassDec(std::shared_ptr<AstBlock> block) {
     }
     
     // Build the structure declaration
-    auto dec = std::make_shared<AstStructDec>(name, className);
-    block->addStatement(dec);
-    
-    classMap[name] = className;
-    
-    // Call the constructor
-    auto classRef = std::make_shared<AstID>(name);
-    auto args = std::make_shared<AstExprList>();
-    args->add_expression(classRef);
-    
-    std::string constructor = className + "_" + className;
-    auto fc = std::make_shared<AstFuncCallStmt>(constructor);
-    block->addStatement(fc);
-    fc->expression = args;
+    if (java) {
+        auto data_type = AstBuilder::buildObjectType(className);
+        auto dec = std::make_shared<AstVarDec>(name, data_type);
+        dec->class_name = className;
+        block->addStatement(dec);
+        
+        classMap[name] = className;
+        
+    } else {
+        auto dec = std::make_shared<AstStructDec>(name, className);
+        block->addStatement(dec);
+        
+        classMap[name] = className;
+        
+        // Call the constructor
+        auto classRef = std::make_shared<AstID>(name);
+        auto args = std::make_shared<AstExprList>();
+        args->add_expression(classRef);
+        
+        std::string constructor = className + "_" + className;
+        auto fc = std::make_shared<AstFuncCallStmt>(constructor);
+        block->addStatement(fc);
+        fc->expression = args;
+    }
     
     // Do the final syntax check
-    token = lex->get_next();
-    if (token != t_semicolon) {
-        syntax->addError(lex->line_number, "Expected terminator.");
-        return false;
-    }
+    consume_token(t_semicolon, "Expected terminator.");
     
     return true;
 }

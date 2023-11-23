@@ -21,6 +21,7 @@
 class Parser : public BaseParser {
 public:
     explicit Parser(std::string input);
+    explicit Parser(std::string input, bool java);
     ~Parser();
     
     bool parse();
@@ -83,5 +84,7 @@ private:
     
     std::shared_ptr<AstClass> currentClass = nullptr;
     std::map<std::string, std::string> classMap;
+    
+    bool java = false;
 };
 

@@ -26,11 +26,23 @@ set(SRC
 )
 
 # Build the LLVM-based compiler
-add_executable(okcc ${SRC} main.cpp)
-target_link_libraries(okcc compiler)
+add_library(orka STATIC ${SRC})
+
+add_executable(okcc main.cpp)
+target_link_libraries(okcc orka compiler)
+
+add_executable(okjc main_java.cpp)
+target_link_libraries(okjc orka compiler_base coffee-maker)
 
 # Enable dev linking mode
 if (DEV_LINK_MODE)
+    target_compile_options(orka PUBLIC
+        -DLINK_CORELIB_LOCATION="${CMAKE_BINARY_DIR}/orka-lang/lib/corelib"
+        -DLINK_STDLIB_LOCATION="${CMAKE_BINARY_DIR}/orka-lang/lib/stdlib"
+        -DORKA_HEADER_LOCATION="${CMAKE_SOURCE_DIR}/orka-lang/lib/stdlib/include"
+        -DLINK_MEMGC_LOCATION="${CMAKE_BINARY_DIR}/runtime/gc"
+    )
+    
     target_compile_options(okcc PUBLIC
         -DLINK_CORELIB_LOCATION="${CMAKE_BINARY_DIR}/orka-lang/lib/corelib"
         -DLINK_STDLIB_LOCATION="${CMAKE_BINARY_DIR}/orka-lang/lib/stdlib"

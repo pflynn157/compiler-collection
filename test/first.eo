@@ -1,27 +1,28 @@
 
 #OUTPUT
-#4
-#4
-#5
-#1
-#16
-#1
+#Hello!
+#Protected: Hello!!!
+#Private: Hello!!!
 #END
 
 #RET 0
 
-routine main(args : str[]) is
-    var x  : int := 4;
-    var a1 : int := x & 5;
-    var a2 : int := x | 5;
-    var a3 : int := x ^ 5;
-    var a4 : int := x << 2;
-    var a5 : int := x >> 2;
-    
-    println(x);
-    println(a1);
-    println(a2);
-    println(a3);
-    println(a4);
-    println(a5);
+public func sayHello is
+    println("Hello!");
+    this.sayHello2();
+    this.sayHello3();
 end
+
+protected func sayHello2 is
+    println("Protected: Hello!!!");
+end
+
+private func sayHello3 is
+    println("Private: Hello!!!");
+end
+
+routine main(args : str[]) is
+    var clazz : first;
+    clazz.sayHello();
+end
+

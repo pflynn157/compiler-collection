@@ -168,10 +168,18 @@ bool Parser::buildVariableAssign(std::shared_ptr<AstBlock> block, std::string va
     std::shared_ptr<AstExpression> expr = buildExpression(block, data_type, t_semicolon);
     if (!expr) return false;
     
-    std::shared_ptr<AstExprStatement> stmt = std::make_shared<AstExprStatement>();
-    stmt->setDataType(data_type);
-    stmt->expression = expr;
-    block->addStatement(stmt);
+    if (java && expr->type == V_AstType::FuncCallExpr) {
+        auto fc = std::static_pointer_cast<AstFuncCallExpr>(expr);
+        auto stmt = std::make_shared<AstFuncCallStmt>(fc->name);
+        stmt->object_name = fc->object_name;
+        //stmt->expression = fc->args;
+        block->addStatement(stmt);
+    } else {
+        auto stmt = std::make_shared<AstExprStatement>();
+        stmt->setDataType(data_type);
+        stmt->expression = expr;
+        block->addStatement(stmt);
+    }
     
     return true;
 }

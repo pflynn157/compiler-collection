@@ -136,7 +136,7 @@ bool Parser::build_identifier(std::shared_ptr<AstBlock> block, int tk, std::shar
             syntax->addWarning(0, "Function call on newline- possible logic error.");
         }
         
-        if (!block->isFunc(name)) {
+        if (!block->isFunc(name) && !java) {
             syntax->addError(0, "Unknown function call: " + name);
             return false;
         }
@@ -157,14 +157,18 @@ bool Parser::build_identifier(std::shared_ptr<AstBlock> block, int tk, std::shar
         tk = lex->get_next();
         if (tk == t_lparen) {
             std::string className = classMap[name];
-            className += "_" + lex->value;
+            std::string func_name = lex->value;
+            if (!java) {
+                func_name = className + "_" + lex->value;
+            }
             
-            auto fc = std::make_shared<AstFuncCallExpr>(className);
+            auto fc = std::make_shared<AstFuncCallExpr>(func_name);
             auto id = std::make_shared<AstID>(name);
+            fc->object_name = id->value;
             
             std::shared_ptr<AstExpression> args2 = buildExpression(block, ctx->varType, t_rparen, false, true);
             std::shared_ptr<AstExprList> args = std::static_pointer_cast<AstExprList>(args2);
-            args->list.insert(args->list.begin(), id);
+            if (!java) args->list.insert(args->list.begin(), id);
             fc->args = args;
             
             ctx->output.push(fc);

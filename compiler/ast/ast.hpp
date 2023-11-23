@@ -698,6 +698,7 @@ struct AstFuncCallExpr : AstExpression {
     // Member variables
     std::shared_ptr<AstExpression> args;
     std::string name = "";
+    std::string object_name;
 };
 
 // Represents the sizeof operator

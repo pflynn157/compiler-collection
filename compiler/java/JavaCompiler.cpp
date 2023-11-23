@@ -21,15 +21,39 @@ Compiler::Compiler(std::string className) {
 void Compiler::Build(std::shared_ptr<AstTree> tree) {
     // Generate the default constructor
     // TODO: We should check if there's a constructor before doing this
+    
+    // Check for constructors
+    bool found_const = false;
+    std::shared_ptr<AstBlock> const_block;
+    
+    for (auto GS : tree->block->block) {
+        if (GS->type != V_AstType::Func) continue;
+        auto funcAst = std::static_pointer_cast<AstFunction>(GS);
+        if (funcAst->name == className) {
+            found_const = true;
+            const_block = funcAst->block;
+            break;
+        }
+    }
+    
     std::shared_ptr<JavaFunction> construct = builder->CreateMethod("<init>", "()V");
-
+    
     builder->CreateALoad(construct, 0);
     builder->CreateInvokeSpecial(construct, "<init>", "java/lang/Object");
-    builder->CreateRetVoid(construct);
+    
+    if (found_const) {
+        for (auto const &stmt : const_block->block) {
+            BuildStatement(stmt, construct);
+        }
+    } else {
+        builder->CreateRetVoid(construct);
+    }
 
     // Build the functions (declarations only)
     for (auto GS : tree->block->block) {
         if (GS->type == V_AstType::Func) {
+            auto funcAst = std::static_pointer_cast<AstFunction>(GS);
+            if (funcAst->name == className) continue;
             BuildFunction(GS);
         }
     }
@@ -39,6 +63,9 @@ void Compiler::Build(std::shared_ptr<AstTree> tree) {
         if (GS->type == V_AstType::Func) {
             auto funcAst = std::static_pointer_cast<AstFunction>(GS);
             std::shared_ptr<JavaFunction> func = funcMap[funcAst->name];
+            if (funcAst->name == className) {
+                continue;
+            }
             
             for (auto const &stmt : funcAst->block->block) {
                 BuildStatement(stmt, func);

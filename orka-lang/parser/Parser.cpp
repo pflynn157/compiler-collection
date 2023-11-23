@@ -12,6 +12,11 @@
 #include <ast/ast_builder.hpp>
 #include <lex/lex.hpp>
 
+Parser::Parser(std::string input, bool java) : BaseParser(input) {
+    lex = std::make_unique<Lex>(input);
+    this->java = java;
+}
+
 Parser::Parser(std::string input) : BaseParser(input) {
     lex = std::make_unique<Lex>(input);
     
@@ -387,7 +392,11 @@ std::shared_ptr<AstDataType> Parser::buildDataType(bool checkBrackets) {
             }
                 
             if (isStruct) {
-                dataType = AstBuilder::buildStructType(lex->value);
+                if (java) {
+                    dataType = AstBuilder::buildObjectType(lex->value);
+                } else {
+                    dataType = AstBuilder::buildStructType(lex->value);
+                }
             }
         } break;
         

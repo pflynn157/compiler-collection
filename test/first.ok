@@ -1,22 +1,16 @@
+import std.io;
 
-func print_numbers(numbers:int[]) is
-    printf("[");
-    forall i in numbers do
-        printf("%d ", i);
+class first is
+    func first is
+        println("Rectange");
     end
-    printf("]\n");
+
+    func sayHello is
+        println("Hello!");
+    end
 end
 
-func main() -> int is
-    array numbers : int[10];
-    for i in 0 .. sizeof(numbers) step 1 do
-        numbers[i] := i + 1;
-    end
-    print_numbers(numbers);
-    
-    numbers := [x *2 : forall x in numbers];
-    print_numbers(numbers);
-    
-    return 0;
+func main is
+    class rect : first;
+    rect.sayHello();
 end
-

@@ -64,7 +64,7 @@ bool Parser::buildFunction(int startToken, std::string className) {
     tk = lex->get_next();
     std::string funcName = lex->value;
     
-    if (funcName == "main" && className == "") funcName = "__main";
+    if (funcName == "main" && className == "" && !java) funcName = "__main";
     
     if (tk != t_id) {
         syntax->addError(lex->line_number, "Expected function name.");
@@ -122,9 +122,16 @@ bool Parser::buildFunction(int startToken, std::string className) {
     func->block->mergeSymbols(tree->block);
     func->block->mergeSymbols(block);
     
+    func->routine = true;
+    func->attr = Attr::Public;
+    
     if (className != "") {
-        std::string fullName = className + "_" + funcName;
-        func->name = fullName;
+        if (java) {
+            func->routine = false;
+        } else {
+            std::string fullName = className + "_" + funcName;
+            func->name = fullName;
+        }
     }
     
     // Build the body
@@ -166,7 +173,7 @@ bool Parser::buildFunction(int startToken, std::string className) {
 // Builds a function call
 bool Parser::buildFunctionCallStmt(std::shared_ptr<AstBlock> block, std::string value) {
     // Make sure the function exists
-    if (!block->isFunc(value)) {
+    if (!block->isFunc(value) && !java) {
         syntax->addError(lex->line_number, "Unknown function.");
         return false;
     }

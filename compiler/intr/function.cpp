@@ -7,24 +7,38 @@
 
 //
 // For running functions
-// TODO: Change the parameter passing method
 //
-std::variant<uint64_t, float, std::string> AstInterpreter::run_function(std::shared_ptr<AstFunction> func, std::vector<uint64_t> args) {   
+vm_arg_list AstInterpreter::run_function(std::shared_ptr<AstFunction> func, std::vector<vm_arg_list> args) {   
     auto ctx = std::make_shared<IntrContext>();
     ctx->func_type = func->data_type;
     
     // Merge arguments into the symbol table
     for (int i = 0; i<func->args.size(); i++) {
         auto arg = func->args[i];
-        ctx->type_map[arg.name] = arg.type;
-        
-        if (is_int_type(arg.type)) {
-            ctx->ivar_map[arg.name] = args[i];
-        } else if (is_float_type(arg.type)) {
-        
-        } else if (is_string_type(arg.type)) {
-            std::string value = *(std::string*)(args[i]);
-            ctx->svar_map[arg.name] = value;
+        // Arrays
+        if (arg.type->type == V_AstType::Ptr) {
+            auto ptr = std::static_pointer_cast<AstPointerType>(arg.type);
+            ctx->type_map[arg.name] = ptr->base_type;
+            
+            if (is_int_type(ptr->base_type)) {
+                ctx->iarray_map[arg.name] = *std::get_if<std::vector<uint64_t>>(&args[i]);
+            } else if (is_float_type(ptr->base_type)) {
+            
+            } else if (is_string_type(ptr->base_type)) {
+                ctx->sarray_map[arg.name] = *std::get_if<std::vector<std::string>>(&args[i]);
+            }
+            
+        // Scalar variables
+        } else {
+            ctx->type_map[arg.name] = arg.type;
+            
+            if (is_int_type(arg.type)) {
+                ctx->ivar_map[arg.name] = *std::get_if<uint64_t>(&args[i]);
+            } else if (is_float_type(arg.type)) {
+            
+            } else if (is_string_type(arg.type)) {
+                ctx->svar_map[arg.name] = *std::get_if<std::string>(&args[i]);
+            }
         }
     }
     
@@ -48,7 +62,7 @@ std::variant<uint64_t, float, std::string> AstInterpreter::run_function(std::sha
     return (uint64_t)0;
 }
 
-std::variant<uint64_t, float, std::string> AstInterpreter::call_function(std::shared_ptr<IntrContext> ctx, std::string name, std::shared_ptr<AstExprList> args) {
+vm_arg_list AstInterpreter::call_function(std::shared_ptr<IntrContext> ctx, std::string name, std::shared_ptr<AstExprList> args) {
     // Handle the "length" call for arrays and strings
     if (name == "length") {
         auto arg1 = args->list[0];
@@ -71,24 +85,40 @@ std::variant<uint64_t, float, std::string> AstInterpreter::call_function(std::sh
     
     // Otherwise, pull from the table
     auto func = function_map[name];
-    std::vector<uint64_t> addrs;
+    std::vector<vm_arg_list> addrs;
     
     // TODO: Check type
     for (int i = 0; i<args->list.size(); i++) {
         auto arg = args->list[i];
         auto data_type = func->args[i].type;
-        if (is_int_type(data_type)) {
-            run_iexpression(ctx, arg);
-            uint64_t value = ctx->istack.top();
-            ctx->istack.pop();
-            addrs.push_back(value);
-        } else if (is_float_type(data_type)) {
         
-        } else if (is_string_type(data_type)) {
-            run_sexpression(ctx, arg);
-            std::string value = ctx->sstack.top();
-            ctx->sstack.pop();
-            addrs.push_back((uint64_t)&value);
+        // Pointers
+        if (data_type->type == V_AstType::Ptr) {
+            auto base_type = std::static_pointer_cast<AstPointerType>(data_type)->base_type;
+            auto id = std::static_pointer_cast<AstID>(arg);
+            if (is_int_type(base_type)) {
+                addrs.push_back(ctx->iarray_map[id->value]);
+            } else if (is_float_type(base_type)) {
+            
+            } else if (is_string_type(base_type)) {
+                addrs.push_back(ctx->sarray_map[id->value]);
+            }
+            
+        // Everything else
+        } else {
+            if (is_int_type(data_type)) {
+                run_iexpression(ctx, arg);
+                uint64_t value = ctx->istack.top();
+                ctx->istack.pop();
+                addrs.push_back(value);
+            } else if (is_float_type(data_type)) {
+            
+            } else if (is_string_type(data_type)) {
+                run_sexpression(ctx, arg);
+                std::string value = ctx->sstack.top();
+                ctx->sstack.pop();
+                addrs.push_back(value);
+            }
         }
     }
     

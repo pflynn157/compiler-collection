@@ -32,7 +32,7 @@ int AstInterpreter::run() {
         return 1;
     }
     
-    auto val = run_function(function_map["main"], std::vector<uint64_t>());
+    auto val = run_function(function_map["main"], std::vector<vm_arg_list>());
     return *std::get_if<uint64_t>(&val);
 }
 
@@ -91,7 +91,7 @@ void AstInterpreter::run_var_decl(std::shared_ptr<IntrContext> ctx, std::shared_
         auto ptr_type = std::static_pointer_cast<AstPointerType>(vd->data_type);
         ctx->type_map[vd->name] = ptr_type->base_type;
         if (is_int_type(ptr_type->base_type)) {
-            ctx->iarray_map[vd->name] = std::vector<int>();
+            ctx->iarray_map[vd->name] = std::vector<uint64_t>();
         } else if (is_float_type(ptr_type->base_type)) {
         
         } else if (is_string_type(ptr_type->base_type)) {

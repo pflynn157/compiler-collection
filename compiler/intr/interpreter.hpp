@@ -26,7 +26,7 @@ struct IntrContext {
     std::map<std::string, std::string> svar_map;
     
     // For array storage
-    std::map<std::string, std::vector<int>> iarray_map;
+    std::map<std::string, std::vector<uint64_t>> iarray_map;
     std::map<std::string, std::vector<std::string>> sarray_map;
     
     // For expression evaluation
@@ -36,6 +36,11 @@ struct IntrContext {
 };
 
 //
+// For passing arguments
+//
+typedef std::variant<uint64_t, float, std::string, std::vector<uint64_t>, std::vector<float>, std::vector<std::string>> vm_arg_list;
+
+//
 // This handles running the actual interpreter
 //
 struct AstInterpreter {
@@ -43,8 +48,8 @@ struct AstInterpreter {
     int run();
     
     // function.cpp
-    std::variant<uint64_t, float, std::string> run_function(std::shared_ptr<AstFunction> func, std::vector<uint64_t> args);
-    std::variant<uint64_t, float, std::string> call_function(std::shared_ptr<IntrContext> ctx, std::string name, std::shared_ptr<AstExprList> args);
+    vm_arg_list run_function(std::shared_ptr<AstFunction> func, std::vector<vm_arg_list> args);
+    vm_arg_list call_function(std::shared_ptr<IntrContext> ctx, std::string name, std::shared_ptr<AstExprList> args);
     void run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstExprList> args);
     
     // interpreter.cpp

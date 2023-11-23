@@ -172,7 +172,13 @@ void AstInterpreter::run_sexpression(std::shared_ptr<IntrContext> ctx, std::shar
             run_iexpression(ctx, acc->index);
             int idx = ctx->istack.top();
             ctx->istack.pop();
-            ctx->sstack.push(ctx->sarray_map[acc->value][idx]);
+            
+            if (ctx->type_map[acc->value]->type == V_AstType::String) {
+                char c = ctx->svar_map[acc->value][idx];
+                ctx->sstack.push(std::string(1, c));
+            } else {
+                ctx->sstack.push(ctx->sarray_map[acc->value][idx]);
+            }
         } break;
         
         // Function call expression

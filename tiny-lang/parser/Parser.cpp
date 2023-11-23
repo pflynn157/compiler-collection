@@ -12,8 +12,9 @@
 #include <ast/ast_builder.hpp>
 #include <lex/lex.hpp>
 
-Parser::Parser(std::string input) : BaseParser(input) {
+Parser::Parser(std::string input, bool ignore_invalid_funcs) : BaseParser(input) {
     lex = std::make_unique<Lex>(input);
+    this->ignore_invalid_funcs = ignore_invalid_funcs;
     
     // Add the built-in functions
     //string malloc(string)

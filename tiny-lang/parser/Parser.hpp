@@ -20,7 +20,7 @@
 // It is also in charge of the error manager
 class Parser : public BaseParser {
 public:
-    explicit Parser(std::string input);
+    explicit Parser(std::string input, bool ignore_invalid_funcs = false);
     ~Parser();
     
     bool parse();
@@ -71,6 +71,6 @@ protected:
     std::shared_ptr<AstDataType> buildDataType(bool checkBrackets = true);
     void consume_token(token expected, std::string msg);
 private:
-    //std::unique_ptr<Lex> lex;
+    bool ignore_invalid_funcs;
 };
 

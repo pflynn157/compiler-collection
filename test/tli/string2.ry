@@ -1,0 +1,13 @@
+
+func main -> i32 is
+    var c : char := '!';
+    var s : string := "Hello!";
+    
+    print(s[1]);
+    
+    c := s[4];
+    print(c);
+    
+    return 0;
+end
+

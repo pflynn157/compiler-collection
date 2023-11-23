@@ -1,0 +1,18 @@
+
+func main -> i32 is
+    var s : string := "Hello!";
+    
+    var i : i32 := length(s);
+    print(i);
+    print(length(s));
+    
+    i := 0;
+    while i < length(s) do
+        var c : char := s[i];
+        print(c);
+        i := i + 1;
+    end
+    
+    return 0;
+end
+

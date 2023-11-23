@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     }
     
     // Now parse the input
-    auto parser = std::make_unique<Parser>(input);
+    auto parser = std::make_unique<Parser>(input, true);
     if (!parser->parse()) {
         return 1;
     }

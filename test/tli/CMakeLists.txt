@@ -5,14 +5,15 @@ set(CORE_TEST_SRC
     iprint1
     func1 func2 func3 func4 func5 func6 func7
     func8 func9 func10
-    string1
-    string_func1
     cond1 cond2
     while1
     array1
     int_array1 int_array2
     str_array1
     char1
+    string1 string2 string3
+    string_func1
+    array_len
 )
 
 foreach(ITEM ${CORE_TEST_SRC})

@@ -112,7 +112,7 @@ bool Parser::build_identifier(std::shared_ptr<AstBlock> block, int tk, std::shar
             syntax->addWarning(lex->line_number, "Function call on newline- possible logic error.");
         }
         
-        if (!block->isFunc(name)) {
+        if (!ignore_invalid_funcs && !block->isFunc(name)) {
             syntax->addError(lex->line_number, "Unknown function call.");
             return false;
         }

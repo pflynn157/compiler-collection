@@ -49,6 +49,27 @@ std::variant<uint64_t, float, std::string> AstInterpreter::run_function(std::sha
 }
 
 std::variant<uint64_t, float, std::string> AstInterpreter::call_function(std::shared_ptr<IntrContext> ctx, std::string name, std::shared_ptr<AstExprList> args) {
+    // Handle the "length" call for arrays and strings
+    if (name == "length") {
+        auto arg1 = args->list[0];
+        if (arg1->type == V_AstType::ID) {
+            auto id = std::static_pointer_cast<AstID>(arg1);
+            if (is_int_array(ctx, id->value)) {
+                return (uint64_t)ctx->iarray_map[id->value].size();
+            } else if (is_float_array(ctx, id->value)) {
+            
+            } else if (is_string_array(ctx, id->value)) {
+                return (uint64_t)ctx->sarray_map[id->value].size();
+            } else if (ctx->type_map[id->value]->type == V_AstType::String) {
+                return (uint64_t)ctx->svar_map[id->value].length();
+            }
+        } else if (arg1->type == V_AstType::StringL) {
+            auto s = std::static_pointer_cast<AstString>(arg1);
+            return (uint64_t)s->value.length();
+        }
+    }
+    
+    // Otherwise, pull from the table
     auto func = function_map[name];
     std::vector<uint64_t> addrs;
     
@@ -151,6 +172,8 @@ void AstInterpreter::run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr
                 
                 } else if (is_string_array(ctx, acc->value)) {
                     std::cout << ctx->sarray_map[acc->value][idx];
+                } else if (ctx->type_map[acc->value]->type == V_AstType::String) {
+                    std::cout << ctx->svar_map[acc->value][idx];
                 }
             } break;
             
@@ -159,13 +182,21 @@ void AstInterpreter::run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr
             case V_AstType::FuncCallExpr: {
                 auto fc = std::static_pointer_cast<AstFuncCallExpr>(arg);
                 auto value = call_function(ctx, fc->name, std::static_pointer_cast<AstExprList>(fc->args));
-                auto func_type = function_map[fc->name]->data_type;
-                if (is_int_type(func_type)) {
-                    std::cout << *std::get_if<uint64_t>(&value);
-                } else if (is_float_type(func_type)) {
                 
-                } else if (is_string_type(func_type)) {
-                    std::cout << *std::get_if<std::string>(&value);
+                // The length function
+                if (fc->name == "length") {
+                    std::cout << *std::get_if<uint64_t>(&value);
+                    
+                // All other functions
+                } else {
+                    auto func_type = function_map[fc->name]->data_type;
+                    if (is_int_type(func_type)) {
+                        std::cout << *std::get_if<uint64_t>(&value);
+                    } else if (is_float_type(func_type)) {
+                    
+                    } else if (is_string_type(func_type)) {
+                        std::cout << *std::get_if<std::string>(&value);
+                    }
                 }
             } break;
             

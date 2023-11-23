@@ -137,7 +137,7 @@ bool Parser::buildFunction(int startToken, std::string className) {
 // TODO: Pass variable name in from block parser
 bool Parser::buildFunctionCallStmt(std::shared_ptr<AstBlock> block, std::string fc_name) {
     // Make sure the function exists
-    if (!block->isFunc(fc_name)) {
+    if (!ignore_invalid_funcs && !block->isFunc(fc_name)) {
         syntax->addError(0, "Unknown function.");
         return false;
     }

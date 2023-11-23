@@ -87,6 +87,12 @@ void AstInterpreter::run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr
                 std::cout << s->value;
             } break;
             
+            // Print a character literal
+            case V_AstType::CharL: {
+                auto c = std::static_pointer_cast<AstChar>(arg);
+                std::cout << c->value;
+            } break;
+            
             // Print an integer literal
             case V_AstType::IntL: {
                 auto i = std::static_pointer_cast<AstInt>(arg);

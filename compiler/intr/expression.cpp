@@ -151,6 +151,11 @@ void AstInterpreter::run_sexpression(std::shared_ptr<IntrContext> ctx, std::shar
             ctx->sstack.push(std::to_string(i->value));
         } break;
         
+        case V_AstType::CharL: {
+            auto c = std::static_pointer_cast<AstChar>(expr);
+            ctx->sstack.push(std::string(1, c->value));
+        } break;
+        
         case V_AstType::StringL: {
             auto s = std::static_pointer_cast<AstString>(expr);
             ctx->sstack.push(s->value);

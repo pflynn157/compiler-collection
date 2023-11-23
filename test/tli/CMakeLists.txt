@@ -12,6 +12,7 @@ set(CORE_TEST_SRC
     array1
     int_array1 int_array2
     str_array1
+    char1
 )
 
 foreach(ITEM ${CORE_TEST_SRC})

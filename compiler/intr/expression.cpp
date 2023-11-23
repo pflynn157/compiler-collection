@@ -65,6 +65,12 @@ void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shar
         case V_AstType::Xor:
         case V_AstType::Lsh:
         case V_AstType::Rsh:
+        case V_AstType::EQ:
+        case V_AstType::NEQ:
+        case V_AstType::GT:
+        case V_AstType::LT:
+        case V_AstType::GTE:
+        case V_AstType::LTE:
         {
             auto op = std::static_pointer_cast<AstBinaryOp>(expr);
             run_iexpression(ctx, op->lval);
@@ -85,6 +91,12 @@ void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shar
             else if (expr->type == V_AstType::Xor) ctx->istack.push(lval ^ rval);
             else if (expr->type == V_AstType::Lsh) ctx->istack.push(lval << rval);
             else if (expr->type == V_AstType::Rsh) ctx->istack.push(lval >> rval);
+            else if (expr->type == V_AstType::EQ)  ctx->istack.push((int)(lval == rval));
+            else if (expr->type == V_AstType::NEQ) ctx->istack.push((int)(lval != rval));
+            else if (expr->type == V_AstType::GT)  ctx->istack.push((int)(lval > rval));
+            else if (expr->type == V_AstType::LT)  ctx->istack.push((int)(lval < rval));
+            else if (expr->type == V_AstType::GTE) ctx->istack.push((int)(lval >= rval));
+            else if (expr->type == V_AstType::LTE) ctx->istack.push((int)(lval <= rval));
         } break;
         
         default: {}

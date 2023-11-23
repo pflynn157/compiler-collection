@@ -107,6 +107,12 @@ std::shared_ptr<AstDataType> AstInterpreter::interpret_type(std::shared_ptr<Intr
         case V_AstType::Xor:
         case V_AstType::Lsh:
         case V_AstType::Rsh:
+        case V_AstType::EQ:
+        case V_AstType::NEQ:
+        case V_AstType::GT:
+        case V_AstType::LT:
+        case V_AstType::GTE:
+        case V_AstType::LTE:
         {
             auto op = std::static_pointer_cast<AstBinaryOp>(expr);
             auto d_type = interpret_type(ctx, op->lval);

@@ -132,6 +132,12 @@ void AstInterpreter::run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr
             case V_AstType::Xor:
             case V_AstType::Lsh:
             case V_AstType::Rsh:
+            case V_AstType::EQ:
+            case V_AstType::NEQ:
+            case V_AstType::GT:
+            case V_AstType::LT:
+            case V_AstType::GTE:
+            case V_AstType::LTE:
             {
                 auto data_type = interpret_type(ctx, arg);
                 if (data_type == nullptr) {
@@ -147,7 +153,10 @@ void AstInterpreter::run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr
                 // TODO: Other types here
             } break;
             
-            default: {}
+            default: {
+                std::cout << "[ERR:INVALID_EXPR]: ";
+                arg->print();
+            }
         }
     }
     

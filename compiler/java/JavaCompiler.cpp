@@ -141,7 +141,7 @@ void Compiler::BuildVarAssign(std::shared_ptr<AstStatement> stmt, std::shared_pt
 void Compiler::BuildFuncCallStatement(std::shared_ptr<AstStatement> stmt, std::shared_ptr<JavaFunction> function) {
     auto fc = std::static_pointer_cast<AstFuncCallStmt>(stmt);
     
-    if (fc->name == "println") {
+    if (fc->name == "println" || fc->name == "print") {
         builder->CreateGetStatic(function, "out");
     }
     

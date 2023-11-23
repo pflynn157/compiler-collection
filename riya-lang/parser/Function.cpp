@@ -106,6 +106,10 @@ bool Parser::buildFunction(int startToken, std::string className) {
     func->block->mergeSymbols(tree->block);
     func->block->mergeSymbols(block);
     
+    // For the Java backend
+    func->routine = true;
+    func->attr = Attr::Public;
+    
     // Build the body
     int stopLayer = 0;
     if (!buildBlock(func->block)) return false;

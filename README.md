@@ -12,7 +12,7 @@ Here is our current project list:
 * test -> The test system
 * riya-lang -> The first language, a mini educational language
 * orka-lang-> A language based on Riya, but with added features such as for loops, for-all loops, floating-point operations, and object oriented programming
-* lex -> A simple lexical analyzer generator (used by all languages except Espresso)
+* lex -> A simple lexical analyzer generator
 * ast_interpreter -> A source level interpreter that can run the included AST
 
 ### Licensing

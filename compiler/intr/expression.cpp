@@ -32,8 +32,14 @@ void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shar
         // Function call expression
         case V_AstType::FuncCallExpr: {
             auto fc = std::static_pointer_cast<AstFuncCallExpr>(expr);
-            auto value = call_function(ctx, fc->name, std::static_pointer_cast<AstExprList>(fc->args));
-            ctx->istack.push(*std::get_if<uint64_t>(&value));
+            if (fc->name == "malloc" || fc->name == "gc_alloc") {
+                auto args = std::static_pointer_cast<AstExprList>(fc->args);
+                auto mul = std::static_pointer_cast<AstMulOp>(args->list[0]);
+                run_iexpression(ctx, mul->rval);
+            } else {
+                auto value = call_function(ctx, fc->name, std::static_pointer_cast<AstExprList>(fc->args));
+                ctx->istack.push(*std::get_if<uint64_t>(&value));
+            }
         } break;
         
         // Assign operator
@@ -45,7 +51,14 @@ void AstInterpreter::run_iexpression(std::shared_ptr<IntrContext> ctx, std::shar
                 // Simple variables
                 case V_AstType::ID: {
                     auto id = std::static_pointer_cast<AstID>(op->lval);
-                    ctx->ivar_map[id->value] = ctx->istack.top();
+                    if (is_int_array(ctx, id->value)) {
+                        int length = ctx->istack.top();
+                        for (int i = 0; i<length; i++) {
+                            ctx->iarray_map[id->value].push_back(0);
+                        }
+                    } else {
+                        ctx->ivar_map[id->value] = ctx->istack.top();
+                    }
                     ctx->istack.pop();
                 } break;
                 
@@ -131,8 +144,14 @@ void AstInterpreter::run_sexpression(std::shared_ptr<IntrContext> ctx, std::shar
         // Function call expression
         case V_AstType::FuncCallExpr: {
             auto fc = std::static_pointer_cast<AstFuncCallExpr>(expr);
-            auto value = call_function(ctx, fc->name, std::static_pointer_cast<AstExprList>(fc->args));
-            ctx->sstack.push(*std::get_if<std::string>(&value));
+            if (fc->name == "malloc" || fc->name == "gc_alloc") {
+                auto args = std::static_pointer_cast<AstExprList>(fc->args);
+                auto mul = std::static_pointer_cast<AstMulOp>(args->list[0]);
+                run_iexpression(ctx, mul->rval);
+            } else {
+                auto value = call_function(ctx, fc->name, std::static_pointer_cast<AstExprList>(fc->args));
+                ctx->sstack.push(*std::get_if<std::string>(&value));
+            }
         } break;
         
         // Assign operator
@@ -144,8 +163,16 @@ void AstInterpreter::run_sexpression(std::shared_ptr<IntrContext> ctx, std::shar
                 // Simple variables
                 case V_AstType::ID: {
                     auto id = std::static_pointer_cast<AstID>(op->lval);
-                    ctx->svar_map[id->value] = ctx->sstack.top();
-                    ctx->sstack.pop();
+                    if (is_string_array(ctx, id->value)) {
+                        int length = ctx->istack.top();
+                        for (int i = 0; i<length; i++) {
+                            ctx->sarray_map[id->value].push_back("");
+                        }
+                        ctx->istack.pop();
+                    } else {
+                        ctx->svar_map[id->value] = ctx->sstack.top();
+                        ctx->sstack.pop();
+                    }
                 } break;
                 
                 // Unknown lval

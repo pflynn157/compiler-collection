@@ -7,6 +7,7 @@
 
 //
 // For running functions
+// TODO: Change the parameter passing method
 //
 std::variant<uint64_t, float, std::string> AstInterpreter::run_function(std::shared_ptr<AstFunction> func, std::vector<uint64_t> args) {   
     auto ctx = std::make_shared<IntrContext>();
@@ -17,7 +18,6 @@ std::variant<uint64_t, float, std::string> AstInterpreter::run_function(std::sha
         auto arg = func->args[i];
         ctx->type_map[arg.name] = arg.type;
         
-        // TODO: Check type
         if (is_int_type(arg.type)) {
             ctx->ivar_map[arg.name] = args[i];
         } else if (is_float_type(arg.type)) {
@@ -94,15 +94,41 @@ void AstInterpreter::run_print(std::shared_ptr<IntrContext> ctx, std::shared_ptr
             } break;
             
             // Identifier
+            // TODO: Eventually clean this up
             case V_AstType::ID: {
                 auto id = std::static_pointer_cast<AstID>(arg);
                 auto data_type = ctx->type_map[id->value];
+                
+                // Integers
                 if (is_int_type(data_type)) {
-                    std::cout << ctx->ivar_map[id->value];
+                    if (is_int_array(ctx, id->value)) {
+                        auto array = ctx->iarray_map[id->value];
+                        std::cout << "[";
+                        for (int i = 0; i<array.size(); i++) {
+                            std::cout << array[i];
+                            if (i+1 < array.size()) std::cout << ", ";
+                        }
+                        std::cout << "]";
+                    } else {
+                        std::cout << ctx->ivar_map[id->value];
+                    }
+                
+                // Floatss
                 } else if (is_float_type(data_type)) {
                 
+                // Strings
                 } else if (is_string_type(data_type)) {
-                    std::cout << ctx->svar_map[id->value];
+                    if (is_string_array(ctx, id->value)) {
+                        auto array = ctx->sarray_map[id->value];
+                        std::cout << "[";
+                        for (int i = 0; i<array.size(); i++) {
+                            std::cout << "\"" << array[i] << "\"";
+                            if (i+1 < array.size()) std::cout << ", ";
+                        }
+                        std::cout << "]";
+                    } else {
+                        std::cout << ctx->svar_map[id->value];
+                    }
                 }
             } break;
             

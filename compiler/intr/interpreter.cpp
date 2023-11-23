@@ -51,18 +51,8 @@ void AstInterpreter::run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr
                 run_expression(ctx, stmt2->expression, stmt2->dataType);
             } break;
         
-            // Variable declarations
-            case V_AstType::VarDec: {
-                auto vd = std::static_pointer_cast<AstVarDec>(stmt);
-                ctx->type_map[vd->name] = vd->data_type;
-                if (is_int_type(vd->data_type)) {
-                    ctx->ivar_map[vd->name] = 0;
-                } else if (is_float_type(vd->data_type)) {
-                
-                } else if (is_string_type(vd->data_type)) {
-                    ctx->svar_map[vd->name] = "";
-                }
-            } break;
+            // Variable and array declarations
+            case V_AstType::VarDec: run_var_decl(ctx, stmt); break;
         
             // Return statements
             case V_AstType::Return: {
@@ -86,6 +76,37 @@ void AstInterpreter::run_block(std::shared_ptr<IntrContext> ctx, std::shared_ptr
             case V_AstType::While: run_while(ctx, stmt); break;
             
             default: {}
+        }
+    }
+}
+
+//
+// Variable and array declarations
+//
+void AstInterpreter::run_var_decl(std::shared_ptr<IntrContext> ctx, std::shared_ptr<AstStatement> stmt) {
+    auto vd = std::static_pointer_cast<AstVarDec>(stmt);
+    
+    // Arrays need slightly different treatment
+    if (vd->data_type->type == V_AstType::Ptr) {
+        auto ptr_type = std::static_pointer_cast<AstPointerType>(vd->data_type);
+        ctx->type_map[vd->name] = ptr_type->base_type;
+        if (is_int_type(ptr_type->base_type)) {
+            ctx->iarray_map[vd->name] = std::vector<int>();
+        } else if (is_float_type(ptr_type->base_type)) {
+        
+        } else if (is_string_type(ptr_type->base_type)) {
+            ctx->sarray_map[vd->name] = std::vector<std::string>();
+        }
+        
+    // Regular scalar variables go right into the normal variable tables
+    } else {
+        ctx->type_map[vd->name] = vd->data_type;
+        if (is_int_type(vd->data_type)) {
+            ctx->ivar_map[vd->name] = 0;
+        } else if (is_float_type(vd->data_type)) {
+        
+        } else if (is_string_type(vd->data_type)) {
+            ctx->svar_map[vd->name] = "";
         }
     }
 }
@@ -177,6 +198,11 @@ bool AstInterpreter::is_int_type(std::shared_ptr<AstDataType> data_type) {
         case V_AstType::Int32:
         case V_AstType::Int64: return true;
         
+        case V_AstType::Ptr: {
+            auto ptr = std::static_pointer_cast<AstPointerType>(data_type);
+            return is_int_type(ptr->base_type);
+        }
+        
         default: {}
     }
     
@@ -187,6 +213,11 @@ bool AstInterpreter::is_float_type(std::shared_ptr<AstDataType> data_type) {
     switch (data_type->type) {
         case V_AstType::Float32:
         case V_AstType::Float64: return true;
+        
+        case V_AstType::Ptr: {
+            auto ptr = std::static_pointer_cast<AstPointerType>(data_type);
+            return is_float_type(ptr->base_type);
+        }
         
         default: {}
     }
@@ -199,9 +230,31 @@ bool AstInterpreter::is_string_type(std::shared_ptr<AstDataType> data_type) {
         case V_AstType::Char:
         case V_AstType::String: return true;
         
+        case V_AstType::Ptr: {
+            auto ptr = std::static_pointer_cast<AstPointerType>(data_type);
+            return is_string_type(ptr->base_type);
+        }
+        
         default: {}
     }
     
     return false;
+}
+
+//
+// Helper functions for determining if a variable is an array of one of the general types
+//
+bool AstInterpreter::is_int_array(std::shared_ptr<IntrContext> ctx, std::string name) {
+    if (ctx->iarray_map.find(name) == ctx->iarray_map.end()) return false;
+    return true;
+}
+
+bool AstInterpreter::is_float_array(std::shared_ptr<IntrContext> ctx, std::string name) {
+    return false;
+}
+
+bool AstInterpreter::is_string_array(std::shared_ptr<IntrContext> ctx, std::string name) {
+    if (ctx->sarray_map.find(name) == ctx->sarray_map.end()) return false;
+    return true;
 }
 

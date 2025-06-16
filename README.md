@@ -1,6 +1,6 @@
-## Laado Compiler Collection
+## Compiler Collection
 
-Welcome to the Laado compiler collection. This is a collection of various experimental programming languages meant to explore and solve specific problems.
+Welcome to my small compiler collection. This is a collection of various experimental programming languages meant to explore and solve specific problems.
 
 However, this is not just a collection of languages. This is meant to be a complete compiler collection. Many of the languages use LLVM for the backend, but we also have in-development sub-projects meant to be replacements for various external dependencies.
 
@@ -19,3 +19,6 @@ Here is our current project list:
 
 This project is not licensed and placed in the public domain. Please see my website for more information on this decision.
 
+### Update: June 2025
+
+I went through and cleaned out a ton of repositories, but kept this one since it was a merger of several compiler and system projects from a while back, and since it was a conglomeration of projects that I was actually proud of. That said, I really don't maintain this at the moment, so take what's here for what it is worth.
